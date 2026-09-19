@@ -1,23 +1,25 @@
-/* Gold AI — thème "sombre trading pro", accent or.
+/* Gold AI — thème "sombre néon fintech", accent bleu/cyan.
    Variables centralisées en haut : pour changer le look plus tard,
    modifier ici plutôt que de chercher dans tout le fichier. */
 
 :root {
-  --fond: #0d0f12;
-  --fond-carte: #16191e;
-  --fond-carte-survol: #1c2027;
-  --bordure: #262b33;
-  --texte: #e8e6e1;
-  --texte-attenue: #8a8f98;
-  --or: #d4af37;
-  --or-clair: #e8c968;
-  --vert: #2ecc71;
-  --vert-fond: rgba(46, 204, 113, 0.12);
-  --rouge: #e74c3c;
-  --rouge-fond: rgba(231, 76, 60, 0.12);
-  --orange: #e0983c;
+  --fond: #090d15;
+  --fond-carte: #121a28;
+  --fond-carte-survol: #182236;
+  --bordure: #223049;
+  --texte: #e8edf5;
+  --texte-attenue: #78899e;
+  --accent: #22d3ee;
+  --accent-clair: #7ee8fa;
+  --accent-texte: #04141a;
+  --vert: #2fe0a3;
+  --vert-fond: rgba(47, 224, 163, 0.12);
+  --rouge: #ff4d6d;
+  --rouge-fond: rgba(255, 77, 109, 0.14);
+  --orange: #ffb454;
   --rayon: 12px;
-  --ombre: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --ombre: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --lueur-accent: 0 0 18px rgba(34, 211, 238, 0.35);
 }
 
 * {
@@ -61,7 +63,7 @@ input {
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: var(--or);
+  color: var(--accent);
 }
 
 .entete .sous-titre {
@@ -127,7 +129,8 @@ h2.titre-section {
 
 .champ input:focus {
   outline: none;
-  border-color: var(--or);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
 }
 
 .ligne-champs {
@@ -143,18 +146,19 @@ h2.titre-section {
   gap: 8px;
   width: 100%;
   padding: 14px;
-  background: var(--or);
-  color: #1a1508;
+  background: var(--accent);
+  color: var(--accent-texte);
   border: none;
   border-radius: 8px;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s ease;
+  box-shadow: var(--lueur-accent);
+  transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .bouton:active {
-  background: var(--or-clair);
+  background: var(--accent-clair);
 }
 
 .bouton.secondaire {
@@ -177,9 +181,10 @@ h2.titre-section {
   align-items: baseline;
   padding: 14px 16px;
   background: var(--fond);
-  border: 1px solid var(--or);
+  border: 1px solid var(--accent);
   border-radius: var(--rayon);
   margin-bottom: 14px;
+  box-shadow: var(--lueur-accent);
 }
 
 .resultat-risque .label {
@@ -190,7 +195,7 @@ h2.titre-section {
 .resultat-risque .valeur {
   font-size: 22px;
   font-weight: 700;
-  color: var(--or);
+  color: var(--accent);
 }
 
 .paliers {
@@ -299,7 +304,7 @@ h2.titre-section {
 }
 
 .badge-impact.medium {
-  background: rgba(224, 152, 60, 0.15);
+  background: rgba(255, 180, 84, 0.15);
   color: var(--orange);
 }
 
@@ -345,7 +350,7 @@ h2.titre-section {
 
 .modale h3 {
   margin: 0 0 4px;
-  color: var(--or);
+  color: var(--accent);
   font-size: 17px;
 }
 
@@ -389,8 +394,8 @@ h2.titre-section {
 .bloc-avertissement {
   margin-top: 16px;
   padding: 12px 14px;
-  background: rgba(224, 152, 60, 0.1);
-  border: 1px solid rgba(224, 152, 60, 0.3);
+  background: rgba(255, 180, 84, 0.1);
+  border: 1px solid rgba(255, 180, 84, 0.3);
   border-radius: 10px;
   font-size: 12px;
   color: var(--orange);
@@ -570,8 +575,9 @@ h2.titre-section {
 }
 
 .case-jour.aujourdhui {
-  border-color: var(--or);
+  border-color: var(--accent);
   border-width: 2px;
+  box-shadow: var(--lueur-accent);
 }
 
 .liste-trades-jour {
@@ -651,7 +657,7 @@ nav.barre-onglets button .icone-onglet {
 }
 
 nav.barre-onglets button.actif {
-  color: var(--or);
+  color: var(--accent);
 }
 
 /* ---------- Petit écran ---------- */

@@ -6,9 +6,9 @@ doré sur fond sombre avec "Au" (symbole chimique de l'or) dessus.
 
 from PIL import Image, ImageDraw, ImageFont
 
-FOND = (13, 15, 18)       # anthracite très sombre (cohérent avec le thème "sombre trading pro")
-OR = (212, 175, 55)       # doré
-OR_CLAIR = (232, 199, 99)
+FOND = (9, 13, 21)        # bleu-noir très sombre (thème "sombre néon fintech")
+ACCENT = (34, 211, 238)   # cyan néon
+ACCENT_CLAIR = (126, 232, 250)
 
 
 def generer(taille, chemin):
@@ -18,7 +18,7 @@ def generer(taille, chemin):
     marge = int(taille * 0.08)
     draw.ellipse(
         [marge, marge, taille - marge, taille - marge],
-        outline=OR,
+        outline=ACCENT,
         width=max(2, int(taille * 0.03)),
     )
 
@@ -26,7 +26,7 @@ def generer(taille, chemin):
     centre = taille // 2
     draw.ellipse(
         [centre - rayon_interieur, centre - rayon_interieur, centre + rayon_interieur, centre + rayon_interieur],
-        fill=OR,
+        fill=ACCENT,
     )
 
     texte = "Au"
