@@ -24,10 +24,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Enregistrement du service worker : c'est ce qui rend l'app installable
 // et utilisable hors-ligne. Aucun coût, tourne entièrement en local.
+//
+// updateViaCache: "none" force le navigateur à toujours revérifier sur le
+// serveur si service-worker.js a changé, plutôt que de faire confiance à son
+// cache HTTP habituel (10 minutes sur GitHub Pages) — sans ça, une mise à
+// jour peut mettre plusieurs minutes, voire rester bloquée, avant d'être vue.
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js").catch((erreur) => {
-      console.warn("Service worker non enregistré :", erreur);
-    });
+    navigator.serviceWorker
+      .register("service-worker.js", { updateViaCache: "none" })
+      .catch((erreur) => {
+        console.warn("Service worker non enregistré :", erreur);
+      });
   });
 }

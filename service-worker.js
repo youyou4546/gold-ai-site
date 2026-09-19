@@ -4,7 +4,7 @@
 //
 // Change ce numéro de version à chaque mise à jour des fichiers pour forcer
 // le téléchargement de la nouvelle version chez l'utilisateur.
-const VERSION = "goldai-v2";
+const VERSION = "goldai-v3";
 
 const FICHIERS_A_METTRE_EN_CACHE = [
   "./",
@@ -23,7 +23,17 @@ const FICHIERS_A_METTRE_EN_CACHE = [
 
 self.addEventListener("install", (evenement) => {
   evenement.waitUntil(
-    caches.open(VERSION).then((cache) => cache.addAll(FICHIERS_A_METTRE_EN_CACHE))
+    caches.open(VERSION).then((cache) =>
+      // { cache: "reload" } force à aller chercher les fichiers sur le serveur plutôt
+      // que dans le cache HTTP du navigateur (GitHub Pages garde les fichiers "frais"
+      // 10 minutes côté navigateur — sans ça, une mise à jour pourrait remettre en
+      // cache une version pas si nouvelle que ça).
+      Promise.all(
+        FICHIERS_A_METTRE_EN_CACHE.map((fichier) =>
+          fetch(fichier, { cache: "reload" }).then((reponse) => cache.put(fichier, reponse))
+        )
+      )
+    )
   );
   self.skipWaiting();
 });
