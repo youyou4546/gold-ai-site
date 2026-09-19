@@ -21,198 +21,258 @@
 </head>
 <body>
 
-<header class="entete">
-  <h1>Gold AI</h1>
-  <p class="sous-titre" id="sous-titre-dynamique">Compagnon de trading XAUUSD</p>
-</header>
+<!-- ============ ÉCRAN : CODE D'ACCÈS AU SITE ============ -->
+<!-- Première barrière : sans ce code, personne n'atteint même l'écran de
+     connexion (utile si le lien du site venait à circuler). -->
+<div class="ecran-plein" id="ecran-acces">
+  <div class="carte-connexion">
+    <div class="icone-ecran">🔒</div>
+    <h1 class="titre-ecran">Gold AI</h1>
+    <p class="sous-titre-ecran">Site privé. Entre le code d'accès pour continuer.</p>
 
-<main>
-
-  <!-- ============ SECTION 1 : CALCULATEUR DE POSITION ============ -->
-  <section class="section actif" id="section-calculateur">
-    <h2 class="titre-section">Calculateur de position</h2>
-
-    <div class="carte">
-      <div class="champ">
-        <label for="taille-compte">Taille du compte ($)</label>
-        <input type="number" id="taille-compte" inputmode="decimal" placeholder="ex: 95000" />
-      </div>
-
-      <div class="ligne-champs">
-        <div class="champ">
-          <label for="pourcentage-risque">Risque par trade (%)</label>
-          <input type="number" id="pourcentage-risque" inputmode="decimal" step="0.05" value="0.3" />
-        </div>
-        <div class="champ">
-          <label for="prix-entree">Prix d'entrée</label>
-          <input type="number" id="prix-entree" inputmode="decimal" step="0.01" placeholder="ex: 2650.00" />
-        </div>
-      </div>
-
-      <div class="champ">
-        <label for="prix-sl">Stop-loss (prix)</label>
-        <input type="number" id="prix-sl" inputmode="decimal" step="0.01" placeholder="ex: 2645.00" />
-      </div>
-
-      <div class="ligne-champs">
-        <div class="champ">
-          <label for="prix-tp1">TP1 (prix)</label>
-          <input type="number" id="prix-tp1" inputmode="decimal" step="0.01" placeholder="ex: 2655.00" />
-        </div>
-        <div class="champ">
-          <label for="prix-tp2">TP2 (prix)</label>
-          <input type="number" id="prix-tp2" inputmode="decimal" step="0.01" placeholder="ex: 2660.00" />
-        </div>
-      </div>
-
-      <div class="champ">
-        <label for="prix-tp3">TP3 / runner (prix)</label>
-        <input type="number" id="prix-tp3" inputmode="decimal" step="0.01" placeholder="ex: 2670.00" />
-      </div>
-
-      <p class="avertissement-erreur" id="erreur-calculateur"></p>
-
-      <button class="bouton" id="bouton-calculer">Calculer</button>
+    <div class="champ">
+      <label for="code-acces-site">Code d'accès</label>
+      <input type="password" id="code-acces-site" autocomplete="off" />
     </div>
 
-    <div id="resultats-calculateur" style="display:none;">
-      <div class="resultat-risque">
-        <div>
-          <div class="label">Risque total</div>
-          <div class="valeur" id="valeur-risque-dollars">$0</div>
-        </div>
-        <div style="text-align:right;">
-          <div class="label" id="label-direction">—</div>
-          <div class="valeur" id="valeur-lot-total" style="font-size:16px;">0 lot</div>
-        </div>
-      </div>
+    <p class="avertissement-erreur" id="erreur-acces-site"></p>
 
-      <h2 class="titre-section" style="margin-top:0;">Répartition en 3 paliers</h2>
-      <div class="paliers" id="conteneur-paliers"></div>
-
-      <div class="carte" style="margin-top:14px;">
-        <div class="palier" style="border:none; padding:0;">
-          <div class="nom">Gain potentiel total (si les 3 TP sont touchés)</div>
-          <div class="gain" id="valeur-gain-total">$0</div>
-        </div>
-      </div>
-
-      <p style="font-size:11px; color:var(--texte-attenue); margin-top:10px; line-height:1.5;">
-        Calcul basé sur une taille de contrat standard de 100 oz par lot (norme la plus courante pour XAUUSD).
-        Vérifie que ça correspond à la spécification de ton broker avant d'exécuter.
-      </p>
-    </div>
-  </section>
-
-  <!-- ============ SECTION 2 : CALENDRIER ÉCONOMIQUE ============ -->
-  <section class="section" id="section-calendrier">
-    <h2 class="titre-section">Calendrier économique du jour</h2>
-    <p style="font-size:12px; color:var(--texte-attenue); margin-top:-6px;" id="date-calendrier"></p>
-    <div id="liste-evenements"></div>
-  </section>
-
-  <!-- ============ SECTION 3 : ANALYSE DE GRAPHIQUE (placeholder) ============ -->
-  <section class="section" id="section-analyse">
-    <h2 class="titre-section">Analyse de graphique</h2>
-    <div class="placeholder">
-      <div class="icone-placeholder">📊</div>
-      <h3>Bientôt disponible</h3>
-      <p>
-        Cette section permettra d'envoyer une capture d'écran de graphique pour recevoir une
-        analyse automatique. Elle nécessite l'API Claude (payante à l'usage) : elle ne sera
-        activée qu'après validation explicite du coût.
-      </p>
-      <div class="zone-upload-desactivee">📷 Envoi de capture désactivé pour l'instant</div>
-    </div>
-  </section>
-
-  <!-- ============ SECTION 4 : JOURNAL DE TRADING ============ -->
-  <section class="section" id="section-journal">
-    <h2 class="titre-section">Journal de trading</h2>
-
-    <div class="entete-mois">
-      <button id="mois-precedent" aria-label="Mois précédent">‹</button>
-      <div class="nom-mois" id="nom-mois-affiche"></div>
-      <button id="mois-suivant" aria-label="Mois suivant">›</button>
-    </div>
-
-    <div class="total-mois" id="total-mois">
-      <div class="label">Total du mois</div>
-      <div class="valeur" id="valeur-total-mois">$0</div>
-    </div>
-
-    <div class="grille-jours-entetes">
-      <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
-    </div>
-    <div class="grille-calendrier" id="grille-calendrier"></div>
-  </section>
-
-</main>
-
-<!-- Modale : explication d'une annonce économique -->
-<div class="fond-modale" id="modale-annonce">
-  <div class="modale">
-    <h3 id="modale-titre-annonce"></h3>
-    <p style="font-size:12px; color:var(--texte-attenue); margin:0 0 12px;" id="modale-meta-annonce"></p>
-
-    <div class="ligne-info">
-      <div class="etiquette">Ce que ça mesure</div>
-      <div class="contenu" id="modale-mesure"></div>
-    </div>
-
-    <div class="ligne-info" id="bloc-impact-or">
-      <div class="etiquette">Impact généralement observé sur l'or</div>
-      <div class="contenu" id="modale-impact-or"></div>
-    </div>
-
-    <div class="bloc-avertissement" id="modale-avertissement"></div>
-
-    <button class="bouton secondaire bouton-fermer-modale" id="bouton-fermer-modale">Fermer</button>
+    <button class="bouton" id="bouton-valider-acces">Continuer</button>
   </div>
 </div>
 
-<!-- Modale : ajouter/voir les trades d'un jour -->
-<div class="fond-modale" id="modale-jour">
-  <div class="modale">
-    <h3 id="modale-titre-jour"></h3>
+<!-- ============ ÉCRAN : CONNEXION / CRÉATION DE COMPTE ============ -->
+<div class="ecran-plein hidden" id="ecran-connexion">
+  <div class="carte-connexion">
+    <h1 class="titre-ecran">Gold AI</h1>
+    <p class="sous-titre-ecran">Connecte-toi ou crée ton compte pour accéder à ton journal.</p>
 
-    <div class="liste-trades-jour" id="liste-trades-jour"></div>
-
-    <div class="carte" style="margin-top:4px;">
-      <div class="champ">
-        <label for="resultat-nouveau-trade">Résultat ($) — négatif si perte</label>
-        <input type="number" id="resultat-nouveau-trade" inputmode="decimal" step="0.01" placeholder="ex: 340 ou -120" />
-      </div>
-      <div class="champ" style="margin-bottom:0;">
-        <label for="note-nouveau-trade">Note (optionnel)</label>
-        <input type="text" id="note-nouveau-trade" placeholder="ex: ORB NY, sorti tôt sur TP1" />
-      </div>
+    <div class="champ">
+      <label for="nom-utilisateur">Nom</label>
+      <input type="text" id="nom-utilisateur" autocomplete="username" />
+    </div>
+    <div class="champ">
+      <label for="code-utilisateur">Code</label>
+      <input type="password" id="code-utilisateur" autocomplete="current-password" />
+    </div>
+    <div class="champ" id="champ-code-acces-creation">
+      <label for="code-acces-creation">Code d'accès du site <span style="font-weight:400; color:var(--texte-attenue);">(uniquement pour créer un compte)</span></label>
+      <input type="password" id="code-acces-creation" autocomplete="off" />
     </div>
 
-    <button class="bouton" id="bouton-ajouter-trade">Ajouter le trade</button>
-    <button class="bouton secondaire bouton-fermer-modale" id="bouton-fermer-modale-jour" style="margin-top:10px;">Fermer</button>
+    <p class="avertissement-erreur" id="erreur-connexion"></p>
+
+    <button class="bouton" id="bouton-se-connecter">Se connecter</button>
+    <button class="bouton secondaire" id="bouton-creer-compte">Créer un compte</button>
   </div>
 </div>
 
-<nav class="barre-onglets">
-  <button class="onglet actif" data-section="calculateur">
-    <span class="icone-onglet">🧮</span>
-    <span>Calculateur</span>
-  </button>
-  <button class="onglet" data-section="calendrier">
-    <span class="icone-onglet">📅</span>
-    <span>Calendrier</span>
-  </button>
-  <button class="onglet" data-section="analyse">
-    <span class="icone-onglet">📊</span>
-    <span>Analyse</span>
-  </button>
-  <button class="onglet" data-section="journal">
-    <span class="icone-onglet">📓</span>
-    <span>Journal</span>
-  </button>
-</nav>
+<!-- ============ APPLICATION PRINCIPALE (visible une fois connecté) ============ -->
+<div id="app-principale" class="hidden">
 
+  <header class="entete entete-avec-compte">
+    <div>
+      <h1>Gold AI</h1>
+      <p class="sous-titre" id="sous-titre-dynamique">Compagnon de trading XAUUSD</p>
+    </div>
+    <div class="bloc-compte">
+      <div class="nom-connecte" id="nom-utilisateur-affiche"></div>
+      <button class="lien-deconnexion" id="bouton-deconnexion">Déconnexion</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============ SECTION 1 : CALCULATEUR DE POSITION ============ -->
+    <section class="section actif" id="section-calculateur">
+      <h2 class="titre-section">Calculateur de position</h2>
+
+      <div class="carte">
+        <div class="champ">
+          <label for="taille-compte">Taille du compte ($)</label>
+          <input type="number" id="taille-compte" inputmode="decimal" placeholder="ex: 95000" />
+        </div>
+
+        <div class="ligne-champs">
+          <div class="champ">
+            <label for="pourcentage-risque">Risque par trade (%)</label>
+            <input type="number" id="pourcentage-risque" inputmode="decimal" step="0.05" value="0.3" />
+          </div>
+          <div class="champ">
+            <label for="prix-entree">Prix d'entrée</label>
+            <input type="number" id="prix-entree" inputmode="decimal" step="0.01" placeholder="ex: 2650.00" />
+          </div>
+        </div>
+
+        <div class="champ">
+          <label for="prix-sl">Stop-loss (prix)</label>
+          <input type="number" id="prix-sl" inputmode="decimal" step="0.01" placeholder="ex: 2645.00" />
+        </div>
+
+        <div class="ligne-champs">
+          <div class="champ">
+            <label for="prix-tp1">TP1 (prix)</label>
+            <input type="number" id="prix-tp1" inputmode="decimal" step="0.01" placeholder="ex: 2655.00" />
+          </div>
+          <div class="champ">
+            <label for="prix-tp2">TP2 (prix)</label>
+            <input type="number" id="prix-tp2" inputmode="decimal" step="0.01" placeholder="ex: 2660.00" />
+          </div>
+        </div>
+
+        <div class="champ">
+          <label for="prix-tp3">TP3 / runner (prix)</label>
+          <input type="number" id="prix-tp3" inputmode="decimal" step="0.01" placeholder="ex: 2670.00" />
+        </div>
+
+        <p class="avertissement-erreur" id="erreur-calculateur"></p>
+
+        <button class="bouton" id="bouton-calculer">Calculer</button>
+      </div>
+
+      <div id="resultats-calculateur" style="display:none;">
+        <div class="resultat-risque">
+          <div>
+            <div class="label">Risque total</div>
+            <div class="valeur" id="valeur-risque-dollars">$0</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="label" id="label-direction">—</div>
+            <div class="valeur" id="valeur-lot-total" style="font-size:16px;">0 lot</div>
+          </div>
+        </div>
+
+        <h2 class="titre-section" style="margin-top:0;">Répartition en 3 paliers</h2>
+        <div class="paliers" id="conteneur-paliers"></div>
+
+        <div class="carte" style="margin-top:14px;">
+          <div class="palier" style="border:none; padding:0;">
+            <div class="nom">Gain potentiel total (si les 3 TP sont touchés)</div>
+            <div class="gain" id="valeur-gain-total">$0</div>
+          </div>
+        </div>
+
+        <p style="font-size:11px; color:var(--texte-attenue); margin-top:10px; line-height:1.5;">
+          Calcul basé sur une taille de contrat standard de 100 oz par lot (norme la plus courante pour XAUUSD).
+          Vérifie que ça correspond à la spécification de ton broker avant d'exécuter.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 2 : CALENDRIER ÉCONOMIQUE ============ -->
+    <section class="section" id="section-calendrier">
+      <h2 class="titre-section">Calendrier économique du jour</h2>
+      <p style="font-size:12px; color:var(--texte-attenue); margin-top:-6px;" id="date-calendrier"></p>
+      <div id="liste-evenements"></div>
+    </section>
+
+    <!-- ============ SECTION 3 : ANALYSE DE GRAPHIQUE (placeholder) ============ -->
+    <section class="section" id="section-analyse">
+      <h2 class="titre-section">Analyse de graphique</h2>
+      <div class="placeholder">
+        <div class="icone-placeholder">📊</div>
+        <h3>Bientôt disponible</h3>
+        <p>
+          Cette section permettra d'envoyer une capture d'écran de graphique pour recevoir une
+          analyse automatique. Elle nécessite l'API Claude (payante à l'usage) : elle ne sera
+          activée qu'après validation explicite du coût.
+        </p>
+        <div class="zone-upload-desactivee">📷 Envoi de capture désactivé pour l'instant</div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 4 : JOURNAL DE TRADING ============ -->
+    <section class="section" id="section-journal">
+      <h2 class="titre-section">Journal de trading</h2>
+
+      <div class="entete-mois">
+        <button id="mois-precedent" aria-label="Mois précédent">‹</button>
+        <div class="nom-mois" id="nom-mois-affiche"></div>
+        <button id="mois-suivant" aria-label="Mois suivant">›</button>
+      </div>
+
+      <div class="total-mois" id="total-mois">
+        <div class="label">Total du mois</div>
+        <div class="valeur" id="valeur-total-mois">$0</div>
+      </div>
+
+      <div class="grille-jours-entetes">
+        <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+      </div>
+      <div class="grille-calendrier" id="grille-calendrier"></div>
+    </section>
+
+  </main>
+
+  <!-- Modale : explication d'une annonce économique -->
+  <div class="fond-modale" id="modale-annonce">
+    <div class="modale">
+      <h3 id="modale-titre-annonce"></h3>
+      <p style="font-size:12px; color:var(--texte-attenue); margin:0 0 12px;" id="modale-meta-annonce"></p>
+
+      <div class="ligne-info">
+        <div class="etiquette">Ce que ça mesure</div>
+        <div class="contenu" id="modale-mesure"></div>
+      </div>
+
+      <div class="ligne-info" id="bloc-impact-or">
+        <div class="etiquette">Impact généralement observé sur l'or</div>
+        <div class="contenu" id="modale-impact-or"></div>
+      </div>
+
+      <div class="bloc-avertissement" id="modale-avertissement"></div>
+
+      <button class="bouton secondaire bouton-fermer-modale" id="bouton-fermer-modale">Fermer</button>
+    </div>
+  </div>
+
+  <!-- Modale : ajouter/voir les trades d'un jour -->
+  <div class="fond-modale" id="modale-jour">
+    <div class="modale">
+      <h3 id="modale-titre-jour"></h3>
+
+      <div class="liste-trades-jour" id="liste-trades-jour"></div>
+
+      <div class="carte" style="margin-top:4px;">
+        <div class="champ">
+          <label for="resultat-nouveau-trade">Résultat ($) — négatif si perte</label>
+          <input type="number" id="resultat-nouveau-trade" inputmode="decimal" step="0.01" placeholder="ex: 340 ou -120" />
+        </div>
+        <div class="champ" style="margin-bottom:0;">
+          <label for="note-nouveau-trade">Note (optionnel)</label>
+          <input type="text" id="note-nouveau-trade" placeholder="ex: ORB NY, sorti tôt sur TP1" />
+        </div>
+      </div>
+
+      <button class="bouton" id="bouton-ajouter-trade">Ajouter le trade</button>
+      <button class="bouton secondaire bouton-fermer-modale" id="bouton-fermer-modale-jour" style="margin-top:10px;">Fermer</button>
+    </div>
+  </div>
+
+  <nav class="barre-onglets">
+    <button class="onglet actif" data-section="calculateur">
+      <span class="icone-onglet">🧮</span>
+      <span>Calculateur</span>
+    </button>
+    <button class="onglet" data-section="calendrier">
+      <span class="icone-onglet">📅</span>
+      <span>Calendrier</span>
+    </button>
+    <button class="onglet" data-section="analyse">
+      <span class="icone-onglet">📊</span>
+      <span>Analyse</span>
+    </button>
+    <button class="onglet" data-section="journal">
+      <span class="icone-onglet">📓</span>
+      <span>Journal</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- Bibliothèque Supabase (comptes + base de données) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/calculateur.js"></script>
 <script src="js/calendrier-eco.js"></script>
 <script src="js/analyse-graphique.js"></script>

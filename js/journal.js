@@ -1,9 +1,8 @@
 // Gold AI — Section 4 : journal de trading en vue calendrier mensuel.
-// Stockage 100% local (localStorage) : aucun serveur, aucun compte.
-// Limite à connaître : les trades saisis restent sur l'appareil utilisé
-// (pas de synchro automatique entre ton téléphone et ton PC).
+// Stocké dans Supabase, rattaché au compte connecté : chaque utilisateur ne
+// voit que ses propres trades (imposé côté serveur par la fonction appelée,
+// pas seulement par ce code).
 (() => {
-  const CLE_JOURNAL = "goldai_journal_trades";
   const NOMS_MOIS = [
     "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
     "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",
@@ -14,20 +13,17 @@
   let moisAffiche = aujourdhui.getMonth(); // 0-11
   let dateJourSelectionne = null; // "AAAA-MM-JJ" pendant que la modale d'un jour est ouverte
 
-  function chargerTousLesTrades() {
-    try {
-      return JSON.parse(localStorage.getItem(CLE_JOURNAL) || "{}");
-    } catch (erreur) {
-      return {};
-    }
+  // Cache mémoire de TOUS les trades de l'utilisateur connecté, sous la forme
+  // { "AAAA-MM-JJ": [{id, resultat, note}, ...] }. Remis à zéro à chaque
+  // connexion/déconnexion pour ne jamais mélanger les journaux de deux comptes.
+  let cacheTrades = null;
+
+  function client() {
+    return window.GoldAI.auth.client;
   }
 
-  function sauvegarderTousLesTrades(trades) {
-    try {
-      localStorage.setItem(CLE_JOURNAL, JSON.stringify(trades));
-    } catch (erreur) {
-      alert("Impossible de sauvegarder : le stockage du navigateur est indisponible ou plein.");
-    }
+  function token() {
+    return window.GoldAI.auth.getToken();
   }
 
   function cleDate(annee, moisIndex, jour) {
@@ -45,8 +41,47 @@
     return (tradesJour || []).reduce((total, t) => total + t.resultat, 0);
   }
 
-  function afficherMoisCourant() {
-    const tousLesTrades = chargerTousLesTrades();
+  // Renvoie false (et déconnecte proprement) si la session n'est plus valide.
+  function gererErreur(error) {
+    if (error?.message === "SESSION_INVALIDE") {
+      window.GoldAI.auth.forcerDeconnexion("Ta session a expiré, reconnecte-toi.");
+      return true;
+    }
+    if (error) {
+      alert("Impossible de contacter le serveur pour l'instant. Vérifie ta connexion et réessaie.");
+      return true;
+    }
+    return false;
+  }
+
+  async function chargerTousLesTrades(forcerRechargement = false) {
+    if (cacheTrades && !forcerRechargement) return cacheTrades;
+
+    const { data, error } = await client().rpc("lister_mes_trades", { p_token: token() });
+    if (gererErreur(error)) return {};
+
+    const parJour = {};
+    (data || []).forEach((trade) => {
+      const cle = trade.date_trade;
+      if (!parJour[cle]) parJour[cle] = [];
+      parJour[cle].push({ id: trade.id, resultat: Number(trade.resultat), note: trade.note || "" });
+    });
+
+    cacheTrades = parJour;
+    return cacheTrades;
+  }
+
+  // Appelé par auth.js après une déconnexion pour ne pas garder les trades
+  // de l'utilisateur précédent en mémoire.
+  function viderCache() {
+    cacheTrades = null;
+  }
+
+  async function afficherMoisCourant() {
+    const grille = document.getElementById("grille-calendrier");
+    grille.innerHTML = `<p class="etat-vide" style="grid-column:1/-1;">Chargement…</p>`;
+
+    const tousLesTrades = await chargerTousLesTrades();
 
     document.getElementById("nom-mois-affiche").textContent = `${NOMS_MOIS[moisAffiche]} ${anneeAffichee}`;
 
@@ -56,7 +91,6 @@
     // getDay() : 0=dimanche..6=samedi → on veut 0=lundi..6=dimanche pour la grille L M M J V S D
     const decalageDebut = (premierJourDuMois.getDay() + 6) % 7;
 
-    const grille = document.getElementById("grille-calendrier");
     grille.innerHTML = "";
 
     for (let i = 0; i < decalageDebut; i++) {
@@ -102,7 +136,7 @@
     if (totalMois < 0) zoneTotalMois.classList.add("perte");
   }
 
-  function ouvrirModaleJour(cle) {
+  async function ouvrirModaleJour(cle) {
     dateJourSelectionne = cle;
 
     const [annee, mois, jour] = cle.split("-").map(Number);
@@ -117,12 +151,12 @@
     document.getElementById("resultat-nouveau-trade").value = "";
     document.getElementById("note-nouveau-trade").value = "";
 
-    rafraichirListeTradesDuJour();
+    await rafraichirListeTradesDuJour();
     document.getElementById("modale-jour").classList.add("visible");
   }
 
-  function rafraichirListeTradesDuJour() {
-    const tousLesTrades = chargerTousLesTrades();
+  async function rafraichirListeTradesDuJour() {
+    const tousLesTrades = await chargerTousLesTrades();
     const tradesJour = tousLesTrades[dateJourSelectionne] || [];
     const conteneur = document.getElementById("liste-trades-jour");
 
@@ -132,7 +166,7 @@
     }
 
     conteneur.innerHTML = "";
-    tradesJour.forEach((trade, index) => {
+    tradesJour.forEach((trade) => {
       const item = document.createElement("div");
       item.className = "trade-item";
       item.innerHTML = `
@@ -142,12 +176,12 @@
         </div>
         <button class="supprimer-trade" aria-label="Supprimer">✕</button>
       `;
-      item.querySelector(".supprimer-trade").addEventListener("click", () => supprimerTrade(index));
+      item.querySelector(".supprimer-trade").addEventListener("click", () => supprimerTrade(trade.id));
       conteneur.appendChild(item);
     });
   }
 
-  function ajouterTrade() {
+  async function ajouterTrade() {
     const champResultat = document.getElementById("resultat-nouveau-trade");
     const champNote = document.getElementById("note-nouveau-trade");
 
@@ -157,31 +191,38 @@
       return;
     }
 
-    const tousLesTrades = chargerTousLesTrades();
+    const note = champNote.value.trim();
+    const { data: idTrade, error } = await client().rpc("ajouter_mon_trade", {
+      p_token: token(),
+      p_date: dateJourSelectionne,
+      p_resultat: resultat,
+      p_note: note || null,
+    });
+    if (gererErreur(error)) return;
+
+    const tousLesTrades = await chargerTousLesTrades();
     if (!tousLesTrades[dateJourSelectionne]) tousLesTrades[dateJourSelectionne] = [];
-    tousLesTrades[dateJourSelectionne].push({ resultat, note: champNote.value.trim() });
-    sauvegarderTousLesTrades(tousLesTrades);
+    tousLesTrades[dateJourSelectionne].push({ id: idTrade, resultat, note });
 
     champResultat.value = "";
     champNote.value = "";
-    rafraichirListeTradesDuJour();
-    afficherMoisCourant();
+    await rafraichirListeTradesDuJour();
+    await afficherMoisCourant();
   }
 
-  function supprimerTrade(index) {
-    const tousLesTrades = chargerTousLesTrades();
+  async function supprimerTrade(idTrade) {
+    const { error } = await client().rpc("supprimer_mon_trade", { p_token: token(), p_trade_id: idTrade });
+    if (gererErreur(error)) return;
+
+    const tousLesTrades = await chargerTousLesTrades();
     const tradesJour = tousLesTrades[dateJourSelectionne] || [];
-    tradesJour.splice(index, 1);
+    const index = tradesJour.findIndex((t) => t.id === idTrade);
+    if (index !== -1) tradesJour.splice(index, 1);
 
-    if (tradesJour.length === 0) {
-      delete tousLesTrades[dateJourSelectionne];
-    } else {
-      tousLesTrades[dateJourSelectionne] = tradesJour;
-    }
+    if (tradesJour.length === 0) delete tousLesTrades[dateJourSelectionne];
 
-    sauvegarderTousLesTrades(tousLesTrades);
-    rafraichirListeTradesDuJour();
-    afficherMoisCourant();
+    await rafraichirListeTradesDuJour();
+    await afficherMoisCourant();
   }
 
   function fermerModaleJour() {
@@ -216,5 +257,5 @@
   });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.journal = { afficherMoisCourant };
+  window.GoldAI.journal = { afficherMoisCourant, viderCache };
 })();
