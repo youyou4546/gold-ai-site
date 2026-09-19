@@ -15,15 +15,18 @@ window.GoldAI = window.GoldAI || {};
   const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const CLE_GATE = "goldai_acces_site_ok";
+  // Le code d'accès du site est retenu ici une fois validé, pour ne pas avoir
+  // à le retaper lors de la création d'un compte (voir creerCompte ci-dessous).
+  const CLE_CODE_ACCES = "goldai_code_acces_site";
   const CLE_SESSION = "goldai_session_token";
   const CLE_NOM = "goldai_nom_utilisateur";
 
   const MESSAGES_ERREUR = {
     NOM_VIDE: "Le nom ne peut pas être vide.",
-    CODE_TROP_COURT: "Le code doit faire au moins 4 caractères.",
+    CODE_TROP_COURT: "Le mot de passe doit faire au moins 4 caractères.",
     NOM_DEJA_PRIS: "Ce nom est déjà utilisé — choisis-en un autre ou connecte-toi.",
-    IDENTIFIANTS_INVALIDES: "Nom ou code incorrect.",
-    CODE_ACCES_INVALIDE: "Code d'accès du site incorrect.",
+    IDENTIFIANTS_INVALIDES: "Nom ou mot de passe incorrect.",
+    CODE_ACCES_INVALIDE: "Code d'accès du site incorrect — retourne à l'écran précédent pour le corriger.",
     SESSION_INVALIDE: "Ta session a expiré, reconnecte-toi.",
   };
 
@@ -101,6 +104,7 @@ window.GoldAI = window.GoldAI || {};
     }
 
     localStorage.setItem(CLE_GATE, "1");
+    localStorage.setItem(CLE_CODE_ACCES, code);
     champ.value = "";
     afficherEcran("ecran-connexion");
   }
@@ -127,9 +131,18 @@ window.GoldAI = window.GoldAI || {};
   async function creerCompte() {
     const nom = document.getElementById("nom-utilisateur").value.trim();
     const code = document.getElementById("code-utilisateur").value;
-    const codeAcces = document.getElementById("code-acces-creation").value;
     const zoneErreur = document.getElementById("erreur-connexion");
     zoneErreur.classList.remove("visible");
+
+    // Réutilise le code d'accès du site déjà validé à l'écran précédent —
+    // pas besoin de le retaper. S'il a disparu (stockage effacé...), on
+    // renvoie proprement à cet écran plutôt que d'échouer sans explication.
+    const codeAcces = localStorage.getItem(CLE_CODE_ACCES);
+    if (!codeAcces) {
+      localStorage.removeItem(CLE_GATE);
+      afficherEcran("ecran-acces");
+      return;
+    }
 
     const { data: token, error } = await client.rpc("creer_compte", {
       p_nom: nom,
@@ -145,7 +158,6 @@ window.GoldAI = window.GoldAI || {};
     localStorage.setItem(CLE_SESSION, token);
     localStorage.setItem(CLE_NOM, nom);
     document.getElementById("code-utilisateur").value = "";
-    document.getElementById("code-acces-creation").value = "";
     afficherApp(nom);
   }
 
