@@ -1,0 +1,663 @@
+/* Gold AI — thème "sombre trading pro", accent or.
+   Variables centralisées en haut : pour changer le look plus tard,
+   modifier ici plutôt que de chercher dans tout le fichier. */
+
+:root {
+  --fond: #0d0f12;
+  --fond-carte: #16191e;
+  --fond-carte-survol: #1c2027;
+  --bordure: #262b33;
+  --texte: #e8e6e1;
+  --texte-attenue: #8a8f98;
+  --or: #d4af37;
+  --or-clair: #e8c968;
+  --vert: #2ecc71;
+  --vert-fond: rgba(46, 204, 113, 0.12);
+  --rouge: #e74c3c;
+  --rouge-fond: rgba(231, 76, 60, 0.12);
+  --orange: #e0983c;
+  --rayon: 12px;
+  --ombre: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--fond);
+  color: var(--texte);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Empêche le "rebond" de défilement de ressembler à une page web sur iOS */
+  overscroll-behavior-y: none;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  /* Respecte l'encoche / la zone de statut sur mobile en plein écran */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+/* ---------- En-tête ---------- */
+
+.entete {
+  padding: 18px 20px 12px;
+  flex-shrink: 0;
+}
+
+.entete h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--or);
+}
+
+.entete .sous-titre {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--texte-attenue);
+}
+
+/* ---------- Contenu des sections ---------- */
+
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 16px 24px;
+}
+
+.section {
+  display: none;
+}
+
+.section.actif {
+  display: block;
+}
+
+h2.titre-section {
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--texte-attenue);
+  margin: 20px 0 10px;
+}
+
+.carte {
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+/* ---------- Formulaires ---------- */
+
+.champ {
+  margin-bottom: 14px;
+}
+
+.champ label {
+  display: block;
+  font-size: 13px;
+  color: var(--texte-attenue);
+  margin-bottom: 6px;
+}
+
+.champ input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--fond);
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  color: var(--texte);
+  font-size: 16px; /* évite le zoom auto de Safari mobile sur focus */
+}
+
+.champ input:focus {
+  outline: none;
+  border-color: var(--or);
+}
+
+.ligne-champs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  background: var(--or);
+  color: #1a1508;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.bouton:active {
+  background: var(--or-clair);
+}
+
+.bouton.secondaire {
+  background: transparent;
+  border: 1px solid var(--bordure);
+  color: var(--texte);
+}
+
+.bouton.danger {
+  background: transparent;
+  border: 1px solid var(--rouge);
+  color: var(--rouge);
+}
+
+/* ---------- Résultats calculateur ---------- */
+
+.resultat-risque {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 14px 16px;
+  background: var(--fond);
+  border: 1px solid var(--or);
+  border-radius: var(--rayon);
+  margin-bottom: 14px;
+}
+
+.resultat-risque .label {
+  font-size: 13px;
+  color: var(--texte-attenue);
+}
+
+.resultat-risque .valeur {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--or);
+}
+
+.paliers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.palier {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  background: var(--fond);
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+}
+
+.palier .nom {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.palier .details {
+  font-size: 12px;
+  color: var(--texte-attenue);
+  margin-top: 2px;
+}
+
+.palier .gain {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--vert);
+  text-align: right;
+}
+
+.palier .r-multiple {
+  font-size: 11px;
+  color: var(--texte-attenue);
+  text-align: right;
+}
+
+.avertissement-erreur {
+  color: var(--rouge);
+  font-size: 13px;
+  margin-top: 8px;
+  display: none;
+}
+
+.avertissement-erreur.visible {
+  display: block;
+}
+
+/* ---------- Calendrier économique ---------- */
+
+.evenement {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.evenement:active {
+  background: var(--fond-carte-survol);
+}
+
+.evenement .heure {
+  font-size: 12px;
+  color: var(--texte-attenue);
+  min-width: 46px;
+}
+
+.evenement .contenu-evenement {
+  flex: 1;
+  min-width: 0;
+}
+
+.evenement .titre-evenement {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.evenement .meta-evenement {
+  font-size: 12px;
+  color: var(--texte-attenue);
+  margin-top: 2px;
+}
+
+.badge-impact {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.badge-impact.high {
+  background: var(--rouge-fond);
+  color: var(--rouge);
+}
+
+.badge-impact.medium {
+  background: rgba(224, 152, 60, 0.15);
+  color: var(--orange);
+}
+
+.badge-impact.low {
+  background: rgba(138, 143, 152, 0.15);
+  color: var(--texte-attenue);
+}
+
+.etat-vide {
+  text-align: center;
+  color: var(--texte-attenue);
+  font-size: 13px;
+  padding: 30px 10px;
+}
+
+/* Panneau d'explication (fiche annonce) */
+
+.fond-modale {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+}
+
+.fond-modale.visible {
+  display: flex;
+}
+
+.modale {
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px 16px 0 0;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
+
+.modale h3 {
+  margin: 0 0 4px;
+  color: var(--or);
+  font-size: 17px;
+}
+
+.modale .ligne-info {
+  margin: 12px 0;
+}
+
+.modale .ligne-info .etiquette {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--texte-attenue);
+  margin-bottom: 4px;
+}
+
+.modale .ligne-info .contenu {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.pastille-direction {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+.pastille-direction.hausse {
+  background: var(--vert-fond);
+  color: var(--vert);
+}
+
+.pastille-direction.baisse {
+  background: var(--rouge-fond);
+  color: var(--rouge);
+}
+
+.bloc-avertissement {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: rgba(224, 152, 60, 0.1);
+  border: 1px solid rgba(224, 152, 60, 0.3);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--orange);
+  line-height: 1.5;
+}
+
+.bouton-fermer-modale {
+  width: 100%;
+  margin-top: 18px;
+}
+
+/* ---------- Analyse graphique (placeholder) ---------- */
+
+.placeholder {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--texte-attenue);
+}
+
+.placeholder .icone-placeholder {
+  font-size: 40px;
+  margin-bottom: 14px;
+  opacity: 0.6;
+}
+
+.placeholder h3 {
+  color: var(--texte);
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.placeholder p {
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.zone-upload-desactivee {
+  margin-top: 20px;
+  border: 2px dashed var(--bordure);
+  border-radius: var(--rayon);
+  padding: 30px 20px;
+  color: var(--texte-attenue);
+  font-size: 13px;
+  opacity: 0.5;
+}
+
+/* ---------- Journal de trading ---------- */
+
+.entete-mois {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.entete-mois .nom-mois {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.entete-mois button {
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  color: var(--texte);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.total-mois {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px 16px;
+  border-radius: var(--rayon);
+  margin-bottom: 14px;
+  border: 1px solid var(--bordure);
+}
+
+.total-mois .label {
+  font-size: 12px;
+  color: var(--texte-attenue);
+}
+
+.total-mois .valeur {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.total-mois.gain {
+  border-color: var(--vert);
+}
+.total-mois.gain .valeur {
+  color: var(--vert);
+}
+
+.total-mois.perte {
+  border-color: var(--rouge);
+}
+.total-mois.perte .valeur {
+  color: var(--rouge);
+}
+
+.grille-jours-entetes,
+.grille-calendrier {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.grille-jours-entetes {
+  margin-bottom: 6px;
+}
+
+.grille-jours-entetes span {
+  text-align: center;
+  font-size: 11px;
+  color: var(--texte-attenue);
+  text-transform: uppercase;
+}
+
+.case-jour {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px solid var(--bordure);
+  background: var(--fond-carte);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 2px;
+  position: relative;
+}
+
+.case-jour.vide {
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+
+.case-jour .numero-jour {
+  font-size: 12px;
+  color: var(--texte-attenue);
+}
+
+.case-jour .resultat-jour {
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.case-jour.jour-gain {
+  background: var(--vert-fond);
+  border-color: var(--vert);
+}
+.case-jour.jour-gain .resultat-jour {
+  color: var(--vert);
+}
+.case-jour.jour-gain .numero-jour {
+  color: var(--texte);
+}
+
+.case-jour.jour-perte {
+  background: var(--rouge-fond);
+  border-color: var(--rouge);
+}
+.case-jour.jour-perte .resultat-jour {
+  color: var(--rouge);
+}
+.case-jour.jour-perte .numero-jour {
+  color: var(--texte);
+}
+
+.case-jour.aujourdhui {
+  border-color: var(--or);
+  border-width: 2px;
+}
+
+.liste-trades-jour {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.trade-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--fond);
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+}
+
+.trade-item .resultat-trade {
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.trade-item .resultat-trade.positif {
+  color: var(--vert);
+}
+
+.trade-item .resultat-trade.negatif {
+  color: var(--rouge);
+}
+
+.trade-item .note-trade {
+  font-size: 12px;
+  color: var(--texte-attenue);
+  margin-top: 2px;
+}
+
+.trade-item .supprimer-trade {
+  background: none;
+  border: none;
+  color: var(--texte-attenue);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+/* ---------- Navigation basse (type app) ---------- */
+
+nav.barre-onglets {
+  display: flex;
+  flex-shrink: 0;
+  background: var(--fond-carte);
+  border-top: 1px solid var(--bordure);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+nav.barre-onglets button {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--texte-attenue);
+  padding: 10px 4px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+nav.barre-onglets button .icone-onglet {
+  font-size: 20px;
+  line-height: 1;
+}
+
+nav.barre-onglets button.actif {
+  color: var(--or);
+}
+
+/* ---------- Petit écran ---------- */
+
+@media (max-width: 360px) {
+  .ligne-champs {
+    grid-template-columns: 1fr;
+  }
+}
