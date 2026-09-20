@@ -48,9 +48,23 @@ window.GoldAI = window.GoldAI || {};
     });
   }
 
+  // Remet Journal et Profil sur leur vue d'accueil (pas une sous-vue) au
+  // prochain affichage de l'app — pour ne jamais montrer les réglages ou les
+  // comptes d'un utilisateur au moment où un autre vient de se connecter.
+  function reinitialiserSousVues() {
+    ["journal-performance", "profil-parametres", "profil-comptes"].forEach((id) => {
+      document.getElementById(id)?.classList.add("hidden");
+    });
+    document.getElementById("profil-accueil")?.classList.remove("hidden");
+  }
+
   function afficherApp(nom) {
     document.getElementById("nom-utilisateur-affiche").textContent = nom;
     afficherEcran("app-principale");
+    // Marché est l'onglet par défaut : charge ses données dès l'affichage de
+    // l'app, comme si on venait de cliquer dessus (les autres onglets se
+    // chargent à la demande, au clic — voir app.js).
+    window.GoldAI.app?.allerA("marche");
   }
 
   // Appelé par journal.js si une opération renvoie SESSION_INVALIDE
@@ -59,6 +73,9 @@ window.GoldAI = window.GoldAI || {};
     localStorage.removeItem(CLE_SESSION);
     localStorage.removeItem(CLE_NOM);
     window.GoldAI.journal?.viderCache();
+    window.GoldAI.comptesTrading?.viderCache();
+    window.GoldAI.parametres?.viderCache();
+    reinitialiserSousVues();
     if (message) {
       document.getElementById("erreur-connexion").textContent = message;
       document.getElementById("erreur-connexion").classList.add("visible");
@@ -169,6 +186,9 @@ window.GoldAI = window.GoldAI || {};
     localStorage.removeItem(CLE_SESSION);
     localStorage.removeItem(CLE_NOM);
     window.GoldAI.journal?.viderCache();
+    window.GoldAI.comptesTrading?.viderCache();
+    window.GoldAI.parametres?.viderCache();
+    reinitialiserSousVues();
     document.getElementById("nom-utilisateur").value = "";
     document.getElementById("code-utilisateur").value = "";
     afficherEcran("ecran-connexion");

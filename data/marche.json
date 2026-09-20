@@ -1,0 +1,32 @@
+{
+  "genere_le": "2026-09-19T21:36:57",
+  "actifs": [
+    {
+      "cle": "dollar",
+      "nom": "Indice dollar (DXY)",
+      "prix": 100.215,
+      "variation_pct": 0.76,
+      "source": "Yahoo Finance (secours)",
+      "correlation": "inverse",
+      "correlation_explication": "Un dollar plus fort rend l'or plus cher pour les autres devises → généralement baissier pour l'or, et inversement."
+    },
+    {
+      "cle": "rendement10ans",
+      "nom": "Rendement obligataire US 10 ans",
+      "prix": 4.998,
+      "variation_pct": 0.75,
+      "source": "Yahoo Finance (secours)",
+      "correlation": "inverse",
+      "correlation_explication": "Des rendements obligataires plus élevés rendent les obligations plus attractives face à l'or (qui ne rapporte pas d'intérêt) → généralement baissier pour l'or, et inversement."
+    },
+    {
+      "cle": "argent",
+      "nom": "Argent (XAG/USD)",
+      "prix": 67.149,
+      "variation_pct": 5.72,
+      "source": "Yahoo Finance (secours)",
+      "correlation": "positif",
+      "correlation_explication": "L'argent est un métal précieux qui suit historiquement des mouvements similaires à l'or (tous deux réagissent au dollar et aux taux) → corrélation généralement positive."
+    }
+  ]
+}

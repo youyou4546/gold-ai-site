@@ -332,6 +332,71 @@ h2.titre-section {
   display: block;
 }
 
+/* ---------- Suivi du marché ---------- */
+
+.carte-actif {
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+
+.entete-actif {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.nom-actif {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pastille-correlation {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.ligne-prix-actif {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.prix-actif {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.variation-actif {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.variation-actif.positif {
+  color: var(--vert);
+}
+
+.variation-actif.negatif {
+  color: var(--rouge);
+}
+
+.explication-correlation {
+  font-size: 11.5px;
+  color: var(--texte-attenue);
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
 /* ---------- Calendrier économique ---------- */
 
 .entete-jour-calendrier {
@@ -557,11 +622,16 @@ h2.titre-section {
 
 /* ---------- Journal de trading ---------- */
 
-/* Accueil du journal : grille de tuiles (d'autres viendront s'ajouter à côté) */
-#journal-accueil {
+/* Accueil du journal / profil : grille de tuiles */
+#journal-accueil,
+.grille-tuiles-profil {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 12px;
+}
+
+.grille-tuiles-profil {
+  margin-top: 16px;
 }
 
 .tuile-journal {
@@ -829,10 +899,193 @@ nav.barre-onglets button.actif {
   color: var(--accent);
 }
 
+/* ---------- Journal > Performance ---------- */
+
+.grille-stats-perf {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.carte-stat {
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 14px;
+}
+
+.carte-stat-large {
+  grid-column: 1 / -1;
+}
+
+.label-stat {
+  font-size: 11.5px;
+  color: var(--texte-attenue);
+  margin-bottom: 6px;
+}
+
+.valeur-stat {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.valeur-stat.positif {
+  color: var(--vert);
+}
+
+.valeur-stat.negatif {
+  color: var(--rouge);
+}
+
+.sous-valeur-stat {
+  font-size: 11px;
+  color: var(--texte-attenue);
+  margin-top: 4px;
+}
+
+/* ---------- Profil > Paramètres ---------- */
+
+.label-groupe {
+  display: block;
+  font-size: 12px;
+  color: var(--texte-attenue);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 18px 0 10px;
+}
+
+.message-succes {
+  font-size: 13px;
+  color: var(--vert);
+  min-height: 18px;
+  margin: 4px 0 10px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.message-succes.succes-visible {
+  opacity: 1;
+}
+
+/* ---------- Profil > Mes comptes ---------- */
+
+.carte-compte-trading {
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.entete-compte-trading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.nom-compte-trading {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.meta-compte-trading {
+  font-size: 11.5px;
+  color: var(--texte-attenue);
+  margin-top: 2px;
+}
+
+.badge-statut-compte {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.badge-statut-compte.challenge {
+  background: rgba(255, 180, 84, 0.15);
+  color: var(--orange);
+}
+
+.badge-statut-compte.finance {
+  background: var(--vert-fond);
+  color: var(--vert);
+}
+
+.ligne-solde-compte {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 10px 0;
+  border-top: 1px solid var(--bordure);
+  border-bottom: 1px solid var(--bordure);
+  margin-bottom: 12px;
+}
+
+.label-solde {
+  font-size: 12px;
+  color: var(--texte-attenue);
+}
+
+.valeur-solde {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.bloc-limite {
+  margin-bottom: 12px;
+}
+
+.entete-limite {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--texte-attenue);
+  margin-bottom: 6px;
+}
+
+.barre-marge {
+  height: 6px;
+  background: var(--fond);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.barre-marge-remplie {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+.marge-restante {
+  font-size: 11.5px;
+  color: var(--texte-attenue);
+}
+
+.actions-compte-trading {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.bouton-petit {
+  width: auto;
+  flex: 1;
+  padding: 9px;
+  font-size: 12.5px;
+}
+
 /* ---------- Petit écran ---------- */
 
 @media (max-width: 360px) {
   .ligne-champs {
+    grid-template-columns: 1fr;
+  }
+  .grille-stats-perf {
     grid-template-columns: 1fr;
   }
 }

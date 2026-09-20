@@ -13,10 +13,13 @@
   let moisAffiche = aujourdhui.getMonth(); // 0-11
   let dateJourSelectionne = null; // "AAAA-MM-JJ" pendant que la modale d'un jour est ouverte
 
-  // Cache mémoire de TOUS les trades de l'utilisateur connecté, sous la forme
-  // { "AAAA-MM-JJ": [{id, resultat, note}, ...] }. Remis à zéro à chaque
-  // connexion/déconnexion pour ne jamais mélanger les journaux de deux comptes.
+  // Cache mémoire de TOUS les trades de l'utilisateur connecté :
+  // - cacheTrades : regroupés par jour { "AAAA-MM-JJ": [...] }, pour le calendrier
+  // - cacheTradesBruts : liste à plat (mêmes objets), pour la section Performance
+  // Remis à zéro à chaque connexion/déconnexion pour ne jamais mélanger les
+  // journaux de deux comptes.
   let cacheTrades = null;
+  let cacheTradesBruts = null;
 
   function client() {
     return window.GoldAI.auth.client;
@@ -60,15 +63,28 @@
     const { data, error } = await client().rpc("lister_mes_trades", { p_token: token() });
     if (gererErreur(error)) return {};
 
+    cacheTradesBruts = (data || []).map((trade) => ({
+      id: trade.id,
+      date: trade.date_trade,
+      resultat: Number(trade.resultat),
+      note: trade.note || "",
+      compteTradingId: trade.compte_trading_id || null,
+    }));
+
     const parJour = {};
-    (data || []).forEach((trade) => {
-      const cle = trade.date_trade;
-      if (!parJour[cle]) parJour[cle] = [];
-      parJour[cle].push({ id: trade.id, resultat: Number(trade.resultat), note: trade.note || "" });
+    cacheTradesBruts.forEach((trade) => {
+      if (!parJour[trade.date]) parJour[trade.date] = [];
+      parJour[trade.date].push(trade);
     });
 
     cacheTrades = parJour;
     return cacheTrades;
+  }
+
+  // Utilisé par journal-performance.js : liste à plat de tous les trades déjà
+  // chargés (appeler chargerTousLesTrades() avant, pour être sûr qu'elle soit à jour).
+  function obtenirTradesBruts() {
+    return cacheTradesBruts || [];
   }
 
   // Appelé par auth.js après une déconnexion pour ne pas garder les trades
@@ -76,7 +92,9 @@
   // journal au prochain compte connecté.
   function viderCache() {
     cacheTrades = null;
+    cacheTradesBruts = null;
     document.getElementById("journal-calendrier")?.classList.add("hidden");
+    document.getElementById("journal-performance")?.classList.add("hidden");
     document.getElementById("journal-accueil")?.classList.remove("hidden");
   }
 
@@ -153,9 +171,27 @@
 
     document.getElementById("resultat-nouveau-trade").value = "";
     document.getElementById("note-nouveau-trade").value = "";
+    await peuplerSelectCompteTrade();
 
     await rafraichirListeTradesDuJour();
     document.getElementById("modale-jour").classList.add("visible");
+  }
+
+  // Remplit le menu "Compte" du formulaire d'ajout de trade avec les comptes
+  // de trading créés dans Profil > Mes comptes (masqué s'il n'y en a aucun).
+  async function peuplerSelectCompteTrade() {
+    const champ = document.getElementById("select-compte-trade");
+    if (!champ || !window.GoldAI.comptesTrading) return;
+
+    const comptes = await window.GoldAI.comptesTrading.chargerComptes();
+    champ.innerHTML = `<option value="">Aucun compte</option>`;
+    comptes.forEach((c) => {
+      const option = document.createElement("option");
+      option.value = c.id;
+      option.textContent = c.nom;
+      champ.appendChild(option);
+    });
+    champ.parentElement.style.display = comptes.length > 0 ? "block" : "none";
   }
 
   async function rafraichirListeTradesDuJour() {
@@ -187,6 +223,7 @@
   async function ajouterTrade() {
     const champResultat = document.getElementById("resultat-nouveau-trade");
     const champNote = document.getElementById("note-nouveau-trade");
+    const champCompte = document.getElementById("select-compte-trade");
 
     const resultat = parseFloat(champResultat.value);
     if (isNaN(resultat)) {
@@ -195,17 +232,21 @@
     }
 
     const note = champNote.value.trim();
+    const compteTradingId = champCompte?.value || null;
     const { data: idTrade, error } = await client().rpc("ajouter_mon_trade", {
       p_token: token(),
       p_date: dateJourSelectionne,
       p_resultat: resultat,
       p_note: note || null,
+      p_compte_trading_id: compteTradingId,
     });
     if (gererErreur(error)) return;
 
     const tousLesTrades = await chargerTousLesTrades();
+    const nouveauTrade = { id: idTrade, date: dateJourSelectionne, resultat, note, compteTradingId };
     if (!tousLesTrades[dateJourSelectionne]) tousLesTrades[dateJourSelectionne] = [];
-    tousLesTrades[dateJourSelectionne].push({ id: idTrade, resultat, note });
+    tousLesTrades[dateJourSelectionne].push(nouveauTrade);
+    if (cacheTradesBruts) cacheTradesBruts.push(nouveauTrade);
 
     champResultat.value = "";
     champNote.value = "";
@@ -223,6 +264,11 @@
     if (index !== -1) tradesJour.splice(index, 1);
 
     if (tradesJour.length === 0) delete tousLesTrades[dateJourSelectionne];
+
+    if (cacheTradesBruts) {
+      const indexBrut = cacheTradesBruts.findIndex((t) => t.id === idTrade);
+      if (indexBrut !== -1) cacheTradesBruts.splice(indexBrut, 1);
+    }
 
     await rafraichirListeTradesDuJour();
     await afficherMoisCourant();
@@ -274,5 +320,5 @@
   });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.journal = { afficherMoisCourant, viderCache };
+  window.GoldAI.journal = { afficherMoisCourant, viderCache, chargerTousLesTrades, obtenirTradesBruts };
 })();

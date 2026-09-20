@@ -11,6 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Charge les données à la demande, seulement au premier affichage de l'onglet.
     // Journal n'a pas besoin d'être ici : sa vue calendrier se charge elle-même
     // au clic sur la tuile "Calendrier" de l'accueil du journal (voir journal.js).
+    if (cible === "marche" && window.GoldAI?.marche?.charger) {
+      window.GoldAI.marche.charger();
+    }
     if (cible === "calendrier" && window.GoldAI?.calendrier?.charger) {
       window.GoldAI.calendrier.charger();
     }
@@ -25,6 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("bouton-raccourci-calendrier")?.addEventListener("click", () => {
     allerA("calendrier");
   });
+
+  window.GoldAI = window.GoldAI || {};
+  window.GoldAI.app = { allerA };
 });
 
 // Enregistrement du service worker : c'est ce qui rend l'app installable

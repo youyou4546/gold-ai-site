@@ -73,8 +73,15 @@
 
   <main>
 
+    <!-- ============ SECTION : SUIVI DU MARCHÉ ============ -->
+    <section class="section actif" id="section-marche">
+      <h2 class="titre-section">Suivi du marché</h2>
+      <p style="font-size:12px; color:var(--texte-attenue); margin-top:-6px;" id="date-marche"></p>
+      <div id="liste-actifs-marche"></div>
+    </section>
+
     <!-- ============ SECTION : CALENDRIER ÉCONOMIQUE ============ -->
-    <section class="section actif" id="section-calendrier">
+    <section class="section" id="section-calendrier">
       <h2 class="titre-section">Calendrier économique de la semaine</h2>
       <p style="font-size:12px; color:var(--texte-attenue); margin-top:-6px;" id="date-calendrier"></p>
       <div id="liste-evenements"></div>
@@ -105,6 +112,10 @@
           <span class="icone-tuile">📅</span>
           <span>Calendrier</span>
         </button>
+        <button class="tuile-journal" id="bouton-ouvrir-performance">
+          <span class="icone-tuile">📊</span>
+          <span>Performance</span>
+        </button>
       </div>
 
       <!-- Vue calendrier des trades (masquée tant qu'on n'a pas cliqué sur "Calendrier" ci-dessus) -->
@@ -131,17 +142,116 @@
         </div>
         <div class="grille-calendrier" id="grille-calendrier"></div>
       </div>
+
+      <!-- Vue Performance (masquée tant qu'on n'a pas cliqué sur "Performance" ci-dessus) -->
+      <div id="journal-performance" class="hidden">
+        <button class="lien-retour" id="bouton-retour-performance">‹ Retour</button>
+
+        <div class="champ" style="display:none;">
+          <label for="select-filtre-compte-perf">Filtrer par compte</label>
+          <select id="select-filtre-compte-perf"></select>
+        </div>
+
+        <div id="contenu-performance"></div>
+      </div>
     </section>
 
     <!-- ============ SECTION 5 : PROFIL ============ -->
     <section class="section" id="section-profil">
       <h2 class="titre-section">Profil</h2>
 
-      <div class="carte carte-profil">
-        <div class="icone-profil">👤</div>
-        <div class="nom-connecte" id="nom-utilisateur-affiche"></div>
-        <p class="sous-titre-ecran" style="margin-bottom:20px;">Connecté sur cet appareil</p>
-        <button class="bouton danger" id="bouton-deconnexion">Déconnexion</button>
+      <div id="profil-accueil">
+        <div class="carte carte-profil">
+          <div class="icone-profil">👤</div>
+          <div class="nom-connecte" id="nom-utilisateur-affiche"></div>
+          <p class="sous-titre-ecran" style="margin-bottom:20px;">Connecté sur cet appareil</p>
+          <button class="bouton danger" id="bouton-deconnexion">Déconnexion</button>
+        </div>
+
+        <div class="grille-tuiles-profil">
+          <button class="tuile-journal" id="bouton-ouvrir-parametres">
+            <span class="icone-tuile">⚙️</span>
+            <span>Paramètres</span>
+          </button>
+          <button class="tuile-journal" id="bouton-ouvrir-comptes">
+            <span class="icone-tuile">💼</span>
+            <span>Mes comptes</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Vue Paramètres -->
+      <div id="profil-parametres" class="hidden">
+        <button class="lien-retour" id="bouton-retour-parametres">‹ Retour</button>
+
+        <div class="carte">
+          <div class="champ">
+            <label for="param-solde-compte">Solde du compte ($)</label>
+            <input type="number" id="param-solde-compte" inputmode="decimal" placeholder="ex: 100000" />
+          </div>
+
+          <div class="champ">
+            <label for="param-pourcentage-risque">Risque par trade (%)</label>
+            <input type="number" id="param-pourcentage-risque" inputmode="decimal" step="0.05" />
+          </div>
+
+          <label class="label-groupe">Répartition des lots (%)</label>
+          <div class="ligne-champs">
+            <div class="champ">
+              <label for="param-repartition-tp1">TP1</label>
+              <input type="number" id="param-repartition-tp1" inputmode="decimal" />
+            </div>
+            <div class="champ">
+              <label for="param-repartition-tp2">TP2</label>
+              <input type="number" id="param-repartition-tp2" inputmode="decimal" />
+            </div>
+            <div class="champ">
+              <label for="param-repartition-runner">Runner</label>
+              <input type="number" id="param-repartition-runner" inputmode="decimal" />
+            </div>
+          </div>
+
+          <div class="champ">
+            <label for="param-max-trades-jour">Nombre max de trades par jour</label>
+            <input type="number" id="param-max-trades-jour" inputmode="numeric" placeholder="ex: 3" />
+          </div>
+
+          <div class="ligne-champs">
+            <div class="champ">
+              <label for="param-seuil-gain-arret">Seuil de gain qui arrête la journée ($)</label>
+              <input type="number" id="param-seuil-gain-arret" inputmode="decimal" placeholder="ex: 1000" />
+            </div>
+            <div class="champ">
+              <label for="param-nombre-pertes-arret">Nombre de pertes qui arrête la journée</label>
+              <input type="number" id="param-nombre-pertes-arret" inputmode="numeric" placeholder="ex: 2" />
+            </div>
+          </div>
+
+          <label class="label-groupe">Heures de la session</label>
+          <div class="ligne-champs">
+            <div class="champ">
+              <label for="param-heure-debut-session">Début</label>
+              <input type="time" id="param-heure-debut-session" />
+            </div>
+            <div class="champ">
+              <label for="param-heure-fin-session">Fin</label>
+              <input type="time" id="param-heure-fin-session" />
+            </div>
+          </div>
+
+          <p class="message-succes" id="message-parametres"></p>
+
+          <button class="bouton" id="bouton-sauvegarder-parametres">Sauvegarder</button>
+        </div>
+      </div>
+
+      <!-- Vue Mes comptes -->
+      <div id="profil-comptes" class="hidden">
+        <button class="lien-retour" id="bouton-retour-comptes">‹ Retour</button>
+
+        <button class="bouton" id="bouton-ajouter-compte-trading" style="margin-bottom:14px;">+ Ajouter un compte</button>
+
+        <div id="liste-comptes-trading"></div>
       </div>
     </section>
 
@@ -181,9 +291,13 @@
           <label for="resultat-nouveau-trade">Résultat ($) — négatif si perte</label>
           <input type="number" id="resultat-nouveau-trade" inputmode="decimal" step="0.01" placeholder="ex: 340 ou -120" />
         </div>
-        <div class="champ" style="margin-bottom:0;">
+        <div class="champ">
           <label for="note-nouveau-trade">Note (optionnel)</label>
           <input type="text" id="note-nouveau-trade" placeholder="ex: ORB NY, sorti tôt sur TP1" />
+        </div>
+        <div class="champ" style="margin-bottom:0; display:none;">
+          <label for="select-compte-trade">Compte</label>
+          <select id="select-compte-trade"></select>
         </div>
       </div>
 
@@ -192,8 +306,63 @@
     </div>
   </div>
 
+  <!-- Modale : ajouter/modifier un compte de trading -->
+  <div class="fond-modale" id="modale-compte-trading">
+    <div class="modale">
+      <h3 id="modale-compte-trading-titre">Ajouter un compte</h3>
+
+      <div class="champ">
+        <label for="champ-nom-compte-trading">Nom du compte</label>
+        <input type="text" id="champ-nom-compte-trading" placeholder="ex: FTMO 100k" />
+      </div>
+
+      <div class="ligne-champs">
+        <div class="champ">
+          <label for="champ-taille-compte-trading">Taille du compte ($)</label>
+          <input type="number" id="champ-taille-compte-trading" inputmode="decimal" placeholder="ex: 100000" />
+        </div>
+        <div class="champ">
+          <label for="champ-solde-compte-trading">Solde actuel ($)</label>
+          <input type="number" id="champ-solde-compte-trading" inputmode="decimal" />
+        </div>
+      </div>
+
+      <div class="ligne-champs">
+        <div class="champ">
+          <label for="champ-statut-compte-trading">Statut</label>
+          <select id="champ-statut-compte-trading">
+            <option value="challenge">Challenge</option>
+            <option value="finance">Financé</option>
+          </select>
+        </div>
+        <div class="champ">
+          <label for="champ-date-compte-trading">Date d'activation</label>
+          <input type="date" id="champ-date-compte-trading" />
+        </div>
+      </div>
+
+      <div class="ligne-champs">
+        <div class="champ">
+          <label for="champ-dll-compte-trading">Daily Loss Limit (%)</label>
+          <input type="number" id="champ-dll-compte-trading" inputmode="decimal" value="5" />
+        </div>
+        <div class="champ" style="margin-bottom:0;">
+          <label for="champ-maxdd-compte-trading">Max Drawdown (%)</label>
+          <input type="number" id="champ-maxdd-compte-trading" inputmode="decimal" value="10" />
+        </div>
+      </div>
+
+      <button class="bouton" id="bouton-sauvegarder-compte-trading" style="margin-top:14px;">Sauvegarder</button>
+      <button class="bouton secondaire" id="bouton-fermer-modale-compte-trading" style="margin-top:10px;">Fermer</button>
+    </div>
+  </div>
+
   <nav class="barre-onglets">
-    <button class="onglet actif" data-section="calendrier">
+    <button class="onglet actif" data-section="marche">
+      <span class="icone-onglet">📈</span>
+      <span>Marché</span>
+    </button>
+    <button class="onglet" data-section="calendrier">
       <span class="icone-onglet">📅</span>
       <span>Calendrier</span>
     </button>
@@ -216,9 +385,14 @@
 <!-- Bibliothèque Supabase (comptes + base de données) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/marche.js"></script>
 <script src="js/calendrier-eco.js"></script>
 <script src="js/analyse-graphique.js"></script>
+<script src="js/comptes-trading.js"></script>
 <script src="js/journal.js"></script>
+<script src="js/journal-performance.js"></script>
+<script src="js/parametres.js"></script>
+<script src="js/profil-comptes.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
