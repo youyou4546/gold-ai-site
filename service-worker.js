@@ -4,7 +4,7 @@
 //
 // Change ce numéro de version à chaque mise à jour des fichiers pour forcer
 // le téléchargement de la nouvelle version chez l'utilisateur.
-const VERSION = "goldai-v5";
+const VERSION = "goldai-v7";
 
 const FICHIERS_A_METTRE_EN_CACHE = [
   "./",
@@ -53,7 +53,7 @@ self.addEventListener("activate", (evenement) => {
 self.addEventListener("fetch", (evenement) => {
   const url = new URL(evenement.request.url);
 
-  if (url.pathname.endsWith("calendrier_du_jour.json")) {
+  if (url.pathname.endsWith("calendrier_du_jour.json") || url.pathname.endsWith("calendrier_semaine.json")) {
     evenement.respondWith(
       fetch(evenement.request)
         .then((reponse) => {

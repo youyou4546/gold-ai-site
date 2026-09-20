@@ -1,24 +1,30 @@
-// Gold AI — navigation entre les 4 sections + enregistrement du service worker (PWA).
+// Gold AI — navigation entre les sections + enregistrement du service worker (PWA).
 
 document.addEventListener("DOMContentLoaded", () => {
   const onglets = document.querySelectorAll("nav.barre-onglets button.onglet");
   const sections = document.querySelectorAll("main .section");
 
+  function allerA(cible) {
+    onglets.forEach((o) => o.classList.toggle("actif", o.dataset.section === cible));
+    sections.forEach((s) => s.classList.toggle("actif", s.id === `section-${cible}`));
+
+    // Charge les données à la demande, seulement au premier affichage de l'onglet
+    if (cible === "calendrier" && window.GoldAI?.calendrier?.charger) {
+      window.GoldAI.calendrier.charger();
+    }
+    if (cible === "journal" && window.GoldAI?.journal?.afficherMoisCourant) {
+      window.GoldAI.journal.afficherMoisCourant();
+    }
+  }
+
   onglets.forEach((onglet) => {
-    onglet.addEventListener("click", () => {
-      const cible = onglet.dataset.section;
+    onglet.addEventListener("click", () => allerA(onglet.dataset.section));
+  });
 
-      onglets.forEach((o) => o.classList.toggle("actif", o === onglet));
-      sections.forEach((s) => s.classList.toggle("actif", s.id === `section-${cible}`));
-
-      // Charge les données à la demande, seulement au premier affichage de l'onglet
-      if (cible === "calendrier" && window.GoldAI?.calendrier?.charger) {
-        window.GoldAI.calendrier.charger();
-      }
-      if (cible === "journal" && window.GoldAI?.journal?.afficherMoisCourant) {
-        window.GoldAI.journal.afficherMoisCourant();
-      }
-    });
+  // Raccourci dans Journal : consulter le calendrier économique sans perdre
+  // de vue qu'on était en train de remplir ses trades.
+  document.getElementById("bouton-raccourci-calendrier")?.addEventListener("click", () => {
+    allerA("calendrier");
   });
 });
 

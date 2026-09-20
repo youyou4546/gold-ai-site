@@ -1,10 +1,17 @@
-// Gold AI — Section 2 : calendrier économique du jour.
-// Lit site/data/calendrier_du_jour.json (copié depuis les données déjà
-// collectées par scripts/collecte_quotidienne.py — voir site/sync_calendrier.py)
+// Gold AI — Section 2 : calendrier économique de la semaine.
+// Lit site/data/calendrier_semaine.json (généré par site/sync_calendrier.py
+// depuis le flux public forexfactory déjà utilisé par collecte_quotidienne.py)
 // et site/data/glossaire_annonces.json (explications fixes, pas d'API).
+//
+// Limite de la source gratuite : le flux ne couvre que la semaine calendaire
+// EN COURS (dimanche→samedi), pas une fenêtre glissante de 7 jours — en fin
+// de semaine il peut donc rester peu ou pas d'annonces à venir.
 (() => {
-  let glossaireCharge = null;
   let dejaCharge = false;
+
+  const NOMS_JOURS = [
+    "Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi",
+  ];
 
   function trouverExplication(titreEvenement, glossaire) {
     const titre = titreEvenement.toLowerCase();
@@ -13,7 +20,35 @@
     );
   }
 
+  function formaterEnteteJour(dateIso) {
+    const [annee, mois, jour] = dateIso.split("-").map(Number);
+    const date = new Date(annee, mois - 1, jour);
+    const aujourdhui = new Date();
+    const estAujourdhui = date.toDateString() === aujourdhui.toDateString();
+
+    const texte = `${NOMS_JOURS[date.getDay()]} ${jour} ${date.toLocaleDateString("fr-FR", { month: "long" })}`;
+    return estAujourdhui ? `${texte} · aujourd'hui` : texte;
+  }
+
+  // Petit résumé inline (visible sans cliquer) de la tendance probable —
+  // l'explication complète reste disponible dans la fiche au clic.
+  function badgeTendanceInline(explication) {
+    if (!explication || !explication.or_affecte) return "";
+    const fleche = (direction) => (direction === "hausse" ? "▲" : "▼");
+    return `
+      <div class="tendance-inline">
+        <span class="pastille-direction ${explication.si_superieur.direction} mini">
+          ${fleche(explication.si_superieur.direction)} si plus fort que prévu
+        </span>
+        <span class="pastille-direction ${explication.si_inferieur.direction} mini">
+          ${fleche(explication.si_inferieur.direction)} si plus faible que prévu
+        </span>
+      </div>
+    `;
+  }
+
   function creerCarteEvenement(evenement, glossaire) {
+    const explication = trouverExplication(evenement.titre, glossaire);
     const div = document.createElement("div");
     div.className = "evenement";
 
@@ -24,20 +59,19 @@
       <div class="contenu-evenement">
         <div class="titre-evenement">${evenement.titre}</div>
         <div class="meta-evenement">${evenement.devise || ""} · prévision ${evenement.prevision || "—"} · précédent ${evenement.precedent || "—"}</div>
+        ${badgeTendanceInline(explication)}
       </div>
       <span class="badge-impact ${impact}">${impact}</span>
     `;
 
-    div.addEventListener("click", () => ouvrirModaleAnnonce(evenement, glossaire));
+    div.addEventListener("click", () => ouvrirModaleAnnonce(evenement, glossaire, explication));
     return div;
   }
 
-  function ouvrirModaleAnnonce(evenement, glossaire) {
-    const explication = trouverExplication(evenement.titre, glossaire);
-
+  function ouvrirModaleAnnonce(evenement, glossaire, explication) {
     document.getElementById("modale-titre-annonce").textContent = evenement.titre;
     document.getElementById("modale-meta-annonce").textContent =
-      `${evenement.devise || ""} · ${evenement.heure || "?"} · prévision ${evenement.prevision || "—"} · précédent ${evenement.precedent || "—"}`;
+      `${evenement.devise || ""} · ${formaterEnteteJour(evenement.date)} à ${evenement.heure || "?"} · prévision ${evenement.prevision || "—"} · précédent ${evenement.precedent || "—"}`;
 
     const blocImpact = document.getElementById("bloc-impact-or");
     const zoneImpact = document.getElementById("modale-impact-or");
@@ -94,27 +128,35 @@
 
     try {
       const [reponseCalendrier, reponseGlossaire] = await Promise.all([
-        fetch("data/calendrier_du_jour.json", { cache: "no-store" }),
+        fetch("data/calendrier_semaine.json", { cache: "no-store" }),
         fetch("data/glossaire_annonces.json"),
       ]);
 
       const calendrier = await reponseCalendrier.json();
-      glossaireCharge = await reponseGlossaire.json();
+      const glossaire = await reponseGlossaire.json();
 
       dateAffichee.textContent = calendrier.genere_le
-        ? `Données du ${calendrier.date} · mises à jour ${new Date(calendrier.genere_le).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}`
+        ? `Mis à jour ${new Date(calendrier.genere_le).toLocaleString("fr-FR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}`
         : "";
 
       const evenements = calendrier.evenements || [];
       listeEvenements.innerHTML = "";
 
       if (evenements.length === 0) {
-        listeEvenements.innerHTML = `<p class="etat-vide">Aucune annonce économique notable aujourd'hui.</p>`;
+        listeEvenements.innerHTML = `<p class="etat-vide">Aucune annonce à venir pour le reste de cette semaine.<br>La source (forexfactory) se remplit à nouveau chaque dimanche pour la semaine suivante.</p>`;
         return;
       }
 
+      let jourCourant = null;
       evenements.forEach((evenement) => {
-        listeEvenements.appendChild(creerCarteEvenement(evenement, glossaireCharge));
+        if (evenement.date !== jourCourant) {
+          jourCourant = evenement.date;
+          const enteteJour = document.createElement("div");
+          enteteJour.className = "entete-jour-calendrier";
+          enteteJour.textContent = formaterEnteteJour(jourCourant);
+          listeEvenements.appendChild(enteteJour);
+        }
+        listeEvenements.appendChild(creerCarteEvenement(evenement, glossaire));
       });
     } catch (erreur) {
       dejaCharge = false; // laisse une chance de réessayer au prochain clic sur l'onglet

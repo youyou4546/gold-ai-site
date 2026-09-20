@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
-<title>Gold AI</title>
+<title>Trading Tool</title>
 
 <!-- PWA : permet l'installation sur l'écran d'accueil -->
 <link rel="manifest" href="manifest.json" />
@@ -13,7 +13,7 @@
      ces balises font le même travail spécifiquement pour Safari/iPhone -->
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Gold AI" />
+<meta name="apple-mobile-web-app-title" content="Trading Tool" />
 <link rel="apple-touch-icon" href="icons/icon-192.png" />
 
 <link rel="icon" href="icons/icon-192.png" />
@@ -27,7 +27,7 @@
 <div class="ecran-plein" id="ecran-acces">
   <div class="carte-connexion">
     <div class="icone-ecran">🔒</div>
-    <h1 class="titre-ecran">Gold AI</h1>
+    <h1 class="titre-ecran">Trading Tool</h1>
     <p class="sous-titre-ecran">Site privé. Entre le code d'accès pour continuer.</p>
 
     <div class="champ">
@@ -44,7 +44,7 @@
 <!-- ============ ÉCRAN : CONNEXION / CRÉATION DE COMPTE ============ -->
 <div class="ecran-plein hidden" id="ecran-connexion">
   <div class="carte-connexion">
-    <h1 class="titre-ecran">Gold AI</h1>
+    <h1 class="titre-ecran">Trading Tool</h1>
     <p class="sous-titre-ecran">Connecte-toi ou crée ton compte pour accéder à ton journal.</p>
 
     <div class="champ">
@@ -66,15 +66,9 @@
 <!-- ============ APPLICATION PRINCIPALE (visible une fois connecté) ============ -->
 <div id="app-principale" class="hidden">
 
-  <header class="entete entete-avec-compte">
-    <div>
-      <h1>Gold AI</h1>
-      <p class="sous-titre" id="sous-titre-dynamique">Compagnon de trading XAUUSD</p>
-    </div>
-    <div class="bloc-compte">
-      <div class="nom-connecte" id="nom-utilisateur-affiche"></div>
-      <button class="lien-deconnexion" id="bouton-deconnexion">Déconnexion</button>
-    </div>
+  <header class="entete">
+    <h1>Trading Tool</h1>
+    <p class="sous-titre" id="sous-titre-dynamique">by Theyous</p>
   </header>
 
   <main>
@@ -101,23 +95,23 @@
         </div>
 
         <div class="champ">
-          <label for="prix-sl">Stop-loss (prix)</label>
+          <label for="prix-sl">Stop-loss</label>
           <input type="number" id="prix-sl" inputmode="decimal" step="0.01" placeholder="ex: 2645.00" />
         </div>
 
         <div class="ligne-champs">
           <div class="champ">
-            <label for="prix-tp1">TP1 (prix)</label>
+            <label for="prix-tp1">TP1</label>
             <input type="number" id="prix-tp1" inputmode="decimal" step="0.01" placeholder="ex: 2655.00" />
           </div>
           <div class="champ">
-            <label for="prix-tp2">TP2 (prix)</label>
+            <label for="prix-tp2">TP2</label>
             <input type="number" id="prix-tp2" inputmode="decimal" step="0.01" placeholder="ex: 2660.00" />
           </div>
         </div>
 
         <div class="champ">
-          <label for="prix-tp3">TP3 / runner (prix)</label>
+          <label for="prix-tp3">TP3 / runner</label>
           <input type="number" id="prix-tp3" inputmode="decimal" step="0.01" placeholder="ex: 2670.00" />
         </div>
 
@@ -157,7 +151,7 @@
 
     <!-- ============ SECTION 2 : CALENDRIER ÉCONOMIQUE ============ -->
     <section class="section" id="section-calendrier">
-      <h2 class="titre-section">Calendrier économique du jour</h2>
+      <h2 class="titre-section">Calendrier économique de la semaine</h2>
       <p style="font-size:12px; color:var(--texte-attenue); margin-top:-6px;" id="date-calendrier"></p>
       <div id="liste-evenements"></div>
     </section>
@@ -181,6 +175,10 @@
     <section class="section" id="section-journal">
       <h2 class="titre-section">Journal de trading</h2>
 
+      <button class="raccourci-calendrier" id="bouton-raccourci-calendrier">
+        📅 Voir le calendrier économique
+      </button>
+
       <div class="entete-mois">
         <button id="mois-precedent" aria-label="Mois précédent">‹</button>
         <div class="nom-mois" id="nom-mois-affiche"></div>
@@ -196,6 +194,18 @@
         <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
       </div>
       <div class="grille-calendrier" id="grille-calendrier"></div>
+    </section>
+
+    <!-- ============ SECTION 5 : PROFIL ============ -->
+    <section class="section" id="section-profil">
+      <h2 class="titre-section">Profil</h2>
+
+      <div class="carte carte-profil">
+        <div class="icone-profil">👤</div>
+        <div class="nom-connecte" id="nom-utilisateur-affiche"></div>
+        <p class="sous-titre-ecran" style="margin-bottom:20px;">Connecté sur cet appareil</p>
+        <button class="bouton danger" id="bouton-deconnexion">Déconnexion</button>
+      </div>
     </section>
 
   </main>
@@ -261,6 +271,10 @@
     <button class="onglet" data-section="journal">
       <span class="icone-onglet">📓</span>
       <span>Journal</span>
+    </button>
+    <button class="onglet" data-section="profil">
+      <span class="icone-onglet">👤</span>
+      <span>Profil</span>
     </button>
   </nav>
 

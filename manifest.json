@@ -1,7 +1,7 @@
 {
-  "name": "Gold AI",
-  "short_name": "Gold AI",
-  "description": "Compagnon de trading XAUUSD : calculateur de position, calendrier économique, journal de trading",
+  "name": "Trading Tool",
+  "short_name": "Trading Tool",
+  "description": "by Theyous — calculateur de position, calendrier économique, journal de trading",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

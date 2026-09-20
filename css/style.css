@@ -135,33 +135,23 @@ input {
   color: var(--texte-attenue);
 }
 
-.entete-avec-compte {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
+/* ---------- Profil ---------- */
+
+.carte-profil {
+  text-align: center;
+  padding: 32px 20px;
 }
 
-.bloc-compte {
-  text-align: right;
-  flex-shrink: 0;
-  padding-top: 2px;
+.icone-profil {
+  font-size: 40px;
+  margin-bottom: 10px;
 }
 
 .nom-connecte {
-  font-size: 12px;
+  font-size: 18px;
   color: var(--texte);
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-
-.lien-deconnexion {
-  background: none;
-  border: none;
-  color: var(--accent);
-  font-size: 12px;
-  cursor: pointer;
-  padding: 0;
+  font-weight: 700;
+  margin-bottom: 4px;
 }
 
 /* ---------- Contenu des sections ---------- */
@@ -262,6 +252,7 @@ h2.titre-section {
 .bouton.danger {
   background: transparent;
   border: 1px solid var(--rouge);
+  box-shadow: none;
   color: var(--rouge);
 }
 
@@ -343,10 +334,23 @@ h2.titre-section {
 
 /* ---------- Calendrier économique ---------- */
 
+.entete-jour-calendrier {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin: 18px 0 8px;
+}
+
+.entete-jour-calendrier:first-child {
+  margin-top: 0;
+}
+
 .evenement {
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: flex-start;
   padding: 12px 14px;
   background: var(--fond-carte);
   border: 1px solid var(--bordure);
@@ -483,6 +487,21 @@ h2.titre-section {
   color: var(--rouge);
 }
 
+/* Version compacte affichée directement dans la liste (pas besoin de cliquer) */
+.tendance-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.pastille-direction.mini {
+  padding: 2px 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .bloc-avertissement {
   margin-top: 16px;
   padding: 12px 14px;
@@ -537,6 +556,21 @@ h2.titre-section {
 }
 
 /* ---------- Journal de trading ---------- */
+
+.raccourci-calendrier {
+  display: block;
+  width: 100%;
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  text-align: center;
+}
 
 .entete-mois {
   display: flex;
