@@ -109,8 +109,11 @@
     const premierJourDuMois = new Date(anneeAffichee, moisAffiche, 1);
     const nombreJoursDansLeMois = new Date(anneeAffichee, moisAffiche + 1, 0).getDate();
 
-    // getDay() : 0=dimanche..6=samedi → on veut 0=lundi..6=dimanche pour la grille L M M J V S D
-    const decalageDebut = (premierJourDuMois.getDay() + 6) % 7;
+    // Grille sans samedi/dimanche (on ne trade pas ces jours-là) : 5 colonnes
+    // L M M J V. Si le mois commence un week-end, aucune case vide n'est
+    // nécessaire — la semaine suivante démarre proprement au lundi.
+    const jourSemaineDebut = premierJourDuMois.getDay(); // 0=dimanche..6=samedi
+    const decalageDebut = jourSemaineDebut >= 1 && jourSemaineDebut <= 5 ? jourSemaineDebut - 1 : 0;
 
     grille.innerHTML = "";
 
@@ -126,7 +129,10 @@
       const cle = cleDate(anneeAffichee, moisAffiche, jour);
       const tradesJour = tousLesTrades[cle] || [];
       const somme = sommeDuJour(tradesJour);
-      totalMois += somme;
+      totalMois += somme; // compte quand même un trade éventuellement noté un week-end
+
+      const jourSemaine = new Date(anneeAffichee, moisAffiche, jour).getDay();
+      if (jourSemaine === 0 || jourSemaine === 6) continue; // pas de case pour samedi/dimanche
 
       const caseJour = document.createElement("div");
       caseJour.className = "case-jour";

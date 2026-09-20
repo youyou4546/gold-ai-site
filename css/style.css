@@ -708,21 +708,6 @@ h2.titre-section {
   margin-bottom: 14px;
 }
 
-.raccourci-calendrier {
-  display: block;
-  width: 100%;
-  background: var(--fond-carte);
-  border: 1px solid var(--bordure);
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: 600;
-  padding: 10px 14px;
-  border-radius: 10px;
-  margin-bottom: 14px;
-  cursor: pointer;
-  text-align: center;
-}
-
 .entete-mois {
   display: flex;
   align-items: center;
@@ -783,7 +768,7 @@ h2.titre-section {
 .grille-jours-entetes,
 .grille-calendrier {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(5, 1fr); /* pas de samedi/dimanche : on ne trade pas ces jours */
   gap: 5px;
 }
 

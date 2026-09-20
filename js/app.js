@@ -26,12 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
     onglet.addEventListener("click", () => allerA(onglet.dataset.section));
   });
 
-  // Raccourci dans Journal : consulter le calendrier économique sans perdre
-  // de vue qu'on était en train de remplir ses trades.
-  document.getElementById("bouton-raccourci-calendrier")?.addEventListener("click", () => {
-    allerA("calendrier");
-  });
-
   window.GoldAI = window.GoldAI || {};
   window.GoldAI.app = { allerA };
 });
