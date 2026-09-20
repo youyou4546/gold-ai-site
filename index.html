@@ -80,6 +80,19 @@
       <div id="liste-actifs-marche"></div>
     </section>
 
+    <!-- ============ SECTION : CHAT PARTAGÉ ============ -->
+    <section class="section" id="section-chat">
+      <h2 class="titre-section">Chat</h2>
+      <p style="font-size:12px; color:var(--texte-attenue); margin-top:-6px;">Visible par tous ceux qui ont l'app.</p>
+
+      <div class="zone-messages-chat" id="zone-messages-chat"></div>
+
+      <div class="barre-envoi-chat">
+        <input type="text" id="champ-message-chat" placeholder="Écris un message…" maxlength="2000" autocomplete="off" />
+        <button class="bouton-envoyer-chat" id="bouton-envoyer-chat" aria-label="Envoyer">➤</button>
+      </div>
+    </section>
+
     <!-- ============ SECTION : CALENDRIER ÉCONOMIQUE ============ -->
     <section class="section" id="section-calendrier">
       <h2 class="titre-section">Calendrier économique de la semaine</h2>
@@ -397,6 +410,10 @@
       <span class="icone-onglet">📈</span>
       <span>Marché</span>
     </button>
+    <button class="onglet" data-section="chat">
+      <span class="icone-onglet">💬</span>
+      <span>Chat</span>
+    </button>
     <button class="onglet" data-section="calendrier">
       <span class="icone-onglet">📅</span>
       <span>Calendrier</span>
@@ -421,6 +438,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/marche.js"></script>
+<script src="js/chat.js"></script>
 <script src="js/calendrier-eco.js"></script>
 <script src="js/analyse-graphique.js"></script>
 <script src="js/comptes-trading.js"></script>

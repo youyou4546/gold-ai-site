@@ -76,6 +76,7 @@ window.GoldAI = window.GoldAI || {};
     window.GoldAI.comptesTrading?.viderCache();
     window.GoldAI.parametres?.viderCache();
     window.GoldAI.profilCompte?.viderCache();
+    window.GoldAI.chat?.arreterRafraichissement();
     reinitialiserSousVues();
     if (message) {
       document.getElementById("erreur-connexion").textContent = message;
@@ -190,6 +191,7 @@ window.GoldAI = window.GoldAI || {};
     window.GoldAI.comptesTrading?.viderCache();
     window.GoldAI.parametres?.viderCache();
     window.GoldAI.profilCompte?.viderCache();
+    window.GoldAI.chat?.arreterRafraichissement();
     reinitialiserSousVues();
     document.getElementById("nom-utilisateur").value = "";
     document.getElementById("code-utilisateur").value = "";

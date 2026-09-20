@@ -1102,6 +1102,120 @@ nav.barre-onglets button.actif {
   font-size: 12.5px;
 }
 
+/* ---------- Chat partagé ---------- */
+
+.zone-messages-chat {
+  height: 55vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 2px 12px;
+}
+
+.bulle-chat {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 85%;
+}
+
+.bulle-chat.de-moi {
+  flex-direction: row-reverse;
+  align-self: flex-end;
+}
+
+.bulle-chat.des-autres {
+  align-self: flex-start;
+}
+
+.avatar-chat {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar-chat img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contenu-bulle-chat {
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  border-radius: 14px;
+  padding: 8px 12px;
+  min-width: 0;
+}
+
+.de-moi .contenu-bulle-chat {
+  background: rgba(34, 211, 238, 0.14);
+  border-color: rgba(34, 211, 238, 0.3);
+}
+
+.nom-expediteur-chat {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+
+.texte-bulle-chat {
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+
+.heure-bulle-chat {
+  font-size: 10px;
+  color: var(--texte-attenue);
+  margin-top: 3px;
+  text-align: right;
+}
+
+.barre-envoi-chat {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.barre-envoi-chat input {
+  flex: 1;
+  padding: 12px 14px;
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  border-radius: 999px;
+  color: var(--texte);
+  font-size: 15px;
+}
+
+.barre-envoi-chat input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.bouton-envoyer-chat {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-texte);
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: var(--lueur-accent);
+}
+
 /* ---------- Petit écran ---------- */
 
 @media (max-width: 360px) {
