@@ -44,6 +44,13 @@ body {
   /* Respecte l'encoche / la zone de statut sur mobile en plein écran */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
+  /* "100%" seul se base sur la hauteur du tout premier affichage : sur
+     téléphone, quand la barre d'adresse du navigateur se cache/réapparaît en
+     scrollant, ça laissait un vide sous la barre d'onglets (qui semblait
+     "trop haute"). 100dvh (hauteur d'écran RÉELLE à l'instant présent) corrige
+     ça sur les navigateurs récents ; 100vh reste en secours sur les anciens. */
+  height: 100vh;
+  height: 100dvh;
 }
 
 button,

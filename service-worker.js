@@ -4,7 +4,7 @@
 //
 // Change ce numéro de version à chaque mise à jour des fichiers pour forcer
 // le téléchargement de la nouvelle version chez l'utilisateur.
-const VERSION = "goldai-v13";
+const VERSION = "goldai-v14";
 
 const FICHIERS_A_METTRE_EN_CACHE = [
   "./",
