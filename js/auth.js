@@ -52,7 +52,7 @@ window.GoldAI = window.GoldAI || {};
   // prochain affichage de l'app — pour ne jamais montrer les réglages ou les
   // comptes d'un utilisateur au moment où un autre vient de se connecter.
   function reinitialiserSousVues() {
-    ["journal-performance", "profil-parametres", "profil-comptes"].forEach((id) => {
+    ["journal-performance", "profil-parametres", "profil-comptes", "profil-mon-compte"].forEach((id) => {
       document.getElementById(id)?.classList.add("hidden");
     });
     document.getElementById("profil-accueil")?.classList.remove("hidden");
@@ -75,6 +75,7 @@ window.GoldAI = window.GoldAI || {};
     window.GoldAI.journal?.viderCache();
     window.GoldAI.comptesTrading?.viderCache();
     window.GoldAI.parametres?.viderCache();
+    window.GoldAI.profilCompte?.viderCache();
     reinitialiserSousVues();
     if (message) {
       document.getElementById("erreur-connexion").textContent = message;
@@ -188,6 +189,7 @@ window.GoldAI = window.GoldAI || {};
     window.GoldAI.journal?.viderCache();
     window.GoldAI.comptesTrading?.viderCache();
     window.GoldAI.parametres?.viderCache();
+    window.GoldAI.profilCompte?.viderCache();
     reinitialiserSousVues();
     document.getElementById("nom-utilisateur").value = "";
     document.getElementById("code-utilisateur").value = "";

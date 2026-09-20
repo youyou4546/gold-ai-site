@@ -10,8 +10,9 @@
   }
 
   function creerCarteActif(actif) {
+    const estOr = actif.cle === "or";
     const div = document.createElement("div");
-    div.className = "carte-actif";
+    div.className = estOr ? "carte-actif carte-or" : "carte-actif";
 
     if (actif.erreur) {
       div.innerHTML = `
@@ -25,18 +26,26 @@
     const classeVariation = hausse ? "positif" : "negatif";
     const signeVariation = hausse ? "+" : "";
 
+    // L'or est l'actif suivi lui-même : pas d'étiquette de corrélation (il n'est
+    // pas corrélé à lui-même), juste son prix mis en avant.
+    const entete = estOr
+      ? `<div class="nom-actif">${actif.nom}</div>`
+      : `
+        <div class="entete-actif">
+          <div class="nom-actif">${actif.nom}</div>
+          <span class="pastille-correlation">
+            ${actif.correlation === "inverse" ? "⇅ Corrélation inverse" : "⇄ Corrélation positive"}
+          </span>
+        </div>
+      `;
+
     div.innerHTML = `
-      <div class="entete-actif">
-        <div class="nom-actif">${actif.nom}</div>
-        <span class="pastille-correlation">
-          ${actif.correlation === "inverse" ? "⇅ Corrélation inverse" : "⇄ Corrélation positive"}
-        </span>
-      </div>
+      ${entete}
       <div class="ligne-prix-actif">
         <div class="prix-actif">${formaterPrix(actif.cle, actif.prix)}</div>
         <div class="variation-actif ${classeVariation}">${signeVariation}${actif.variation_pct.toFixed(2)}%</div>
       </div>
-      <div class="explication-correlation">${actif.correlation_explication}</div>
+      ${actif.correlation_explication ? `<div class="explication-correlation">${actif.correlation_explication}</div>` : ""}
     `;
     return div;
   }

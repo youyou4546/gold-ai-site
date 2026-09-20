@@ -147,6 +147,29 @@ input {
   margin-bottom: 10px;
 }
 
+.icone-profil img,
+.avatar-profil img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatar-profil {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--fond);
+  border: 1px solid var(--bordure);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  overflow: hidden;
+}
+
 .nom-connecte {
   font-size: 18px;
   color: var(--texte);
@@ -340,6 +363,21 @@ h2.titre-section {
   border-radius: var(--rayon);
   padding: 14px 16px;
   margin-bottom: 10px;
+}
+
+/* L'or : juste un contour doré (pas de remplissage) pour le distinguer des
+   actifs corrélés, sans reprendre l'accent cyan du reste de l'app. */
+.carte-or {
+  border: 2px solid #d4af37;
+  background: var(--fond-carte);
+}
+
+.carte-or .nom-actif {
+  color: #d4af37;
+}
+
+.carte-or .prix-actif {
+  font-size: 26px;
 }
 
 .entete-actif {

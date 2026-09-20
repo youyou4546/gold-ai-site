@@ -8,7 +8,20 @@
   }
 
   function calculerStats(trades) {
-    if (trades.length === 0) return null;
+    if (trades.length === 0) {
+      // Affiche quand même toutes les tuiles, à zéro, plutôt qu'un message
+      // vide — plus lisible en un coup d'œil, même sans historique.
+      return {
+        nombreTrades: 0,
+        winRate: 0,
+        ratioGainPerte: null,
+        meilleureJournee: 0,
+        pireJournee: 0,
+        serieGainsMax: 0,
+        seriePertesMax: 0,
+        gainNetTotal: 0,
+      };
+    }
 
     const gagnants = trades.filter((t) => t.resultat > 0);
     const perdants = trades.filter((t) => t.resultat < 0);
@@ -64,12 +77,6 @@
 
   function afficherStats(stats) {
     const conteneur = document.getElementById("contenu-performance");
-
-    if (!stats) {
-      conteneur.innerHTML = `<p class="etat-vide">Pas encore de trades enregistrés pour ce filtre.</p>`;
-      return;
-    }
-
     const classeGainNet = stats.gainNetTotal >= 0 ? "positif" : "negatif";
 
     conteneur.innerHTML = `

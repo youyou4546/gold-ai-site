@@ -17,6 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cible === "calendrier" && window.GoldAI?.calendrier?.charger) {
       window.GoldAI.calendrier.charger();
     }
+    if (cible === "profil" && window.GoldAI?.profilCompte?.charger) {
+      window.GoldAI.profilCompte.charger();
+    }
   }
 
   onglets.forEach((onglet) => {

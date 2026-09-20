@@ -4,7 +4,7 @@
 //
 // Change ce numéro de version à chaque mise à jour des fichiers pour forcer
 // le téléchargement de la nouvelle version chez l'utilisateur.
-const VERSION = "goldai-v10";
+const VERSION = "goldai-v11";
 
 const FICHIERS_A_METTRE_EN_CACHE = [
   "./",
@@ -21,6 +21,7 @@ const FICHIERS_A_METTRE_EN_CACHE = [
   "./js/journal-performance.js",
   "./js/parametres.js",
   "./js/profil-comptes.js",
+  "./js/profil-mon-compte.js",
   "./data/glossaire_annonces.json",
   "./icons/icon-192.png",
   "./icons/icon-512.png",

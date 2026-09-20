@@ -139,7 +139,13 @@
         ? `Mis à jour ${new Date(calendrier.genere_le).toLocaleString("fr-FR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}`
         : "";
 
-      const evenements = calendrier.evenements || [];
+      // Le week-end n'a normalement aucune annonce économique — on filtre au
+      // cas où la source en listerait une (ex. jour férié) pour ne jamais
+      // afficher un en-tête "Samedi"/"Dimanche" vide ou hors-sujet.
+      const evenements = (calendrier.evenements || []).filter((e) => {
+        const jourSemaine = new Date(`${e.date}T00:00:00`).getDay();
+        return jourSemaine !== 0 && jourSemaine !== 6;
+      });
       listeEvenements.innerHTML = "";
 
       if (evenements.length === 0) {

@@ -169,6 +169,10 @@
         </div>
 
         <div class="grille-tuiles-profil">
+          <button class="tuile-journal" id="bouton-ouvrir-mon-compte">
+            <span class="icone-tuile">🪪</span>
+            <span>Mon compte</span>
+          </button>
           <button class="tuile-journal" id="bouton-ouvrir-parametres">
             <span class="icone-tuile">⚙️</span>
             <span>Paramètres</span>
@@ -177,6 +181,41 @@
             <span class="icone-tuile">💼</span>
             <span>Mes comptes</span>
           </button>
+        </div>
+      </div>
+
+      <!-- Vue Mon compte -->
+      <div id="profil-mon-compte" class="hidden">
+        <button class="lien-retour" id="bouton-retour-mon-compte">‹ Retour</button>
+
+        <div class="carte" style="text-align:center;">
+          <div class="avatar-profil">👤</div>
+          <input type="file" id="champ-photo-profil" accept="image/*" class="hidden" />
+          <button class="bouton secondaire bouton-petit" id="bouton-changer-photo" style="width:auto; display:inline-flex; margin:12px auto 0;">
+            Changer la photo
+          </button>
+        </div>
+
+        <div class="carte">
+          <div class="champ" style="margin-bottom:0;">
+            <label for="champ-nouveau-nom">Nom</label>
+            <input type="text" id="champ-nouveau-nom" />
+          </div>
+          <p class="message-succes" id="message-nom"></p>
+          <button class="bouton" id="bouton-modifier-nom">Modifier le nom</button>
+        </div>
+
+        <div class="carte">
+          <div class="champ">
+            <label for="champ-ancien-mdp">Mot de passe actuel</label>
+            <input type="password" id="champ-ancien-mdp" autocomplete="current-password" />
+          </div>
+          <div class="champ" style="margin-bottom:0;">
+            <label for="champ-nouveau-mdp">Nouveau mot de passe</label>
+            <input type="password" id="champ-nouveau-mdp" autocomplete="new-password" />
+          </div>
+          <p class="message-succes" id="message-mdp"></p>
+          <button class="bouton" id="bouton-modifier-mdp" style="margin-top:14px;">Modifier le mot de passe</button>
         </div>
       </div>
 
@@ -393,6 +432,7 @@
 <script src="js/journal-performance.js"></script>
 <script src="js/parametres.js"></script>
 <script src="js/profil-comptes.js"></script>
+<script src="js/profil-mon-compte.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

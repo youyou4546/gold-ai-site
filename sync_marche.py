@@ -49,29 +49,28 @@ def main():
     config = cq.charger_config()
     actifs = []
 
-    for cle in ("dollar", "rendement10ans", "argent"):
+    # "or" en premier : c'est l'actif suivi, pas un actif corrélé à lui-même
+    # (pas d'étiquette de corrélation pour celui-là — voir marche.js).
+    for cle in ("or", "dollar", "rendement10ans", "argent"):
         donnees = cq.recuperer_prix(cle, config["cle_api_twelvedata"])
-        info_correlation = CORRELATIONS[cle]
+        info_correlation = CORRELATIONS.get(cle)
 
         if "erreur" in donnees:
-            actifs.append({
+            actif = {"cle": cle, "nom": donnees["nom"], "erreur": donnees["erreur"]}
+        else:
+            actif = {
                 "cle": cle,
                 "nom": donnees["nom"],
-                "erreur": donnees["erreur"],
-                "correlation": info_correlation["sens"],
-                "correlation_explication": info_correlation["explication"],
-            })
-            continue
+                "prix": donnees["actuel"],
+                "variation_pct": round(donnees["variation_pct"], 2),
+                "source": donnees["source"],
+            }
 
-        actifs.append({
-            "cle": cle,
-            "nom": donnees["nom"],
-            "prix": donnees["actuel"],
-            "variation_pct": round(donnees["variation_pct"], 2),
-            "source": donnees["source"],
-            "correlation": info_correlation["sens"],
-            "correlation_explication": info_correlation["explication"],
-        })
+        if info_correlation:
+            actif["correlation"] = info_correlation["sens"]
+            actif["correlation_explication"] = info_correlation["explication"]
+
+        actifs.append(actif)
 
     SITE_DATA_DIR.mkdir(exist_ok=True)
     sortie = {
