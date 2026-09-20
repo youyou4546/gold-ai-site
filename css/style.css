@@ -557,6 +557,49 @@ h2.titre-section {
 
 /* ---------- Journal de trading ---------- */
 
+/* Accueil du journal : grille de tuiles (d'autres viendront s'ajouter à côté) */
+#journal-accueil {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.tuile-journal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  aspect-ratio: 1;
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  color: var(--texte);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tuile-journal:active {
+  background: var(--fond-carte-survol);
+  border-color: var(--accent);
+}
+
+.tuile-journal .icone-tuile {
+  font-size: 30px;
+}
+
+.lien-retour {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 14px;
+}
+
 .raccourci-calendrier {
   display: block;
   width: 100%;

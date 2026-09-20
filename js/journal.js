@@ -72,9 +72,12 @@
   }
 
   // Appelé par auth.js après une déconnexion pour ne pas garder les trades
-  // de l'utilisateur précédent en mémoire.
+  // de l'utilisateur précédent en mémoire, et repartir de l'accueil du
+  // journal au prochain compte connecté.
   function viderCache() {
     cacheTrades = null;
+    document.getElementById("journal-calendrier")?.classList.add("hidden");
+    document.getElementById("journal-accueil")?.classList.remove("hidden");
   }
 
   async function afficherMoisCourant() {
@@ -253,6 +256,20 @@
     document.getElementById("bouton-fermer-modale-jour").addEventListener("click", fermerModaleJour);
     document.getElementById("modale-jour").addEventListener("click", (evenement) => {
       if (evenement.target.id === "modale-jour") fermerModaleJour();
+    });
+
+    // Le calendrier des trades n'est chargé/affiché qu'au clic sur la tuile
+    // "Calendrier" de l'accueil du journal (pas dès qu'on ouvre l'onglet Journal
+    // — d'autres tuiles viendront s'ajouter à côté à l'avenir).
+    document.getElementById("bouton-ouvrir-calendrier-trades").addEventListener("click", () => {
+      document.getElementById("journal-accueil").classList.add("hidden");
+      document.getElementById("journal-calendrier").classList.remove("hidden");
+      afficherMoisCourant();
+    });
+
+    document.getElementById("bouton-retour-journal").addEventListener("click", () => {
+      document.getElementById("journal-calendrier").classList.add("hidden");
+      document.getElementById("journal-accueil").classList.remove("hidden");
     });
   });
 

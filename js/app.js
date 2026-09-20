@@ -8,12 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
     onglets.forEach((o) => o.classList.toggle("actif", o.dataset.section === cible));
     sections.forEach((s) => s.classList.toggle("actif", s.id === `section-${cible}`));
 
-    // Charge les données à la demande, seulement au premier affichage de l'onglet
+    // Charge les données à la demande, seulement au premier affichage de l'onglet.
+    // Journal n'a pas besoin d'être ici : sa vue calendrier se charge elle-même
+    // au clic sur la tuile "Calendrier" de l'accueil du journal (voir journal.js).
     if (cible === "calendrier" && window.GoldAI?.calendrier?.charger) {
       window.GoldAI.calendrier.charger();
-    }
-    if (cible === "journal" && window.GoldAI?.journal?.afficherMoisCourant) {
-      window.GoldAI.journal.afficherMoisCourant();
     }
   }
 

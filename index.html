@@ -73,84 +73,8 @@
 
   <main>
 
-    <!-- ============ SECTION 1 : CALCULATEUR DE POSITION ============ -->
-    <section class="section actif" id="section-calculateur">
-      <h2 class="titre-section">Calculateur de position</h2>
-
-      <div class="carte">
-        <div class="champ">
-          <label for="taille-compte">Taille du compte ($)</label>
-          <input type="number" id="taille-compte" inputmode="decimal" placeholder="ex: 95000" />
-        </div>
-
-        <div class="ligne-champs">
-          <div class="champ">
-            <label for="pourcentage-risque">Risque par trade (%)</label>
-            <input type="number" id="pourcentage-risque" inputmode="decimal" step="0.05" value="0.3" />
-          </div>
-          <div class="champ">
-            <label for="prix-entree">Prix d'entrée</label>
-            <input type="number" id="prix-entree" inputmode="decimal" step="0.01" placeholder="ex: 2650.00" />
-          </div>
-        </div>
-
-        <div class="champ">
-          <label for="prix-sl">Stop-loss</label>
-          <input type="number" id="prix-sl" inputmode="decimal" step="0.01" placeholder="ex: 2645.00" />
-        </div>
-
-        <div class="ligne-champs">
-          <div class="champ">
-            <label for="prix-tp1">TP1</label>
-            <input type="number" id="prix-tp1" inputmode="decimal" step="0.01" placeholder="ex: 2655.00" />
-          </div>
-          <div class="champ">
-            <label for="prix-tp2">TP2</label>
-            <input type="number" id="prix-tp2" inputmode="decimal" step="0.01" placeholder="ex: 2660.00" />
-          </div>
-        </div>
-
-        <div class="champ">
-          <label for="prix-tp3">TP3 / runner</label>
-          <input type="number" id="prix-tp3" inputmode="decimal" step="0.01" placeholder="ex: 2670.00" />
-        </div>
-
-        <p class="avertissement-erreur" id="erreur-calculateur"></p>
-
-        <button class="bouton" id="bouton-calculer">Calculer</button>
-      </div>
-
-      <div id="resultats-calculateur" style="display:none;">
-        <div class="resultat-risque">
-          <div>
-            <div class="label">Risque total</div>
-            <div class="valeur" id="valeur-risque-dollars">$0</div>
-          </div>
-          <div style="text-align:right;">
-            <div class="label" id="label-direction">—</div>
-            <div class="valeur" id="valeur-lot-total" style="font-size:16px;">0 lot</div>
-          </div>
-        </div>
-
-        <h2 class="titre-section" style="margin-top:0;">Répartition en 3 paliers</h2>
-        <div class="paliers" id="conteneur-paliers"></div>
-
-        <div class="carte" style="margin-top:14px;">
-          <div class="palier" style="border:none; padding:0;">
-            <div class="nom">Gain potentiel total (si les 3 TP sont touchés)</div>
-            <div class="gain" id="valeur-gain-total">$0</div>
-          </div>
-        </div>
-
-        <p style="font-size:11px; color:var(--texte-attenue); margin-top:10px; line-height:1.5;">
-          Calcul basé sur une taille de contrat standard de 100 oz par lot (norme la plus courante pour XAUUSD).
-          Vérifie que ça correspond à la spécification de ton broker avant d'exécuter.
-        </p>
-      </div>
-    </section>
-
-    <!-- ============ SECTION 2 : CALENDRIER ÉCONOMIQUE ============ -->
-    <section class="section" id="section-calendrier">
+    <!-- ============ SECTION : CALENDRIER ÉCONOMIQUE ============ -->
+    <section class="section actif" id="section-calendrier">
       <h2 class="titre-section">Calendrier économique de la semaine</h2>
       <p style="font-size:12px; color:var(--texte-attenue); margin-top:-6px;" id="date-calendrier"></p>
       <div id="liste-evenements"></div>
@@ -175,25 +99,38 @@
     <section class="section" id="section-journal">
       <h2 class="titre-section">Journal de trading</h2>
 
-      <button class="raccourci-calendrier" id="bouton-raccourci-calendrier">
-        📅 Voir le calendrier économique
-      </button>
-
-      <div class="entete-mois">
-        <button id="mois-precedent" aria-label="Mois précédent">‹</button>
-        <div class="nom-mois" id="nom-mois-affiche"></div>
-        <button id="mois-suivant" aria-label="Mois suivant">›</button>
+      <!-- Vue d'accueil du journal : d'autres raccourcis viendront s'ajouter ici -->
+      <div id="journal-accueil">
+        <button class="tuile-journal" id="bouton-ouvrir-calendrier-trades">
+          <span class="icone-tuile">📅</span>
+          <span>Calendrier</span>
+        </button>
       </div>
 
-      <div class="total-mois" id="total-mois">
-        <div class="label">Total du mois</div>
-        <div class="valeur" id="valeur-total-mois">$0</div>
-      </div>
+      <!-- Vue calendrier des trades (masquée tant qu'on n'a pas cliqué sur "Calendrier" ci-dessus) -->
+      <div id="journal-calendrier" class="hidden">
+        <button class="lien-retour" id="bouton-retour-journal">‹ Retour</button>
 
-      <div class="grille-jours-entetes">
-        <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+        <button class="raccourci-calendrier" id="bouton-raccourci-calendrier">
+          📅 Voir le calendrier économique
+        </button>
+
+        <div class="entete-mois">
+          <button id="mois-precedent" aria-label="Mois précédent">‹</button>
+          <div class="nom-mois" id="nom-mois-affiche"></div>
+          <button id="mois-suivant" aria-label="Mois suivant">›</button>
+        </div>
+
+        <div class="total-mois" id="total-mois">
+          <div class="label">Total du mois</div>
+          <div class="valeur" id="valeur-total-mois">$0</div>
+        </div>
+
+        <div class="grille-jours-entetes">
+          <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+        </div>
+        <div class="grille-calendrier" id="grille-calendrier"></div>
       </div>
-      <div class="grille-calendrier" id="grille-calendrier"></div>
     </section>
 
     <!-- ============ SECTION 5 : PROFIL ============ -->
@@ -256,11 +193,7 @@
   </div>
 
   <nav class="barre-onglets">
-    <button class="onglet actif" data-section="calculateur">
-      <span class="icone-onglet">🧮</span>
-      <span>Calculateur</span>
-    </button>
-    <button class="onglet" data-section="calendrier">
+    <button class="onglet actif" data-section="calendrier">
       <span class="icone-onglet">📅</span>
       <span>Calendrier</span>
     </button>
@@ -283,7 +216,6 @@
 <!-- Bibliothèque Supabase (comptes + base de données) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/calculateur.js"></script>
 <script src="js/calendrier-eco.js"></script>
 <script src="js/analyse-graphique.js"></script>
 <script src="js/journal.js"></script>
