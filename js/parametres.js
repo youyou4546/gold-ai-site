@@ -104,6 +104,7 @@
     document.getElementById("bouton-ouvrir-parametres")?.addEventListener("click", async () => {
       document.getElementById("profil-accueil").classList.add("hidden");
       document.getElementById("profil-parametres").classList.remove("hidden");
+      window.GoldAI.reglagesCalculateur?.ouvrir();
       if (!dejaCharge) {
         dejaCharge = true;
         await charger();

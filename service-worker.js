@@ -1,10 +1,16 @@
-// Service worker Gold AI — permet l'installation en PWA et l'utilisation
-// hors-ligne (calculateur et journal fonctionnent sans internet ; le
-// calendrier économique a besoin du fichier data téléchargé au moins une fois).
+// Service worker Gold AI — installation en PWA et utilisation hors ligne.
 //
-// Change ce numéro de version à chaque mise à jour des fichiers pour forcer
-// le téléchargement de la nouvelle version chez l'utilisateur.
-const VERSION = "goldai-v14";
+// Stratégie :
+//  - Fichiers de l'app (HTML/CSS/JS) et données (data/*.json) : RÉSEAU
+//    D'ABORD, copie en cache seulement en secours hors ligne. Avant, l'app
+//    était servie "cache d'abord" : une ancienne version (et ses anciennes
+//    données) pouvait rester affichée tant que ce numéro n'était pas changé.
+//  - Requêtes vers d'autres sites (Twelve Data, Supabase) : jamais touchées,
+//    pour ne jamais servir une cotation ou une donnée de compte en cache.
+//  - Bibliothèques du CDN (Supabase, Chart.js) : cache d'abord (versions figées).
+//
+// Change ce numéro à chaque mise à jour pour nettoyer les anciens caches.
+const VERSION = "goldai-v15";
 
 const FICHIERS_A_METTRE_EN_CACHE = [
   "./",
@@ -12,10 +18,17 @@ const FICHIERS_A_METTRE_EN_CACHE = [
   "./manifest.json",
   "./css/style.css",
   "./js/auth.js",
+  "./js/utils.js",
+  "./js/noyau.js",
+  "./js/donnees.js",
+  "./js/cotations.js",
   "./js/app.js",
   "./js/marche.js",
   "./js/chat.js",
-  "./js/calendrier-eco.js",
+  "./js/annonces.js",
+  "./js/impact.js",
+  "./js/parametres-calculateur.js",
+  "./js/calculateur.js",
   "./js/analyse-graphique.js",
   "./js/comptes-trading.js",
   "./js/journal.js",
@@ -28,16 +41,14 @@ const FICHIERS_A_METTRE_EN_CACHE = [
   "./icons/icon-512.png",
 ];
 
+const CDN = ["cdn.jsdelivr.net"];
+
 self.addEventListener("install", (evenement) => {
   evenement.waitUntil(
     caches.open(VERSION).then((cache) =>
-      // { cache: "reload" } force à aller chercher les fichiers sur le serveur plutôt
-      // que dans le cache HTTP du navigateur (GitHub Pages garde les fichiers "frais"
-      // 10 minutes côté navigateur — sans ça, une mise à jour pourrait remettre en
-      // cache une version pas si nouvelle que ça).
       Promise.all(
         FICHIERS_A_METTRE_EN_CACHE.map((fichier) =>
-          fetch(fichier, { cache: "reload" }).then((reponse) => cache.put(fichier, reponse))
+          fetch(fichier, { cache: "reload" }).then((reponse) => (reponse.ok ? cache.put(fichier, reponse) : null)).catch(() => null)
         )
       )
     )
@@ -47,36 +58,38 @@ self.addEventListener("install", (evenement) => {
 
 self.addEventListener("activate", (evenement) => {
   evenement.waitUntil(
-    caches.keys().then((noms) =>
-      Promise.all(noms.filter((nom) => nom !== VERSION).map((nom) => caches.delete(nom)))
-    )
+    caches.keys().then((noms) => Promise.all(noms.filter((nom) => nom !== VERSION).map((nom) => caches.delete(nom))))
   );
   self.clients.claim();
 });
 
-// Stratégie : réseau d'abord pour le fichier de calendrier du jour (données
-// fraîches), cache d'abord pour le reste (app shell = rapide + hors-ligne).
 self.addEventListener("fetch", (evenement) => {
-  const url = new URL(evenement.request.url);
+  const requete = evenement.request;
+  if (requete.method !== "GET") return;
+  const url = new URL(requete.url);
 
-  if (
-    url.pathname.endsWith("calendrier_du_jour.json") ||
-    url.pathname.endsWith("calendrier_semaine.json") ||
-    url.pathname.endsWith("marche.json")
-  ) {
+  if (CDN.includes(url.hostname)) {
     evenement.respondWith(
-      fetch(evenement.request)
-        .then((reponse) => {
-          const copie = reponse.clone();
-          caches.open(VERSION).then((cache) => cache.put(evenement.request, copie));
-          return reponse;
-        })
-        .catch(() => caches.match(evenement.request))
+      caches.match(requete).then((enCache) => enCache || fetch(requete).then((reponse) => {
+        const copie = reponse.clone();
+        caches.open(VERSION).then((cache) => cache.put(requete, copie));
+        return reponse;
+      }))
     );
     return;
   }
 
+  if (url.origin !== self.location.origin) return; // Twelve Data, Supabase… : réseau direct
+
   evenement.respondWith(
-    caches.match(evenement.request).then((reponseEnCache) => reponseEnCache || fetch(evenement.request))
+    fetch(requete, { cache: "no-store" })
+      .then((reponse) => {
+        if (reponse.ok) {
+          const copie = reponse.clone();
+          caches.open(VERSION).then((cache) => cache.put(requete, copie));
+        }
+        return reponse;
+      })
+      .catch(() => caches.match(requete, { ignoreSearch: true }))
   );
 });

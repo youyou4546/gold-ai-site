@@ -1,4 +1,1906 @@
 {
-  "genere_le": "2026-09-19T20:14:21",
-  "evenements": []
+  "genere_le": "2026-09-25T07:15:19+00:00",
+  "fuseau_source": "UTC",
+  "sources": [
+    {
+      "source": "Forex Factory",
+      "statut": "ok",
+      "recupere_le": "2026-09-25T07:15:19+00:00",
+      "note": "Flux public gratuit : prévision et précédent uniquement (pas de résultat publié ni de révision). Semaine en cours seulement. Cache 15 min."
+    },
+    {
+      "source": "Investing.com",
+      "statut": "non connecté",
+      "recupere_le": null,
+      "note": "Aucune API publique ; accès automatisé refusé (HTTP 403). Non intégré pour ne pas contourner leurs restrictions."
+    }
+  ],
+  "evenements": [
+    {
+      "id": "2cf2cd6f12b279d7",
+      "titre": "Bank Holiday",
+      "devise": "JPY",
+      "pays": "Japon",
+      "horodatage_utc": "2026-09-20T23:00:00Z",
+      "date_utc": "2026-09-20",
+      "precision_heure": "heure",
+      "impact": "holiday",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/393-jn-bank-holiday"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "44abcc8b6ffb3db5",
+      "titre": "Rightmove HPI m/m",
+      "devise": "GBP",
+      "pays": "Royaume-Uni",
+      "horodatage_utc": "2026-09-20T23:01:00Z",
+      "date_utc": "2026-09-20",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "-2.0%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/243-uk-rightmove-hpi-mm"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "5021064818400c3e",
+      "titre": "Credit Card Spending y/y",
+      "devise": "NZD",
+      "pays": "Nouvelle-Zélande",
+      "horodatage_utc": "2026-09-21T03:00:00Z",
+      "date_utc": "2026-09-21",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "5.3%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/184-nz-credit-card-spending-yy"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "336faddcf04e4d46",
+      "titre": "German Buba Monthly Report",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-21T10:00:00Z",
+      "date_utc": "2026-09-21",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/581-ge-buba-monthly-report"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "df8306d2993be121",
+      "titre": "FOMC Member Goolsbee Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-21T10:30:00Z",
+      "date_utc": "2026-09-21",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/889-us-fomc-member-goolsbee-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "c8c459adb4b0a025",
+      "titre": "ECB President Lagarde Speaks",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-21T15:00:00Z",
+      "date_utc": "2026-09-21",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/832-ez-ecb-president-lagarde-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "684f2490ae292a73",
+      "titre": "BOC Gov Macklem Speaks",
+      "devise": "CAD",
+      "pays": "Canada",
+      "horodatage_utc": "2026-09-21T15:05:00Z",
+      "date_utc": "2026-09-21",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/840-ca-boc-gov-macklem-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "d6802fb0d3aca854",
+      "titre": "RBA Assist Gov Hunter Speaks",
+      "devise": "AUD",
+      "pays": "Australie",
+      "horodatage_utc": "2026-09-21T19:00:00Z",
+      "date_utc": "2026-09-21",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/907-au-rba-assist-gov-hunter-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "2f9555730971efe1",
+      "titre": "Bank Holiday",
+      "devise": "JPY",
+      "pays": "Japon",
+      "horodatage_utc": "2026-09-21T23:00:00Z",
+      "date_utc": "2026-09-21",
+      "precision_heure": "heure",
+      "impact": "holiday",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/393-jn-bank-holiday"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "5a73a0feee3b1cd5",
+      "titre": "RBA Gov Bullock Speaks",
+      "devise": "AUD",
+      "pays": "Australie",
+      "horodatage_utc": "2026-09-22T03:10:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "high",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/671-au-rba-gov-bullock-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "b762850094244839",
+      "titre": "Public Sector Net Borrowing",
+      "devise": "GBP",
+      "pays": "Royaume-Uni",
+      "horodatage_utc": "2026-09-22T06:00:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "15.2B",
+          "precedent": "1.8B",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/342-uk-public-sector-net-borrowing"
+        }
+      ],
+      "unite": "B",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "3a05736f56dc8451",
+      "titre": "German Buba President Nagel Speaks",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-22T08:30:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/851-ge-buba-president-nagel-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "260caea619bbc862",
+      "titre": "CBI Industrial Order Expectations",
+      "devise": "GBP",
+      "pays": "Royaume-Uni",
+      "horodatage_utc": "2026-09-22T10:00:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "-33",
+          "precedent": "-25",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/331-uk-cbi-industrial-order-expectations"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "65424cac53d9b3e6",
+      "titre": "ECB President Lagarde Speaks",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-22T11:00:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/832-ez-ecb-president-lagarde-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "1752a46e14702cc5",
+      "titre": "ADP Weekly Employment Change",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-22T12:15:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "16.3K",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/929-us-adp-weekly-employment-change"
+        }
+      ],
+      "unite": "K",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "eb3e80437b43a430",
+      "titre": "President Trump Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-22T13:55:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/645-us-president-trump-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "d45d47a5bc752e3b",
+      "titre": "Consumer Confidence",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-22T14:00:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "-16",
+          "precedent": "-16",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/336-ez-consumer-confidence"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "8a98feb00d429d7e",
+      "titre": "Richmond Manufacturing Index",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-22T14:00:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "2",
+          "precedent": "4",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/186-us-richmond-manufacturing-index"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "ce6ef5e37379f620",
+      "titre": "FOMC Member Williams Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-22T14:05:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/518-us-fomc-member-williams-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "29456e3d36389190",
+      "titre": "FOMC Member Jefferson Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-22T14:20:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/881-us-fomc-member-jefferson-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "52687f008d0a594c",
+      "titre": "FOMC Member Barkin Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-22T17:00:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/728-us-fomc-member-barkin-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "3a05736f56dc8451",
+      "titre": "German Buba President Nagel Speaks",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-22T19:30:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/851-ge-buba-president-nagel-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "45d8b0c87a08d60a",
+      "titre": "API Weekly Statistical Bulletin",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-22T20:30:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/754-us-api-weekly-statistical-bulletin"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "854eca93434cf6b3",
+      "titre": "Bank Holiday",
+      "devise": "JPY",
+      "pays": "Japon",
+      "horodatage_utc": "2026-09-22T23:00:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "holiday",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/393-jn-bank-holiday"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "2e2fd55d13b5a017",
+      "titre": "Flash Manufacturing PMI",
+      "devise": "AUD",
+      "pays": "Australie",
+      "horodatage_utc": "2026-09-22T23:00:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "52.0",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/817-au-flash-manufacturing-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "001feb6f1cfc9513",
+      "titre": "Flash Services PMI",
+      "devise": "AUD",
+      "pays": "Australie",
+      "horodatage_utc": "2026-09-22T23:00:00Z",
+      "date_utc": "2026-09-22",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "52.9",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/818-au-flash-services-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "3df9841df612a9d5",
+      "titre": "French Flash Manufacturing PMI",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-23T07:15:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "50.9",
+          "precedent": "51.5",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/268-fr-flash-manufacturing-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "fd1e8bfa5158e082",
+      "titre": "French Flash Services PMI",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-23T07:15:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "48.3",
+          "precedent": "48.4",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/269-fr-flash-services-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "3e977e86961425a3",
+      "titre": "German Flash Manufacturing PMI",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-23T07:30:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "54.1",
+          "precedent": "54.1",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/266-ge-flash-manufacturing-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "8632fd215b6d15e8",
+      "titre": "German Flash Services PMI",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-23T07:30:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "49.9",
+          "precedent": "48.5",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/267-ge-flash-services-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "356bdadb9ec03ada",
+      "titre": "Flash Manufacturing PMI",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-23T08:00:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "52.6",
+          "precedent": "52.8",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/263-ez-flash-manufacturing-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "0c316970404c1403",
+      "titre": "Flash Services PMI",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-23T08:00:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "51.4",
+          "precedent": "51.7",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/244-ez-flash-services-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "e02254b7a852c8ad",
+      "titre": "Flash Manufacturing PMI",
+      "devise": "GBP",
+      "pays": "Royaume-Uni",
+      "horodatage_utc": "2026-09-23T08:30:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "51.5",
+          "precedent": "51.5",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/837-uk-flash-manufacturing-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "fc87a901560e53cc",
+      "titre": "Flash Services PMI",
+      "devise": "GBP",
+      "pays": "Royaume-Uni",
+      "horodatage_utc": "2026-09-23T08:30:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "52.0",
+          "precedent": "52.8",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/836-uk-flash-services-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "09856dbec5aa9548",
+      "titre": "German 30-y Bond Auction",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-23T09:35:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "3.90|2.4",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/541-ge-30-y-bond-auction"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "80618d408dbf4ae9",
+      "titre": "Flash Manufacturing PMI",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-23T13:45:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "53.6",
+          "precedent": "53.2",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/552-us-flash-manufacturing-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "82dbdb7afbd71767",
+      "titre": "Flash Services PMI",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-23T13:45:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "55.8",
+          "precedent": "56.8",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/583-us-flash-services-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "ddb2faa56a9b7f59",
+      "titre": "FOMC Member Barr Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-23T14:05:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/880-us-fomc-member-barr-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "77b4cfc806555f9d",
+      "titre": "Crude Oil Inventories",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-23T14:30:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "-0.7M",
+          "precedent": "-0.6M",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/10-us-crude-oil-inventories"
+        }
+      ],
+      "unite": "M",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "2903b0c59b245fd7",
+      "titre": "FOMC Member Goolsbee Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-23T16:00:00Z",
+      "date_utc": "2026-09-23",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/889-us-fomc-member-goolsbee-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "9824d65478c5d6f3",
+      "titre": "Flash Manufacturing PMI",
+      "devise": "JPY",
+      "pays": "Japon",
+      "horodatage_utc": "2026-09-24T00:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "55.0",
+          "precedent": "55.1",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/595-jn-flash-manufacturing-pmi"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "4d294d6308de7c97",
+      "titre": "Employment Change",
+      "devise": "AUD",
+      "pays": "Australie",
+      "horodatage_utc": "2026-09-24T01:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "high",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "21.5K",
+          "precedent": "-15.8K",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/73-au-employment-change"
+        }
+      ],
+      "unite": "K",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "a58d4d632d447504",
+      "titre": "NAB Quarterly Business Confidence",
+      "devise": "AUD",
+      "pays": "Australie",
+      "horodatage_utc": "2026-09-24T01:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "-19",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/248-au-nab-quarterly-business-confidence"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "9cb97a5af3f10df7",
+      "titre": "Unemployment Rate",
+      "devise": "AUD",
+      "pays": "Australie",
+      "horodatage_utc": "2026-09-24T01:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "high",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "4.5%",
+          "precedent": "4.5%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/64-au-unemployment-rate"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "54458af894adb23a",
+      "titre": "SNB Monetary Policy Assessment",
+      "devise": "CHF",
+      "pays": "Suisse",
+      "horodatage_utc": "2026-09-24T07:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "high",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/18-sz-snb-monetary-policy-assessment"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "2b2f18d2ae656bb5",
+      "titre": "SNB Policy Rate",
+      "devise": "CHF",
+      "pays": "Suisse",
+      "horodatage_utc": "2026-09-24T07:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "high",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "0.00%",
+          "precedent": "0.00%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/834-sz-snb-policy-rate"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "95e9b8a9921e4983",
+      "titre": "ECB Economic Bulletin",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-24T08:00:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/612-ez-ecb-economic-bulletin"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "fa13029de19fa4bd",
+      "titre": "German ifo Business Climate",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-24T08:00:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "89.1",
+          "precedent": "88.8",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/316-ge-ifo-business-climate"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "743ca28b7d29d630",
+      "titre": "SNB Press Conference",
+      "devise": "CHF",
+      "pays": "Suisse",
+      "horodatage_utc": "2026-09-24T08:00:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "high",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/163-sz-snb-press-conference"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "44d3b9a668ddb990",
+      "titre": "FOMC Member Williams Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-24T08:10:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/518-us-fomc-member-williams-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "0948351a784db1be",
+      "titre": "MPC Member Dhingra Speaks",
+      "devise": "GBP",
+      "pays": "Royaume-Uni",
+      "horodatage_utc": "2026-09-24T09:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/875-uk-mpc-member-dhingra-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "fa62985b9ec1cf7e",
+      "titre": "CBI Realized Sales",
+      "devise": "GBP",
+      "pays": "Royaume-Uni",
+      "horodatage_utc": "2026-09-24T10:00:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "-42",
+          "precedent": "-48",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/329-uk-cbi-realized-sales"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "2b408996fcbf8a27",
+      "titre": "Core Retail Sales m/m",
+      "devise": "CAD",
+      "pays": "Canada",
+      "horodatage_utc": "2026-09-24T12:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "-0.5%",
+          "precedent": "0.5%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/103-ca-core-retail-sales-mm"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "0235082b4dd81324",
+      "titre": "Current Account",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-24T12:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "-258B",
+          "precedent": "-227B",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/195-us-current-account"
+        }
+      ],
+      "unite": "B",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "47cf20e4444f06d5",
+      "titre": "FOMC Member Barkin Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-24T12:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/728-us-fomc-member-barkin-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "4ce094655a531dae",
+      "titre": "Retail Sales m/m",
+      "devise": "CAD",
+      "pays": "Canada",
+      "horodatage_utc": "2026-09-24T12:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "-0.8%",
+          "precedent": "0.6%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/104-ca-retail-sales-mm"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "89957528137610a5",
+      "titre": "Unemployment Claims",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-24T12:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "201K",
+          "precedent": "196K",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/11-us-unemployment-claims"
+        }
+      ],
+      "unite": "K",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "940104c328c7c5a3",
+      "titre": "FOMC Member Hammack Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-24T12:50:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/913-us-fomc-member-hammack-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "cd9987aa062befee",
+      "titre": "Belgian NBB Business Climate",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-24T13:00:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "-13.5",
+          "precedent": "-13.2",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/317-be-nbb-business-climate"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "1931d037c0b2204c",
+      "titre": "CB Leading Index m/m",
+      "devise": "CNY",
+      "pays": "Chine",
+      "horodatage_utc": "2026-09-24T13:00:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "-0.3%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/495-ch-cb-leading-index-mm"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "38bd4e892d5a1224",
+      "titre": "MPC Member Breeden Speaks",
+      "devise": "GBP",
+      "pays": "Royaume-Uni",
+      "horodatage_utc": "2026-09-24T13:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/899-uk-mpc-member-breeden-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "4b0e3e50920c3a66",
+      "titre": "MPC Member Lombardelli Speaks",
+      "devise": "GBP",
+      "pays": "Royaume-Uni",
+      "horodatage_utc": "2026-09-24T14:00:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/908-uk-mpc-member-lombardelli-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "2abbc97e2f482706",
+      "titre": "New Home Sales",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-24T14:00:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "615K",
+          "precedent": "607K",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/231-us-new-home-sales"
+        }
+      ],
+      "unite": "K",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "4244efb4d0331f6d",
+      "titre": "FOMC Member Paulson Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-24T14:10:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/920-us-fomc-member-paulson-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "aa3042fabcdfafa1",
+      "titre": "President Trump Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-24T14:15:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/645-us-president-trump-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "2c2e09c396f82148",
+      "titre": "Natural Gas Storage",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-24T14:30:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "50B",
+          "precedent": "44B",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/26-us-natural-gas-storage"
+        }
+      ],
+      "unite": "B",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "c1b99d55889709fc",
+      "titre": "Bank Holiday",
+      "devise": "CNY",
+      "pays": "Chine",
+      "horodatage_utc": "2026-09-24T23:01:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "holiday",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/468-ch-bank-holiday"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "119e650a389ec8ac",
+      "titre": "GfK Consumer Confidence",
+      "devise": "GBP",
+      "pays": "Royaume-Uni",
+      "horodatage_utc": "2026-09-24T23:01:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "-16",
+          "precedent": "-14",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/188-uk-gfk-consumer-confidence"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "aa3042fabcdfafa1",
+      "titre": "President Trump Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-24T23:55:00Z",
+      "date_utc": "2026-09-24",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/645-us-president-trump-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "13d4094e4ededd7c",
+      "titre": "BOJ Core CPI y/y",
+      "devise": "JPY",
+      "pays": "Japon",
+      "horodatage_utc": "2026-09-25T05:00:00Z",
+      "date_utc": "2026-09-25",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "1.5%",
+          "precedent": "1.6%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/631-jn-boj-core-cpi-yy"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "adb47fa3bb3f1c73",
+      "titre": "German GfK Consumer Climate",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-25T06:00:00Z",
+      "date_utc": "2026-09-25",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "-27.1",
+          "precedent": "-26.6",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/335-ge-gfk-consumer-climate"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "62894f9e43982f06",
+      "titre": "M3 Money Supply y/y",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-25T08:00:00Z",
+      "date_utc": "2026-09-25",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "3.5%",
+          "precedent": "3.4%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/375-ez-m3-money-supply-yy"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "cac0a8e334b2e0a3",
+      "titre": "Private Loans y/y",
+      "devise": "EUR",
+      "pays": "Zone euro",
+      "horodatage_utc": "2026-09-25T08:00:00Z",
+      "date_utc": "2026-09-25",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "3.2%",
+          "precedent": "3.1%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/365-ez-private-loans-yy"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "14afd2befc7f5037",
+      "titre": "BOE Gov Bailey Speaks",
+      "devise": "GBP",
+      "pays": "Royaume-Uni",
+      "horodatage_utc": "2026-09-25T09:15:00Z",
+      "date_utc": "2026-09-25",
+      "precision_heure": "heure",
+      "impact": "high",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/838-uk-boe-gov-bailey-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "34c7ad8a699c567b",
+      "titre": "FOMC Member Williams Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-25T09:15:00Z",
+      "date_utc": "2026-09-25",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/518-us-fomc-member-williams-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "983c60389cb89e27",
+      "titre": "Core Durable Goods Orders m/m",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-25T12:30:00Z",
+      "date_utc": "2026-09-25",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "0.6%",
+          "precedent": "0.4%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/350-us-core-durable-goods-orders-mm"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "b31577424f2f606a",
+      "titre": "Durable Goods Orders m/m",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-25T12:30:00Z",
+      "date_utc": "2026-09-25",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "-0.3%",
+          "precedent": "1.1%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/349-us-durable-goods-orders-mm"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "c0121b8b2a511c16",
+      "titre": "FOMC Member Schmid Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-25T13:20:00Z",
+      "date_utc": "2026-09-25",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/912-us-fomc-member-schmid-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "f1dc9575130f9d95",
+      "titre": "Revised UoM Consumer Sentiment",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-25T14:00:00Z",
+      "date_utc": "2026-09-25",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "47.4",
+          "precedent": "47.8",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/54-us-revised-uom-consumer-sentiment"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "a3fbce763c3ca415",
+      "titre": "Revised UoM Inflation Expectations",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-25T14:00:00Z",
+      "date_utc": "2026-09-25",
+      "precision_heure": "heure",
+      "impact": "medium",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "4.6%",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/238-us-revised-uom-inflation-expectations"
+        }
+      ],
+      "unite": "%",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "7bed293faca5ce61",
+      "titre": "FOMC Member Hammack Speaks",
+      "devise": "USD",
+      "pays": "États-Unis",
+      "horodatage_utc": "2026-09-25T18:00:00Z",
+      "date_utc": "2026-09-25",
+      "precision_heure": "heure",
+      "impact": "low",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/913-us-fomc-member-hammack-speaks"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    },
+    {
+      "id": "648cce314736f2db",
+      "titre": "Daylight Saving Time Shift",
+      "devise": "NZD",
+      "pays": "Nouvelle-Zélande",
+      "horodatage_utc": "2026-09-26T14:00:00Z",
+      "date_utc": "2026-09-26",
+      "precision_heure": "heure",
+      "impact": "holiday",
+      "valeurs": [
+        {
+          "source": "Forex Factory",
+          "prevision": "",
+          "precedent": "",
+          "resultat": null,
+          "url": "https://www.forexfactory.com/calendar/404-nz-daylight-saving-time-shift"
+        }
+      ],
+      "unite": "",
+      "sources": [
+        "Forex Factory"
+      ]
+    }
+  ]
 }

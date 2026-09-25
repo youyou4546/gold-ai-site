@@ -1,5 +1,33 @@
 {
-  "date": "2026-09-19",
-  "genere_le": "2026-09-19T20:14:19",
-  "evenements": []
+  "date": "2026-09-25",
+  "genere_le": "2026-09-25T03:15:19",
+  "evenements": [
+    {
+      "heure": "2:00pm",
+      "titre": "Revised UoM Consumer Sentiment",
+      "impact": "medium",
+      "prevision": "47.4",
+      "precedent": "47.8",
+      "devise": "USD",
+      "url": "https://www.forexfactory.com/calendar/54-us-revised-uom-consumer-sentiment"
+    },
+    {
+      "heure": "2:00pm",
+      "titre": "Revised UoM Inflation Expectations",
+      "impact": "medium",
+      "prevision": "",
+      "precedent": "4.6%",
+      "devise": "USD",
+      "url": "https://www.forexfactory.com/calendar/238-us-revised-uom-inflation-expectations"
+    },
+    {
+      "heure": "9:15am",
+      "titre": "BOE Gov Bailey Speaks",
+      "impact": "high",
+      "prevision": "",
+      "precedent": "",
+      "devise": "GBP",
+      "url": "https://www.forexfactory.com/calendar/838-uk-boe-gov-bailey-speaks"
+    }
+  ]
 }

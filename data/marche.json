@@ -1,39 +1,91 @@
 {
-  "genere_le": "2026-09-19T23:45:13",
+  "genere_le": "2026-09-25T07:15:19+00:00",
   "actifs": [
     {
       "cle": "or",
-      "nom": "Or (XAU/USD)",
-      "prix": 4380.10214,
-      "variation_pct": -0.0,
-      "source": "Twelve Data"
+      "nom": "Or spot (XAU/USD)",
+      "instrument": "XAU/USD",
+      "type_instrument": "spot",
+      "fournisseur": "Twelve Data",
+      "type_prix": "prix agrégé (le fournisseur ne précise pas bid/ask)",
+      "prix": 4275.14145,
+      "cloture_precedente": 4275.2841,
+      "variation_pct": -0.003,
+      "horodatage_cotation": "2026-09-25T07:15:00+00:00",
+      "marche_ouvert": true,
+      "differe": false
     },
     {
       "cle": "dollar",
       "nom": "Indice dollar (DXY)",
-      "prix": 100.215,
-      "variation_pct": 0.76,
-      "source": "Yahoo Finance (secours)",
+      "instrument": "DX-Y.NYB",
+      "type_instrument": "indice",
+      "fournisseur": "Yahoo Finance",
+      "type_prix": "dernier prix",
+      "differe": true,
+      "prix": 101.183,
+      "cloture_precedente": 101.29000091552734,
+      "variation_pct": -0.106,
+      "horodatage_cotation": "2026-09-25T07:05:16+00:00",
+      "marche_ouvert": true,
       "correlation": "inverse",
-      "correlation_explication": "Un dollar plus fort rend l'or plus cher pour les autres devises → généralement baissier pour l'or, et inversement."
+      "correlation_explication": "Un dollar plus fort rend l'or plus cher pour les autres devises → souvent baissier pour l'or, et inversement."
     },
     {
       "cle": "rendement10ans",
-      "nom": "Rendement obligataire US 10 ans",
-      "prix": 4.998,
-      "variation_pct": 0.75,
-      "source": "Yahoo Finance (secours)",
+      "nom": "Rendement US 10 ans",
+      "instrument": "^TNX",
+      "type_instrument": "taux (%)",
+      "fournisseur": "Yahoo Finance",
+      "type_prix": "dernier prix",
+      "differe": true,
+      "prix": 5.162,
+      "cloture_precedente": 5.113999843597412,
+      "variation_pct": 0.939,
+      "horodatage_cotation": "2026-09-24T18:59:54+00:00",
+      "marche_ouvert": false,
       "correlation": "inverse",
-      "correlation_explication": "Des rendements obligataires plus élevés rendent les obligations plus attractives face à l'or (qui ne rapporte pas d'intérêt) → généralement baissier pour l'or, et inversement."
+      "correlation_explication": "Des rendements plus élevés rendent les obligations plus attractives face à l'or (qui ne rapporte pas d'intérêt) → souvent baissier pour l'or, et inversement."
     },
     {
       "cle": "argent",
-      "nom": "Argent (XAG/USD)",
-      "prix": 67.149,
-      "variation_pct": 5.72,
-      "source": "Yahoo Finance (secours)",
+      "nom": "Argent — contrat à terme COMEX (SI=F)",
+      "instrument": "SI=F",
+      "type_instrument": "contrat à terme",
+      "fournisseur": "Yahoo Finance",
+      "type_prix": "dernier prix",
+      "differe": true,
+      "prix": 64.18,
+      "cloture_precedente": 63.457000732421875,
+      "variation_pct": 1.139,
+      "horodatage_cotation": "2026-09-25T07:05:00+00:00",
+      "marche_ouvert": true,
       "correlation": "positif",
-      "correlation_explication": "L'argent est un métal précieux qui suit historiquement des mouvements similaires à l'or (tous deux réagissent au dollar et aux taux) → corrélation généralement positive."
+      "correlation_explication": "L'argent réagit souvent aux mêmes facteurs que l'or (dollar, taux) → évolue généralement dans le même sens. Il ne « cause » pas les mouvements de l'or."
     }
-  ]
+  ],
+  "correlations_observees": {
+    "calcule_le": "2026-09-25T06:36:56+00:00",
+    "methode": "corrélation de Pearson des variations quotidiennes de clôture (or spot Twelve Data vs instrument Yahoo), dates communes",
+    "valeurs": {
+      "dollar": {
+        "coefficient": -0.6,
+        "seances": 60,
+        "du": "2026-07-01",
+        "au": "2026-09-25"
+      },
+      "rendement10ans": {
+        "coefficient": -0.37,
+        "seances": 60,
+        "du": "2026-06-30",
+        "au": "2026-09-24"
+      },
+      "argent": {
+        "coefficient": 0.76,
+        "seances": 60,
+        "du": "2026-07-02",
+        "au": "2026-09-25"
+      }
+    }
+  }
 }

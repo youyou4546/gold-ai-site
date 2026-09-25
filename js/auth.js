@@ -61,6 +61,10 @@ window.GoldAI = window.GoldAI || {};
   function afficherApp(nom) {
     document.getElementById("nom-utilisateur-affiche").textContent = nom;
     afficherEcran("app-principale");
+    // Données publiées (marché, calendrier, actualités) et cotations en direct :
+    // un seul flux pour toute l'app, démarré une fois après la connexion.
+    window.GoldAI.donnees?.demarrer();
+    window.GoldAI.cotations?.demarrer();
     // Marché est l'onglet par défaut : charge ses données dès l'affichage de
     // l'app, comme si on venait de cliquer dessus (les autres onglets se
     // chargent à la demande, au clic — voir app.js).
@@ -77,6 +81,10 @@ window.GoldAI = window.GoldAI || {};
     window.GoldAI.parametres?.viderCache();
     window.GoldAI.profilCompte?.viderCache();
     window.GoldAI.chat?.arreterRafraichissement();
+    window.GoldAI.cotations?.arreter();
+    window.GoldAI.donnees?.arreter();
+    window.GoldAI.reglagesCalculateur?.viderCache();
+    window.GoldAI.impact?.viderCache();
     reinitialiserSousVues();
     if (message) {
       document.getElementById("erreur-connexion").textContent = message;
@@ -192,6 +200,10 @@ window.GoldAI = window.GoldAI || {};
     window.GoldAI.parametres?.viderCache();
     window.GoldAI.profilCompte?.viderCache();
     window.GoldAI.chat?.arreterRafraichissement();
+    window.GoldAI.cotations?.arreter();
+    window.GoldAI.donnees?.arreter();
+    window.GoldAI.reglagesCalculateur?.viderCache();
+    window.GoldAI.impact?.viderCache();
     reinitialiserSousVues();
     document.getElementById("nom-utilisateur").value = "";
     document.getElementById("code-utilisateur").value = "";

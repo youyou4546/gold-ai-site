@@ -1,0 +1,2885 @@
+{
+  "genere_le": "2026-09-25T06:39:57+00:00",
+  "fenetre_heures": 36,
+  "sources": [
+    {
+      "source": "Google News — conflit",
+      "statut": "ok",
+      "nombre": 25
+    },
+    {
+      "source": "Google News — sanctions_commerce",
+      "statut": "ok",
+      "nombre": 25
+    },
+    {
+      "source": "Google News — banque_centrale",
+      "statut": "ok",
+      "nombre": 25
+    },
+    {
+      "source": "Google News — declaration",
+      "statut": "ok",
+      "nombre": 25
+    },
+    {
+      "source": "Google News — crise_bancaire",
+      "statut": "ok",
+      "nombre": 25
+    },
+    {
+      "source": "Google News — or_dollar",
+      "statut": "ok",
+      "nombre": 25
+    },
+    {
+      "source": "Réserve fédérale (Fed)",
+      "statut": "ok",
+      "nombre": 20
+    },
+    {
+      "source": "Banque centrale européenne (BCE)",
+      "statut": "ok",
+      "nombre": 15
+    },
+    {
+      "source": "Banque d'Angleterre",
+      "statut": "ok",
+      "nombre": 20
+    }
+  ],
+  "ia": {
+    "statut": "ok",
+    "note": null,
+    "nouveaux_evenements_classes": 143
+  },
+  "evenements": [
+    {
+      "id": "f2a8261d6a1ee1cd",
+      "titre_original": "Dollar perched at two-month high as hot PMI fuels inflation fears, rate hike bets",
+      "titre_fr": "Le dollar atteint un plus haut de deux mois alors que les PMI élevés alimentent les craintes d'inflation et les paris sur une hausse des taux",
+      "resume_fr": "Le dollar a atteint un plus haut de deux mois, soutenu par des données PMI fortes qui raviven les anticipations d'inflation et de hausses de taux.",
+      "categorie": "marche",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "haute",
+      "justification": "Les craintes d'inflation et les anticipations de hausse des taux soutiennent le dollar et pèsent directement sur l'or en dollars.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Un dollar plus fort augmente le coût de l'or pour les acheteurs étrangers et réduit l'attrait de l'or comme couverture d'inflation immédiate."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T07:01:11+00:00",
+      "dernier_article_le": "2026-09-24T07:01:11+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Dollar perched at two-month high as hot PMI fuels inflation fears, rate hike bets",
+          "source": "WHTC",
+          "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQTHN1aWM3d2djdHVXT3hpR19LTDQyWFVYX2EzTG1NUkp0M0tJeDVvcWNsYzdvOWU2SGJXTklIMldqekxvdGpJLTZhSHduaXJGamRHVG9nVXl4TkdCUHpibGVaU1BKQkF3ZTRzUXo3bXMzbk9PcG9RT1RpU242TDlYeGttdDlhUlIzVWtvVmppWUY0UGlEYm9EUjNqc1BtcFVKd29fTFRSX2pBcjhoR2c?oc=5",
+          "publie_le": "2026-09-24T07:01:11+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "2a4f41a67d903e77",
+      "titre_original": "Missile War Monitor: Russia hits Kyiv day and night as Moscow rebuffs ceasefire calls",
+      "titre_fr": "Moniteur de la guerre aux missiles : la Russie frappe Kyiv jour et nuit alors que Moscou rejette les appels au cessez-le-feu",
+      "resume_fr": "La Russie continue de frapper Kyiv jour et nuit et rejette les appels au cessez-le-feu.",
+      "categorie": "conflit",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "L'escalade du conflit soutient généralement l'or comme actif refuge, bien que l'effet dépende de la perception du risque systémique.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "L'intensification des hostilités renforce la demande d'or refuge en cas d'aggravation des tensions géopolitiques."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T08:23:36+00:00",
+      "dernier_article_le": "2026-09-24T08:23:36+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Missile War Monitor: Russia hits Kyiv day and night as Moscow rebuffs ceasefire calls",
+          "source": "intellinews.com",
+          "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPTUV5d0ZXajVIQzl2ZV9vODlmb3MzemgwWHNPU090OHV6NUZ0ZDVnV3hWcDFTM1A2WklDNlhMWHJMaW1wVUh4ek1wNHJ5SEFkc2Vnc0FrbGpCRUVDU1BMZnRYYnVRZWNmTVhMNW5sOE8xT2NNY1RBb053VTAwa0RBNkszUHUzcUFUc0J5T19MRm1YbHBZR0d4S19TM1JGRWhDRjJhc1RWWno1SExLYmNvcEhuRXdRU0dRMVhNTEhXdnpoQlhxSFJPUmM2Z1JlWjQ?oc=5",
+          "publie_le": "2026-09-24T08:23:36+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "3a34c5a012530c87",
+      "titre_original": "Philip R. Lane: The outlook for the euro area economy",
+      "titre_fr": "Philip R. Lane : Les perspectives pour l'économie de la zone euro",
+      "resume_fr": "La BCE par la voix de Philip R. Lane commente les perspectives économiques de la zone euro.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les déclarations de responsables de la BCE sur les perspectives économiques peuvent influencer les attentes de politique monétaire et les flux vers l'euro par rapport au dollar.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "L'impact dépendra du ton adopté sur la politique monétaire future et les risques économiques pour la zone euro."
+      },
+      "statut": "confirmé",
+      "raison_statut": "communiqué d'une source officielle",
+      "fiabilite": 3,
+      "officiel": true,
+      "publie_le": "2026-09-24T09:00:00+00:00",
+      "dernier_article_le": "2026-09-24T09:00:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Philip R. Lane: The outlook for the euro area economy",
+          "source": "Banque centrale européenne (BCE)",
+          "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp260924~e0eceef02c.en.pdf",
+          "publie_le": "2026-09-24T09:00:00+00:00",
+          "officiel": true
+        }
+      ]
+    },
+    {
+      "id": "b9df2e355405ce5b",
+      "titre_original": "Swiss National Bank Holds Rates for Fifth Straight Meeting, Softens Language on Currency Intervention",
+      "titre_fr": "La Banque nationale suisse maintient les taux pour la cinquième réunion consécutive et adoucit le langage sur l'intervention sur les changes",
+      "resume_fr": "La BNS a maintenu les taux inchangés pour la cinquième réunion d'affilée et a adouci son langage sur l'intervention monétaire.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "L'assouplissement du langage sur l'intervention change les attentes de politique monétaire et peut affecter les flux vers le franc suisse et l'or.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Un assouplissement des positions sur l'intervention peut réduire les pressions déflationnistes et favoriser l'or comme couverture."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T09:25:00+00:00",
+      "dernier_article_le": "2026-09-24T09:25:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Swiss National Bank Holds Rates for Fifth Straight Meeting, Softens Language on Currency Intervention",
+          "source": "finance.biggo.com",
+          "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBlMjlLV0xKMnVPVDgzbGIzalJzZEFFa21INEF6Y3FCTWFadnExMWhpOHdDSUFWbXIybW1kZVl4b3k5aUZoU3RCMnNFVWl3aXhiSnl5LU9LbzFBeHBLNVpJcE5ORmVUd29iRXFMSmgwM2ZCbWNCa2c?oc=5",
+          "publie_le": "2026-09-24T09:25:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "17264bfbca0bbafc",
+      "titre_original": "Gold Prices Decline as Markets Assess Higher Oil Prices and Treasury Yields",
+      "titre_fr": "Les prix de l'or baissent alors que les marchés évaluent la hausse des prix du pétrole et des rendements des bons du Trésor",
+      "resume_fr": "Les prix de l'or reculent face à la hausse des prix du pétrole et des rendements des bons du Trésor.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "haute",
+      "justification": "Les rendements des bons du Trésor plus élevés augmentent le coût d'opportunité de l'or non productif et soutiennent le dollar.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "L'augmentation des rendements des Treasuries réduit l'attractivité relative de l'or et renforce le dollar."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T09:56:08+00:00",
+      "dernier_article_le": "2026-09-24T09:56:08+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Gold Prices Decline as Markets Assess Higher Oil Prices and Treasury Yields",
+          "source": "Yahoo Finance",
+          "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOUXNuTzRIZjJjbHpXeUxtenR2U1RrXzRUVS13dy1DZThPUG9MbEx5QjFPSjF4TTdhOUhEbHBpMWd1RndYLXBuUU5YdG9lSmlNVjlCYVY0eE54RVlYTTZrVEp2VTVYOG1YUHYwTlAxYzlxOVVrTWx4WW1lWVFoeXltc05xcC0tV0hVbnVnSUZlOGdYdWY2VTdCYllMRENET0RZUEFVZFduTQ?oc=5",
+          "publie_le": "2026-09-24T09:56:08+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "73ffe2b00da41fd7",
+      "titre_original": "Diesel export ban backed by Trump could result in 'unintended consequences,' experts warn",
+      "titre_fr": "L'interdiction des exportations de diesel soutenue par Trump pourrait entraîner des 'conséquences non intentionnelles', avertissent les experts",
+      "resume_fr": "Des experts avertissent qu'une interdiction des exportations de diesel soutenue par Trump pourrait produire des conséquences non intentionnelles.",
+      "categorie": "marche",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les mesures commerciales unilatérales impactent les flux de capitaux, les perspectives d'inflation et peuvent affecter le dollar et l'or comme refuge.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Les mesures protectionnistes peuvent créer de l'inflation et de l'incertitude, soutenant l'or, mais l'impact sur le dollar dépend de la réaction des marchés."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "formulé comme une information non vérifiée (« selon des sources »…)",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T10:00:00+00:00",
+      "dernier_article_le": "2026-09-24T10:00:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Diesel export ban backed by Trump could result in 'unintended consequences,' experts warn",
+          "source": "Yahoo Finance",
+          "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxNcVZvQnlScWUtMHp2dmdpdnBtYkk2Vk5wMFMyMXFoVGVnOGxkZXcxaTByZnM2MTZLUWFlUFh2eDRJVG40dTk2c2FjcDB3T1k2RG4zQTVFbHd1cHdkM1NRMnduN2NHQzR2XzFPRWNEa1VQTjZNc0w1bE1vZFV2OVRhTlk4X3Y4SUo1SF8zUmN5YTh6UjNTNUFPMjFtS3ZXQjZPVXZSTFJaeEt4V2JvZktFaWlTTTFFTFo5SWtSRTBtSjdXN2dTYWphbGJtbDloRTltWTNuU01wVVFBNTQ?oc=5",
+          "publie_le": "2026-09-24T10:00:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "3265b66d03fe3d76",
+      "titre_original": "EU says Canada partnership not aimed at US after Trump tariff threat",
+      "titre_fr": "L'UE affirme que son partenariat avec le Canada n'est pas dirigé contre les États-Unis après la menace de tarifs de Trump",
+      "resume_fr": "L'UE déclare que son accord de partenariat avec le Canada n'est pas destiné à répondre aux menaces tarifaires américaines de Trump.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les tensions commerciales et les menaces tarifaires influencent la volatilité du dollar et peuvent affecter les valeurs refuge comme l'or",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Les tensions géopolitiques commerciales renforcent la demande d'actifs refuge tels que l'or"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T10:50:50+00:00",
+      "dernier_article_le": "2026-09-24T10:50:50+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "EU says Canada partnership not aimed at US after Trump tariff threat",
+          "source": "TRT World",
+          "url": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE5MUTdmU0NFaTRiaGRHNDZpallWYThTZlhtODl0UzM0VkdCNHpHMkluWUYwOVJMWlo2bUw0T29aenFCaHR0dnZhbmtESXkwZTN6R3pMRllmTHM?oc=5",
+          "publie_le": "2026-09-24T10:50:50+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "548d730d074e0df7",
+      "titre_original": "U.S. Considers Diesel-Export Restrictions, Not a Ban, Energy Secretary Says",
+      "titre_fr": "Les États-Unis envisagent des restrictions sur les exportations de diesel, pas une interdiction, déclare la secrétaire à l'Énergie",
+      "resume_fr": "Le secrétaire à l'Énergie américain annonce que les États-Unis envisagent des restrictions, non une interdiction, sur les exportations de diesel.",
+      "categorie": "marche",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "faible",
+      "justification": "Mesure énergétique avec impact limité sur les cours de l'or ou du dollar",
+      "interpretation": null,
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T11:04:00+00:00",
+      "dernier_article_le": "2026-09-24T11:04:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "U.S. Considers Diesel-Export Restrictions, Not a Ban, Energy Secretary Says",
+          "source": "WSJ",
+          "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOc09LVEJ6M0RnVGRxMUluTEdJQ01ZX255OWVyTXFOSXYzeG1QMEthaGY2Qm43Wk5NakM3SFNjeFAzWEJPejRkb0FZUTZLNUplOE1UMEFSSXZMRHBkeXp6N3l2c0xrdng3T0RsdmZOaTVWQVVITGhuVlY4RWozb0pqemxVLVFMNkRVVGtEMXNIX2tNTmNNU2JEUkNLaURQRFlsaVVPYkwtWW1Ma09aM0RoX2F4TlVsMGV0U2c?oc=5",
+          "publie_le": "2026-09-24T11:04:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "eabacf5ab75b1518",
+      "titre_original": "Gold price today, Thursday, September 24, 2026: Gold prices fall as inflation concerns steadily mount",
+      "titre_fr": "Prix de l'or aujourd'hui, jeudi 24 septembre 2026 : les prix de l'or chutent à mesure que les préoccupations concernant l'inflation augmentent régulièrement",
+      "resume_fr": "Les prix de l'or baissent alors que les craintes d'inflation persistent.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "Titre qui rend compte d'une baisse des prix de l'or en réaction directe aux attentes d'inflation",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Une inflation croissante peut réduire l'attrait de l'or en raison de l'augmentation des taux d'intérêt réels attendue"
+      },
+      "statut": "confirmé",
+      "raison_statut": "rapporté par 3 médias différents",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T11:06:59+00:00",
+      "dernier_article_le": "2026-09-24T18:16:52+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Gold price today, Thursday, September 24, 2026: Gold prices fall as inflation concerns steadily mount",
+          "source": "Yahoo Finance",
+          "url": "https://news.google.com/rss/articles/CBMigwJBVV95cUxPZWowZGo0XzdHUVB0emxsY0VOUFBvV0ROUVc0bURydjhPVkM5bk1SazRFLThqU2NvTVZxZ1VfYW4wNzJKWGhpZVBIQVctRE9vcnI2cUFGcDI4cUVUMHZ2bHZVVEpKTGNHN3BhcGI0TGhNVHEtdFhvVV9mdkpzQ3ktSm1vVXNHVW4zRlpZbS1RYmhZWkVFeWYyWEMyUUU1MzJ2VnVLT3dCekJFaXk0UG1US0lnc1VXVVE0MXZwbWNVeEV0enFtNXVtcGgyTFpTbDR4Q28wZ0VraVZaSEhnaWRJSE9PTFJuYzBWbW9STjA3VkNDdng3RktUMGU0WHlxRmVrTlZ3?oc=5",
+          "publie_le": "2026-09-24T11:06:59+00:00",
+          "officiel": false
+        },
+        {
+          "titre": "Gold Price Today: Gold Falls 2.48% on September 24, 2026",
+          "source": "USA Today",
+          "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQRG1vU0dFRDJtT3BpR1BzQldlWUU1b0p3R0txbGxpVWk1TnZUdURIOUFRMWxheTg1Q3VGRThWLUNOZmVNSy1xQnNySndyT2ZoSC1NdWh2WmZxeHZlVkZQNERFX0p2YTBwaGhsbEtnQ3MycFJ6MVZwcE40ZGxnQm15b3VjaEZaSVFsYTQxd0xSbWp3MDJ6dUs5YzlsRG8zMjNXOTdzMExIV25KWGNj?oc=5",
+          "publie_le": "2026-09-24T16:14:00+00:00",
+          "officiel": false
+        },
+        {
+          "titre": "Gold Price September 25 2026",
+          "source": "Robinhood",
+          "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQbWdTUUFsNHczS3J4Ul9nUzExckF6ODB5eWE3OFZPQTRPd0hfTzJkRm0yZ2JKYlVUMmVHOGRhWjRpZ1E0VmRXZzRycUFjOWlNTGk2QnB2YjNqRnBMdHVkTmpXNTBiOHU4OEpmN05rTHFPem5rUTdMSFlRWFdpcWpmbWJHeG04YXBvZUhkSk5wSW8wYy1JR0dIRW9tbHpXcmVVRHVWTA?oc=5",
+          "publie_le": "2026-09-24T18:16:52+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "a6937abc3dc1040b",
+      "titre_original": "51 Nations Just Called on Russia to Cease Fire. Moscow Answered With a Day-Long Missile and Drone Barrage on Ukraine",
+      "titre_fr": "51 nations appellent la Russie à cesser le feu. Moscou répond par un jour de barrage de missiles et de drones sur l'Ukraine",
+      "resume_fr": "Après l'appel de 51 nations à un cessez-le-feu, la Russie lance une campagne d'un jour avec missiles et drones contre l'Ukraine.",
+      "categorie": "conflit",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "haute",
+      "justification": "L'escalade des tensions géopolitiques soutient les actifs refuge comme l'or et peut affecter les flux de capital vers le dollar",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "L'intensification du conflit Ukraine-Russie renforce la demande d'or comme valeur refuge face à l'incertitude géopolitique"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T11:30:50+00:00",
+      "dernier_article_le": "2026-09-24T11:30:50+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "51 Nations Just Called on Russia to Cease Fire. Moscow Answered With a Day-Long Missile and Drone Barrage on Ukraine",
+          "source": "UNITED24 Media",
+          "url": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxQNnFrRkZNVjIzdlRqM21TdEtVS1ZmMHNZLXhVNVM1N3pKZUZZdzhCZGVwQXEzTEpaOTlyVGo2WXgxVE5fSFctV3BsbjUxMEY4R2ZkbUE1dDROZV9WRFNYRm9SbnVTVl9zRE04b0stV0NpNFJiWUtJUDJQUVFGTUJWQkhpRDd3TXlsaW15NGNFYlRuYjhKMzhtTnE2X0NNak44eV9FanhERUxYa0s3SEllV096YlpMUVI3SE1DUGhDT1Y4MGl2UnpXb2duQnVsb1VFODUtQkJVTU5uM2NfNnhEeG9jYTVoM3Z3TGVLSjBudXlVVG9P?oc=5",
+          "publie_le": "2026-09-24T11:30:50+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "aae9c3b6340fb0fe",
+      "titre_original": "ECB Executive Board member Isabel Schnabel to resign to take senior role at IMF",
+      "titre_fr": "La membre du conseil exécutif de la BCE Isabel Schnabel démissionne pour prendre un rôle senior au FMI",
+      "resume_fr": "Isabel Schnabel quitte le conseil exécutif de la BCE pour occuper un poste senior au FMI.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "USD",
+        "EUR"
+      ],
+      "importance": "moyenne",
+      "justification": "Changement au sein de la direction de la BCE pouvant affecter les politiques monétaires eurozone et les taux de change EUR/USD, impactant indirectement l'or.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Une transition au leadership de la BCE pourrait entraîner des révisions des anticipations de politique monétaire, créant de la volatilité sur les devises et donc sur l'or."
+      },
+      "statut": "confirmé",
+      "raison_statut": "communiqué d'une source officielle",
+      "fiabilite": 3,
+      "officiel": true,
+      "publie_le": "2026-09-24T12:00:00+00:00",
+      "dernier_article_le": "2026-09-24T12:00:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "ECB Executive Board member Isabel Schnabel to resign to take senior role at IMF",
+          "source": "Banque centrale européenne (BCE)",
+          "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr260924~bea1dd9824.en.html",
+          "publie_le": "2026-09-24T12:00:00+00:00",
+          "officiel": true
+        }
+      ]
+    },
+    {
+      "id": "ce2d7eab46c700c7",
+      "titre_original": "EU launches diplomatic offensive to stop Trump’s diesel export ban",
+      "titre_fr": "L'UE lance une offensive diplomatique pour arrêter l'interdiction d'exportation de diesel de Trump",
+      "resume_fr": "L'UE engage une action diplomatique pour contester l'interdiction d'exportation de diesel annoncée par Trump.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les tensions commerciales USA-UE peuvent créer de l'incertitude géopolitique, généralement favorable aux actifs refuge comme l'or.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Les tensions commerciales accroissent l'aversion au risque et soutiennent la demande d'or comme actif refuge."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T12:10:00+00:00",
+      "dernier_article_le": "2026-09-24T12:10:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "EU launches diplomatic offensive to stop Trump’s diesel export ban",
+          "source": "politico.eu",
+          "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOd3Y2RWUwcjVhQjNwdC1hZ1JFT1ZuT1J5T29PR01OTXNldC1sOFdEeHJINTQzY043c3ZHUkNxNm9fV3hyb0lldFFBNzhUV0hqSnZlTUpwMGdqaTBIRFlmSDB0RVN0Njk3dndhblVnLUlVRWtrWDJwdVQzNGJJWW1NWHA0aHRKb2Y1aDZjM1B3ZmlvdEtvNmxhVWEtZ0hNaTQ?oc=5",
+          "publie_le": "2026-09-24T12:10:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "83ba7337f234d5b9",
+      "titre_original": "Trump-Xi summit live: US president says 'Super Intelligence' will be big topic",
+      "titre_fr": "Sommet Trump-Xi en direct : le président américain déclare que la 'Super Intelligence' sera un grand sujet",
+      "resume_fr": "Lors d'un sommet Trump-Xi, le président américain indique que l'intelligence artificielle sera un sujet majeur.",
+      "categorie": "declaration",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les sommets entre superpuissances et les déclarations commerciales/technologiques peuvent créer de la volatilité géopolitique affectant les actifs refuge.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Selon l'issue du sommet et la perception des tensions USA-Chine, cela pourrait créer de l'incertitude favorable à l'or comme refuge."
+      },
+      "statut": "en développement",
+      "raison_statut": "couverture en direct / en cours",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T12:14:00+00:00",
+      "dernier_article_le": "2026-09-24T12:14:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Trump-Xi summit live: US president says 'Super Intelligence' will be big topic",
+          "source": "Nikkei Asia",
+          "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNZHZIbFBKNTR0VHd6ZjBJNmkzZ0dqZk53Z1ZKREV1SFVnSjZMWmUyMHd5VjhmUVNpc1pOWEJLeE1adFhVbzdTTlJjQ3ZzLVdwaWdUdmFXMTdtYk9vcnFOWXlXWTZaWFZSUV85bHo4SUhIUVE1RjB2ZjlzX3dUcVJBUC16VjlSZ0o1dDFTeEtndTV2T1UyeEp4X3NwR3pUMTlJTm51VnJNR3ZUSUFiekN4MHdCai1QQXI2bmlJSWxCOXhCSEk?oc=5",
+          "publie_le": "2026-09-24T12:14:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "96e0f0ceb0b602cb",
+      "titre_original": "Gold Prices Slip as Strong US Data Fuels Fed Tightening Bets",
+      "titre_fr": "Les prix de l'or baissent alors que les données économiques américaines fortes alimentent les attentes de resserrement de la Fed",
+      "resume_fr": "Des données économiques américaines solides renforcent les anticipations d'un resserrement monétaire par la Réserve fédérale, exerçant une pression baissière sur l'or.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "haute",
+      "justification": "Les attentes de resserrement de la Fed affectent directement le coût d'opportunité de l'or et soutiennent le dollar.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Un resserrement monétaire antérieur augmente les rendements réels en dollars, rendant l'or moins attractif; le dollar bénéficie d'une hausse des taux."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T13:01:16+00:00",
+      "dernier_article_le": "2026-09-24T13:01:16+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Gold Prices Slip as Strong US Data Fuels Fed Tightening Bets",
+          "source": "TradingView",
+          "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQNVl5UkJpSnRBRFZtZVNoODY0N3hmNmR4bGpsUzBPbWlfTTlSNW04QU56Yzl1OEJJUG5UMTZpek1GOEhBdnNTY1NmTnhTbUt3a0VjRm1ITnRFVmRPR1NCQTVjdW9wcngwZ1FvaUpJb2RUYnUyeXp5dEJwYlZXU2JydGh4R3d1bUZrMi03bnE5dE01MWJtMG9ZaDZnMW95TDFZUzkyNGozbXBnZTFqbjZSYQ?oc=5",
+          "publie_le": "2026-09-24T13:01:16+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "04c17c5c31256ec8",
+      "titre_original": "USD/JPY Outlook: Hawkish Fed Recalibration Pressures the Yen",
+      "titre_fr": "Perspective USD/JPY : un recalibrage hawkish de la Fed pèse sur le yen",
+      "resume_fr": "Un ton hawkish révisé de la Réserve fédérale exerce une pression à la baisse sur le yen japonais.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "Un dollar plus fort généralement limité pour l'or, mais l'effet direct sur XAUUSD est secondaire par rapport à l'USD/JPY.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Un dollar plus fort relatif au yen indique une Fed hawkish, ce qui renforce les taux réels en USD et pèse sur l'or."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T13:02:59+00:00",
+      "dernier_article_le": "2026-09-24T13:02:59+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "USD/JPY Outlook: Hawkish Fed Recalibration Pressures the Yen",
+          "source": "Investing.com",
+          "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxOSHkxa05lSWtodlRsVEFGVlJwMzlwVkhBdWMxdmJ3c3MtY215dDQ4ZzZpMl9ocFNLU2VfZHlqRWs3dExoazlRUVFCZVhvX214ZFpkYlUzOXlPQ0lPU0xRMllsX3k5eHFiN1JQZy1BOUpsTjFOVDFBTUdla0VCMEtVRjVRdzRnMDBYUk93dkVBdE5qOWtZNjFub3ZxZVQ5NWRrUlNTeDNR?oc=5",
+          "publie_le": "2026-09-24T13:02:59+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "75cf137bb48670db",
+      "titre_original": "Jamie Dimon Says Recession Is ‘Likely Outcome’ of Trump Tariffs",
+      "titre_fr": "Jamie Dimon déclare qu'une récession est un « résultat probable » des tarifs de Trump",
+      "resume_fr": "Le PDG de JPMorgan déclare qu'une récession est un résultat probable résultant des tarifs du Président Trump.",
+      "categorie": "declaration",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "haute",
+      "justification": "Les craintes de récession augmentent la demande de valeurs refuge comme l'or et peuvent affaiblir le dollar en raison du risque économique.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Une récession réduit les taux d'intérêt réels attendus et accroît l'attrait des actifs refuge; l'or bénéficie généralement des craintes de contraction économique."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T13:10:56+00:00",
+      "dernier_article_le": "2026-09-24T13:10:56+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Jamie Dimon Says Recession Is ‘Likely Outcome’ of Trump Tariffs",
+          "source": "WSJ",
+          "url": "https://news.google.com/rss/articles/CBMiggJBVV95cUxNVXR3eHlUd1FOd0R4ZHZSZ1ljRGVwVDVoR2IxZHJ3SzY2Nll2NVVFVGVVYjhlSHB6U1RCT25pUnZUWkFrSGFhMWlnaThJVFExR2xaUEZpcFJRbFA4SXNWUUZzWE96WWJOQ1VWamIyaExFTmNFQ1p0ZEdEUTA3b3BDTEdRMGt2dFZxR3U5NjY1R0RwVndoc1hNaHQtM2VwcnJMclZrVTF1WnlqRUhjNUZMWU4wdExRUHRSWE1iOFZxWDFLR2k4ZVplaUczeVg3akhXRHRMa3dQZHRRNHFSZUVFaGtRQ21wQndpclRfRmpKcTJrR2F1LTEyY0JLdGRPZUVzNlE?oc=5",
+          "publie_le": "2026-09-24T13:10:56+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "19f275c8b9ced4a5",
+      "titre_original": "Gold price breaks 50-day support as oil rebound lifts inflation pressure - Kitco AM Report",
+      "titre_fr": "Le prix de l'or casse le support des 50 jours alors que la reprise du pétrole renforce les pressions inflationnistes",
+      "resume_fr": "Le prix de l'or franchit à la baisse le support de sa moyenne mobile de 50 jours, tandis que la reprise du pétrole intensifie les pressions inflationnistes.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "La rupture technique est un signal de marché; les pressions inflationnistes peuvent soutenir ou compliquer la trajectoire de la Fed et donc de l'or.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Le franchissement à la baisse du support indique un momentum baissier technique, bien que les pressions inflationnistes puissent créer une tension entre l'attrait de refuge et les attentes de taux réels."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T13:23:49+00:00",
+      "dernier_article_le": "2026-09-24T13:23:49+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Gold price breaks 50-day support as oil rebound lifts inflation pressure - Kitco AM Report",
+          "source": "Kitco",
+          "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPLVVHTVhKSXRXeFhRN3NaSG1UanBtYTJndzR4b3ZQV1RnbzJjYl9CRTZmSnZKR1UxdUJmOEs0em5rVXlyaHBhN21BQ2xNMUVjQ19QVEJPVzk1TDVzTTFfdWVUZXM1SHMwdFpCZU5PNHVHMWtPR0RWYWtfOVFKdmc2Y3p4OXB3QjRSNGJDbnFyUnk2czR4VnlKQUtYeUc2a2s4YjRMV3hXX05laUgyNzZRTV9FRkpwcG9oX0ZwNnVB?oc=5",
+          "publie_le": "2026-09-24T13:23:49+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "9df575ce91086f6e",
+      "titre_original": "From the red phone to the red carpet, Trump and Xi put their trade truce on firmer ground",
+      "titre_fr": "De la ligne rouge au tapis rouge : Trump et Xi consolident leur trêve commerciale sur des bases plus solides",
+      "resume_fr": "Trump et Xi renforcent leur trêve commerciale en plaçant les négociations commerciales sino-américaines sur une base plus stable.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Une réduction des tensions commerciales Sino-américaines réduit l'aversion au risque global et peut favoriser les actifs risqués au détriment de l'or refuge.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "L'apaisement des tensions commerciales diminue la demande d'actifs refuge, ce qui pèse sur l'or; le sentiment de risque s'améliore, réduisant l'attrait de refuge."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T13:30:36+00:00",
+      "dernier_article_le": "2026-09-24T13:30:36+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "From the red phone to the red carpet, Trump and Xi put their trade truce on firmer ground",
+          "source": "Decode39",
+          "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQdmdvcU1RTW5zbUFEaXBlcndmVlA0RHoxMWZIcTg2NFNXVzhNRGltM0JhTlQ0bHpDa1N2WXlucElnTHFNbGM0a2lXOWJWem55NTM5cGZ1MDBKZVAtWGdFQnhic1dTUmxWVEVMNWNROGtReDNXZzdGWXlsY0xwcG13dWhmYzhNZG81cmdfdnZtSEpHWkRPdmlfOWtBSUJGdzh4cXJhZkJiODBLWkJEQl9vcEhwdFI2blU?oc=5",
+          "publie_le": "2026-09-24T13:30:36+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "fc57cca937e59060",
+      "titre_original": "Gold prices fell below the 50-day moving average support, while the rebound in oil prices intensified inflationary pressures.",
+      "titre_fr": "Les prix de l'or sont tombés sous la moyenne mobile de 50 jours, tandis que la reprise du pétrole a intensifié les pressions inflationnistes.",
+      "resume_fr": "Le prix de l'or est passé sous sa moyenne mobile de 50 jours pendant que la reprise du pétrole intensifie les pressions inflationnistes.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "Signal technique baissier combiné à une dynamique inflationniste qui complique l'attrait refuge de l'or face aux attentes de taux réels.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Le passage sous le support de 50 jours suggère une faiblesse technique; une inflation accrue peut inciter la Fed à maintenir une stance hawkish, pesant sur l'or."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T13:52:12+00:00",
+      "dernier_article_le": "2026-09-24T13:52:12+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Gold prices fell below the 50-day moving average support, while the rebound in oil prices intensified inflationary pressures.",
+          "source": "moomoo.com",
+          "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxOVVlrbk54ZlRQeURJQkJlZnhUbXhPYzREdUpkUkxtLVVrT3hydWlhQmZpSjRVbWl4U1JjZVNmUU0wYkFhR0tiWXlZbG53TTZtbHhVM2pNajhSMFptNk9FdVJFQVViajhudHZpelhKYXBlTXNJRFhpdG41RFdmaWgyR2c1Q3dZRVRSNU5EdC1CbXE5YWxJRGNDa1JzenB6Z19EY0E?oc=5",
+          "publie_le": "2026-09-24T13:52:12+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "cea5624a2680613e",
+      "titre_original": "Hamas ready to implement roadmap for Gaza ceasefire agreement: official",
+      "titre_fr": "Le Hamas prêt à mettre en œuvre une feuille de route pour un accord de cessez-le-feu à Gaza",
+      "resume_fr": "Un responsable du Hamas a déclaré que le mouvement est prêt à appliquer une feuille de route pour un accord de cessez-le-feu à Gaza.",
+      "categorie": "conflit",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les progrès vers un cessez-le-feu au Moyen-Orient réduisent les primes de risque géopolitique, affectant les valeurs refuges comme l'or.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Un apaisement du conflit pourrait diminuer la demande de valeurs refuge, exerçant une pression baissière sur l'or."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T14:10:00+00:00",
+      "dernier_article_le": "2026-09-24T14:10:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Hamas ready to implement roadmap for Gaza ceasefire agreement: official",
+          "source": "bastillepost.com",
+          "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxOdTFqUVZXRGFjb1dzSDltajJ0dmg3S1B4U2tXbDBOMGNuUlpPVFBXVW1iSEhUUV9ZWjMyMzctbWxtTlBqX1FwMmxBR2lobTIwc2tST1RmRjhaeEdCZExSQl9xVDRqWEttdDJEWXVHTTRyUllDR3B6eEtNMTV2LTZwTVFsR2VLQ1g0aEswQktPVEpNZnMyOVRVeW5LbjNqRHdmbkNHeVlQeGlKQlpyZUJmMjRobkt6VGV3dm5hLUFoYw?oc=5",
+          "publie_le": "2026-09-24T14:10:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "a9e24adfd07ffef1",
+      "titre_original": "Big business warns Trump against diesel export ban in joint letter",
+      "titre_fr": "Les grandes entreprises avertissent Trump contre une interdiction d'exportation de diesel dans une lettre conjointe",
+      "resume_fr": "De grandes entreprises ont exprimé leur opposition conjointe à une potentielle interdiction d'exportation de diesel proposée par Trump.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Une interdiction d'exportation affecterait le commerce américain et pourrait créer de l'incertitude macroéconomique, impactant le dollar et les actifs refuges.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "L'incertitude commerciale et les risques pour l'économie mondiale tendraient à renforcer la demande pour l'or comme valeur refuge."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T14:22:46+00:00",
+      "dernier_article_le": "2026-09-24T14:22:46+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Big business warns Trump against diesel export ban in joint letter",
+          "source": "CNBC",
+          "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPZlVmLXpSVTZKZHlVa3U4MFdoUUhPNXJYWXJGdWI3VVVmblBvblFiX1hmQjJKQ2hVcUx1cnhTcUE0S0g4a2dGQUNNb05QeV9CZkItcXpBeldoLXBHcWxTZVhUNkNlVXQ5VEN3MldmT2dJNDRfN3hxQ2ZnVjVQTXhWTXRaV1dUUVowUzZEM05oSXN5LTdQcUY1NnE3SUExVzBoUEFzcEhVaWhqQdIBrwFBVV95cUxQdjI4c0xkcVFtc3ZFOWdBNUxfcnJUSHlnMGlTd1FpNE9GYjZTQTVid3c3bEF3TW1Hc0JUSGNfNENJLUhUc3FOWDc2X2Q3b1NMOVV1SnFNN1l2Q19RTU92VmtVRmlBMTNqX1pNM3NJZzNQQktISl9OM0l6RzllT2pYZ0drRzI5ODdHTlFseV9oRV9USFZVdUk1b3ZGdnBUZHZORk9OZjd4MEgza0FGTmk4?oc=5",
+          "publie_le": "2026-09-24T14:22:46+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "6cc1d72c6ceeb2bf",
+      "titre_original": "Watch: Why Trump’s push to scrap quarterly earnings caused Wall Street to ‘freak out’",
+      "titre_fr": "Regardez : Pourquoi la volonté de Trump d'abolir les rapports trimestriels a provoqué un « choc » à Wall Street",
+      "resume_fr": "La proposition de Trump de supprimer les rapports financiers trimestriels a provoqué une réaction négative chez les professionnels de Wall Street.",
+      "categorie": "declaration",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Une réaction de marché sur Wall Street peut influencer la volatilité du dollar et les appétences pour les actifs refuges comme l'or.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Une inquiétude accrue concernant la transparence des marchés pourrait augmenter la recherche de valeurs refuge comme l'or."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T14:32:53+00:00",
+      "dernier_article_le": "2026-09-24T14:32:53+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Watch: Why Trump’s push to scrap quarterly earnings caused Wall Street to ‘freak out’",
+          "source": "Straight Arrow",
+          "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPSnNXLXV5S1ktMWhCTjFDUkZ4T3VISTRyVkNJeEdJd29JX0d3ckh0S0V5akpNSHN3WnlJbVVWeXlkRDVCTWkybE45M0dIMEJBbnRWUWx1bHVpMDNvWjdXR1Q4MW9keGhfRkl3djJnT3p4NDlwVjZoN2FMMmg5bGpqVzZfNlA2d0FGMjRhV3Qycko4Y3BJaVJWdmEwbF8xel9BR0lQby15a1k2NmRacGF1T1RIZFlrSEphM1kzYnQ2QzZ0Wk0?oc=5",
+          "publie_le": "2026-09-24T14:32:53+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "366f811e5cf0ea19",
+      "titre_original": "EU says Trump plan to ban US diesel exports would ‘negatively impact both sides’",
+      "titre_fr": "L'UE dit que le projet d'interdiction des exportations de diesel américain aurait un « impact négatif des deux côtés »",
+      "resume_fr": "L'Union européenne a déclaré qu'une interdiction proposée des exportations de diesel américain aurait des conséquences négatives pour les deux parties.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les tensions commerciales transatlantiques accroissent l'incertitude macroéconomique et renforcent l'appétence pour les actifs refuges.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Les tensions commerciales internationales augmentent l'aversion au risque, soutenant les investissements dans l'or comme valeur refuge."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T14:46:00+00:00",
+      "dernier_article_le": "2026-09-24T14:46:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "EU says Trump plan to ban US diesel exports would ‘negatively impact both sides’",
+          "source": "The Guardian",
+          "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNam1maVdMUm9JWUpxcjBGNklxZmRPZHZhcThkWFVUOHhFX28wRFhRR0Q4amlmNGZpZ0VobjFqNFBsTURmMWdwUjJWdGZaR3ljdjIyQVd3NGdyTkd5SUFDRDR0X2NGV0JOdER4NVNoV1hTSGdUWjAwLUlFRmo2T2VtQ3V0aHptN2VsaEFOQXl5emp0X2NjZk53Wjd3?oc=5",
+          "publie_le": "2026-09-24T14:46:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "f608357ef908d605",
+      "titre_original": "Americans, Canadians say Trump was wrong to impose tariffs on Canada: Poll",
+      "titre_fr": "Américains et Canadiens déclarent que Trump avait tort d'imposer des tarifs au Canada : Sondage",
+      "resume_fr": "Un sondage montre que les citoyens américains et canadiens désapprouvent l'imposition de tarifs contre le Canada par Trump.",
+      "categorie": "declaration",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "faible",
+      "justification": "L'opinion publique peut influencer les politiques futures mais n'a pas d'impact immédiat sur les marchés de l'or et du dollar.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Le sentiment public contre les tarifs pourrait réduire les risques géopolitiques si les politiques étaient modifiées."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T14:51:02+00:00",
+      "dernier_article_le": "2026-09-24T14:51:02+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Americans, Canadians say Trump was wrong to impose tariffs on Canada: Poll",
+          "source": "Anadolu Ajansı",
+          "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQU0JEVmJ6Zks2NWs2RHM1TVRnUHE5SkpNMmJpRk02cXl6RS1xSm81TnRhT1Rkc04wbTRiZDlET3djMTVWcW5qdW1wbG9OcjZFSUZqSGhXbEVMLTRBbXR1cWYyZHhQUlFDMXU5MzhNNmlHdlRmM3RJR1IwUXZ4UHlvR2RhZFY2dkRyT1R5bXZtM0VyX0J2S3RTcUxrVUpJMVN3Y2VmWk1SWTdsb3FldkJqTzljWQ?oc=5",
+          "publie_le": "2026-09-24T14:51:02+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "54ed6d86a4b81b3e",
+      "titre_original": "US-China decisions on security, tech, AI can bring ‘decades’ of peace, Trump says",
+      "titre_fr": "Les décisions américano-chinoises en matière de sécurité, de technologie et d'IA pourraient apporter « des décennies » de paix, selon Trump",
+      "resume_fr": "Trump a déclaré que des décisions communes entre les États-Unis et la Chine sur la sécurité, la technologie et l'IA pourraient apporter une paix durable.",
+      "categorie": "declaration",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Toute amélioration des relations US-Chine réduirait les primes géopolitiques et affecterait la demande pour les valeurs refuges comme l'or.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Un apaisement des tensions géopolitiques majeures diminuerait l'appétence pour l'or comme valeur refuge."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T14:51:04+00:00",
+      "dernier_article_le": "2026-09-24T14:51:04+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "US-China decisions on security, tech, AI can bring ‘decades’ of peace, Trump says",
+          "source": "Anadolu Ajansı",
+          "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPOXNIRm1lN0VwSUNoVkd2RDJPQ0NzbEQ2YmprT05FaVQ2Q1htXzdJWjQxZENpa2d6TnVjNnU4TUFPY3V0RVRockJXT054U3MzbWkwajZmRnh1VzMxc09WRmo4YmNBallLdEVzdzh4Y3N0cXBWQjE4Q3dkQlBZbjB2Y19uRlBfNDRhM3pQUzB2YmV1cW1la0pGZVV6YzFCaWVwc3NlZ05FOXd2RUFnZzFLTEMwM3dWMnhPWWRxYThRdw?oc=5",
+          "publie_le": "2026-09-24T14:51:04+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "a08fd0170e1e086a",
+      "titre_original": "Trump Says He and Xi Made ‘Tremendous Progress’ on Issues Facing Both Countries",
+      "titre_fr": "Trump affirme qu'il et Xi ont réalisé des « progrès considérables » sur les questions affectant les deux pays",
+      "resume_fr": "Trump déclare avoir réalisé des progrès considérables avec Xi sur les enjeux communs aux États-Unis et à la Chine.",
+      "categorie": "declaration",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les déclarations sur les relations commerciales sino-américaines peuvent affecter les devises de risque et les flux vers l'or refuge.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Un sentiment de rapprochement réduirait les tensions géopolitiques, diminuant la demande d'or refuge et soutenant le dollar dans un environnement moins risqué."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T14:53:43+00:00",
+      "dernier_article_le": "2026-09-24T14:53:43+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Trump Says He and Xi Made ‘Tremendous Progress’ on Issues Facing Both Countries",
+          "source": "bloomingbit",
+          "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE0zbkJoanh4eGtTM05qcTNRVGtxVWI3cE9Tam1ickxRRWxXNmc0UTFoWlc4NHNDZ3U0Z3pFWkgyR0FveTlUNER2X0lXZmxSa3JaSFB6RA?oc=5",
+          "publie_le": "2026-09-24T14:53:43+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "7913fd695a309a1a",
+      "titre_original": "USD/CHF (USDCHF) Volatility Intensified on Sep 24: Factors to Watch",
+      "titre_fr": "La volatilité USD/CHF (USDCHF) s'intensifie le 24 sep : facteurs à surveiller",
+      "resume_fr": "La volatilité de la paire USD/CHF s'est intensifiée le 24 septembre.",
+      "categorie": "marche",
+      "actifs": [
+        "USD",
+        "CHF"
+      ],
+      "importance": "faible",
+      "justification": "Observation de volatilité sur une paire spécifique sans nouveau catalyseur identifié pour l'or.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "La volatilité accrue du dollar peut être neutre ou indirectement refléter une réévaluation du risque affectant l'or."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T15:05:20+00:00",
+      "dernier_article_le": "2026-09-24T15:05:20+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "USD/CHF (USDCHF) Volatility Intensified on Sep 24: Factors to Watch",
+          "source": "TradingKey",
+          "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOY0pGQ2tTZ01ncW14NHNhMlpNenVZNEF4NFlSTWdlWDdYUnRzNFlQWlRUUWdJeWRELXZJaW8xNVlRWEhPNHdPTmZQUzlZaW9SQml6VzJNZGtReVRmeGNaekItVXdJalZNMVN3bkMzd0ZKdXVBZVhrQTY2SV9FVkVmenR3S0RHTDhmS2Z0V2dR?oc=5",
+          "publie_le": "2026-09-24T15:05:20+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "9115ddefbe4c70cc",
+      "titre_original": "Gold price slides as oil, Fed rate concerns lift dollar",
+      "titre_fr": "Le prix de l'or baisse alors que le pétrole et les préoccupations concernant les taux de la Fed soutiennent le dollar",
+      "resume_fr": "Le prix de l'or baisse tandis que les préoccupations concernant les taux de la Fed soutiennent le dollar et le pétrole.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "haute",
+      "justification": "Directement pertinent pour l'or et le dollar : baisse de l'or liée à la force du dollar et aux attentes de taux.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Un dollar plus fort en réaction aux taux de la Fed réduit la demande d'or libellé en dollars et augmente le coût d'opportunité par rapport aux actifs rémunérés."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T15:09:15+00:00",
+      "dernier_article_le": "2026-09-24T15:09:15+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Gold price slides as oil, Fed rate concerns lift dollar",
+          "source": "Mining.com",
+          "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE5iUmo2eGVHdGJVZnp5cjBNX0hVQzNWYk5TcTBneUl3OFhzRVViLTlpd2d3V1EzUEpVR3U1VktmQ0dlZ3V2Zm5Jcml2aWd2OFdLQV9EeTVXNi0zUEpIZkNoVnlwQU0wWmdoeW5ONE11ekZ4U282Zi1jZ0ZPcHo?oc=5",
+          "publie_le": "2026-09-24T15:09:15+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "853859db97c4f658",
+      "titre_original": "An October Surprise: Another Rate Hike Coming",
+      "titre_fr": "Une surprise en octobre : une autre hausse de taux à venir",
+      "resume_fr": "Anticipation d'une hausse de taux supplémentaire en octobre.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "haute",
+      "justification": "Les attentes de hausse de taux de la Fed soutiennent directement le dollar et pèsent sur l'or en augmentant le coût de détention.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Des taux plus élevés renforcent le dollar et réduisent l'attrait de l'or non rémunéré pour les investisseurs."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T15:16:53+00:00",
+      "dernier_article_le": "2026-09-24T15:16:53+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "An October Surprise: Another Rate Hike Coming",
+          "source": "Seeking Alpha",
+          "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOYVJ5NklCS2pWR0l4bGV5R1UySURGNllSVk5lVlNpdTRGYXVMR2ZzZ01XbVFlRzVMNU1LWjlzd2NyTzFMVE0wVnNiZjkzeDUwUl9lcnpoRXA5OGludTBfRVVDMzRneWFXQ0hKVFJKeUFWN21LWVJQVEdReVctQTRfT0NRQ1NXVjNRTmJta053?oc=5",
+          "publie_le": "2026-09-24T15:16:53+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "2e7389feefd6d291",
+      "titre_original": "SBA Loan Defaults Surged at 2 Nonbank Lenders. $1.3 Billion Entered Liquidation",
+      "titre_fr": "Les défauts de prêts de la SBA ont augmenté chez 2 prêteurs non bancaires. 1,3 milliard de dollars sont entrés en liquidation",
+      "resume_fr": "Deux prêteurs non bancaires ont connu une augmentation des défauts de prêts SBA, avec 1,3 milliard de dollars entrés en liquidation.",
+      "categorie": "crise_bancaire",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les tensions du crédit et les liquidations peuvent augmenter la demande refuge vers l'or, mais l'impact reste limité aux prêteurs non bancaires.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Les défauts de crédit et liquidations renforcent les craintes de crise financière, favorisant les actifs refuge comme l'or."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T15:51:58+00:00",
+      "dernier_article_le": "2026-09-24T15:51:58+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "SBA Loan Defaults Surged at 2 Nonbank Lenders. $1.3 Billion Entered Liquidation",
+          "source": "inc.com",
+          "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPZWNwNHNLWkIzM0FkTnhBZm5OZ2phRjdjR0NjVEZJakhvQVhhS0R3dXkzUWxtZWdnWTF3T0d1cE5ubHNtQ0UwREdkM09uV1RmMHo1WFMyOC1kUUtSa0dfTUtaaVVtRnloYVdER3dIN0t5Y0Y4OF9OMnBta0hBV1ZXU3A4WThpeHZ3UFhCY25GTldFQ3B5QU5nNGl5RXEzemxKdVdZSzk5LWJQMjh6bnpCcmxVTTBCXzA0Zjh4S1JR?oc=5",
+          "publie_le": "2026-09-24T15:51:58+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "ca5da3f3f867dfe0",
+      "titre_original": "Carney reveals Canada has examined risk of US military action under Trump",
+      "titre_fr": "Carney révèle que le Canada a examiné le risque d'une action militaire américaine sous Trump",
+      "resume_fr": "Le Canada a examiné les risques d'une action militaire américaine potentielle sous l'administration Trump.",
+      "categorie": "conflit",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les tensions géopolitiques augmentent la demande d'actifs refuge, mais la pertinence directe pour XAUUSD dépend de l'escalade réelle.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Les risques géopolitiques accroissent la demande d'or comme actif de sécurité en période d'incertitude."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T15:55:39+00:00",
+      "dernier_article_le": "2026-09-24T15:55:39+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Carney reveals Canada has examined risk of US military action under Trump",
+          "source": "The News International",
+          "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNRWxjaXBHTTBDXy1odVlicDdrb1NLRmRNUmkteDhCWkVIV2VaTFI2S3UtSXJ1emRuU1pMNXBKQno3MUhBbUhqbjgwYlh0ZlY4ek5pVU5CRlNrM0s2Tm1QWFZvZE1iQW9nTEFQUVVXWTFNa09ka3FwaldJcENucUQ5aXJkVnNVMUgwZHpCTm90bXllTmhwOVhfU2Y4M0N0ZkptUmphdm9VYVhWQlU5QkZMbUt6TUFDUdIBsgFBVV95cUxNUHFZSFBETTdvUEJPZ0FvOGY2U09zRXhiczc4X3NKQU9id3otSUhON3NXWGxvZFcwY1cyUDhZOFN2UWUwNGdCME90VEhpQ0dmTmFJRTY0NnBMTVlsZkFFNGppMGJiN3NyRnhhTXlTUjhZMHd2ekhMQldzVFdkcGRUVlVyeWkzV1pfc0tzWllCRnd5VjRkMGkwbkpJcklkZTJmakloXzRqLU04LXd1ZXkyTGRR?oc=5",
+          "publie_le": "2026-09-24T15:55:39+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "7119e6bf49be1b5c",
+      "titre_original": "Iran’s Guards Will View Military Vessels Approaching Strait as Ceasefire Breach",
+      "titre_fr": "Les Gardiens de l'Iran considéreront l'approche de navires militaires du détroit comme une violation du cessez-le-feu",
+      "resume_fr": "Les Gardiens de la Révolution iranienne ont déclaré que l'approche de navires militaires du détroit serait perçue comme une violation du cessez-le-feu.",
+      "categorie": "conflit",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "haute",
+      "justification": "Les tensions au détroit d'Ormuz menacent directement les flux pétroliers mondiaux, créant une volatilité refuge pour l'or et impacts majeurs sur les marchés.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Les tensions géopolitiques au détroit d'Ormuz augmentent les risques systémiques, renforçant la demande d'or comme couverture refuge."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T16:04:59+00:00",
+      "dernier_article_le": "2026-09-24T16:04:59+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Iran’s Guards Will View Military Vessels Approaching Strait as Ceasefire Breach",
+          "source": "EnergyNow.com",
+          "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQTFItMENRN2tDRHZvdXNHbU5hUjRqOUtWODhvWWZNU09sVmZiUHpORWRIQTViTjlJRzJMX1RYWDBPX3hUQ3ItWW9HZV9PVWdsM2hRbU9aOUUtLVZzUEYySFlUbExEWVlhVk1FZmRVZkNDd3pDdUc0alJjaEFUWFo5QVZvMDVzN0VQQlhkTnFheklfLVBBZmZ0MnFvSzRrMDYzWW9SbWM1QktYRFdTREE?oc=5",
+          "publie_le": "2026-09-24T16:04:59+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "b641b4ad7e8d8290",
+      "titre_original": "Gold’s Price Barely Moved. Five Institutions Repositioned Anyway.",
+      "titre_fr": "Le prix de l'or a à peine bougé. Cinq institutions se sont repositionnées néanmoins.",
+      "resume_fr": "Bien que le prix de l'or soit resté stable, cinq institutions ont réajusté leurs positions.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD"
+      ],
+      "importance": "faible",
+      "justification": "Les repositionnements institutionnels sans mouvement de prix n'indiquent pas de pression directe imminente sur le marché.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Les repositionnements pourraient préparer une volatilité future, mais sans signal de direction claireau vu l'absence de mouvement de prix."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T16:24:43+00:00",
+      "dernier_article_le": "2026-09-24T16:24:43+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Gold’s Price Barely Moved. Five Institutions Repositioned Anyway.",
+          "source": "GoldSilver",
+          "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQa2hSVHVCTUUwX2J4ZXNNXzhFMHVYY2dvTjlnMUNpTUdic3E0c1RwVFZTd1Z6QjV1Ym94R01tSUZyaXJ5OERsRzZnT2NqSl9BVzVGYXVOZTZrMGlreV84R1NoWmJDN09JWHJfYUxGdUF6UDhWVUJDaUZDYWMtRGRpb1A0UkM1VzRULWZEbmdZeDBsZXlMeExKd0trOA?oc=5",
+          "publie_le": "2026-09-24T16:24:43+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "9933b2f0d2c5fdd0",
+      "titre_original": "Oil Quietly Hands the Fed a Reason to Stay Hawkish",
+      "titre_fr": "Le pétrole offre discrètement à la Fed une raison de rester belliciste",
+      "resume_fr": "Les évolutions du pétrole fournissent à la Réserve fédérale un argument pour maintenir une politique monétaire restrictive.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "haute",
+      "justification": "La position de la Fed sur les taux impacte directement le rendement réel et l'attrait du dollar face à l'or.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Une Fed belliciste soutient le dollar et augmente les coûts d'opportunité de l'or non productif de rendement."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T16:26:42+00:00",
+      "dernier_article_le": "2026-09-24T16:26:42+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Oil Quietly Hands the Fed a Reason to Stay Hawkish",
+          "source": "FOREX.com",
+          "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPb2VPQVBUVnJKUUtjSkNUQzN6UTZVXzNCd2FhMVVCb1RkTFlXVXJhYVEybFNkTlB5VjhIMjFsY2J5RlpyMmJ3c2NxUDFOUmFfM3o5SVhOaDRTaE5DNU9jYnU3WjRwd3RIeW1uOF9mZmFMUXJMUlo4RUwxTTJ1aUZYVG9XUlp5RGxZTGR4bFE4c0JlVnpfalQ0UEF3?oc=5",
+          "publie_le": "2026-09-24T16:26:42+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "338a295044fb9cb0",
+      "titre_original": "Companies channel IEEPA tariff refunds into their coffers, Atlanta Fed says",
+      "titre_fr": "Les entreprises canalisent les remboursements de droits IEEPA dans leurs caisses, selon la Fed d'Atlanta",
+      "resume_fr": "Les entreprises réorientent les remboursements de droits de douane IEEPA vers leur trésorerie selon la Réserve fédérale d'Atlanta.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les dynamiques commerciales et tarifaires affectent la politique monétaire et la valeur du dollar, mais l'impact immédiat reste indirect.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Les remboursements tarifaires soutiennent la liquidité d'entreprises, réduisant potentiellement la pression refuge sur l'or."
+      },
+      "statut": "confirmé",
+      "raison_statut": "rapporté par 2 médias différents",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T16:51:05+00:00",
+      "dernier_article_le": "2026-09-24T19:30:23+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Companies channel IEEPA tariff refunds into their coffers, Atlanta Fed says",
+          "source": "supplychaindive.com",
+          "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPNDhQUmhGZl9PdktaWFJWV1ZQSUlYbkw3clQtVkZ5T3JnRG11aDNzb3VKX0NSenhkeWUxUm1PN010VEQyaElVdGlWNUdybHcwbnNwVnVlZ3o3am0zOTY1SFJTRXFWX3RxUXJ1UHhfV0hZY3VsYUNJdTVHa2M0elBWd2pOTm54QzZDLWlQQWU5UC1ySHU1bDVPeFVkZkowSzM0cXk5Q2NLM0lSS2VKeTNlSXVtemhIRjViSG5N?oc=5",
+          "publie_le": "2026-09-24T16:51:05+00:00",
+          "officiel": false
+        },
+        {
+          "titre": "Atlanta Fed Survey: Companies Funnel IEEPA Tariff Refunds Back Into Operations",
+          "source": "IndexBox",
+          "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNUTRvc3FNQ3paWEpka3hTU3hRb2ZOQURJWHlEcXByMmJfT0RTNXRtWHBtSXVuaHhldHpoTW1IOUJGMEk4eExBN1kxa29IM1V3cGV2cUs4ck4wU0Nsb2l0Z1g2eThTTjZQeENGcWdieVo2aUhjQkQ3T0JkbnE3S1RtdzlfSW9kaDlmeXRqU3hubFgyTGNVUHF1cFg5S2hCNDN0UzVjS3hudW8tT28?oc=5",
+          "publie_le": "2026-09-24T19:30:23+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "4a908fbdf548d3a0",
+      "titre_original": "Oracle credit default swaps hit record high as AI debt worries mount",
+      "titre_fr": "Les swaps de défaut de crédit d'Oracle atteignent un record alors que les inquiétudes liées à la dette IA s'accumulent",
+      "resume_fr": "Les swaps de défaut de crédit d'Oracle ont atteint un niveau record dans un contexte de préoccupations grandissantes concernant l'endettement lié à l'IA.",
+      "categorie": "crise_bancaire",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les problèmes de crédit d'entreprises majeures signalent des tensions financières et renforcent la demande d'actifs refuge.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "L'augmentation des CDS reflète une anxiété de crédit accrue, renforçant l'attractivité de l'or comme couverture refuge."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T16:52:56+00:00",
+      "dernier_article_le": "2026-09-24T16:52:56+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Oracle credit default swaps hit record high as AI debt worries mount",
+          "source": "TradingView",
+          "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxOOU9Vc0VqQkJoMUU0bjhNUTFLa2FvNTBMa2RZVXhFVndGYkd4VmlHRGNuaUctNjdVSHpoelFjTGNlU3I0ZU9oZFJQa05MN2hqRE1XWjk3Q3R4UVdUYWhFcHRnNXh1MXZkMFdwVno4SFVCSjVBeTZ3WVN5UmJwalRPd1haV21BcTlmdkF0WjRLMUVRUUpXbGtRVGlmaEJEcWtuZ29lNGtWOG5fU0c2eUZDUXQ4OGs4NFh3Q2Q5WUZVSkZYRUdPZWZIR2c4NA?oc=5",
+          "publie_le": "2026-09-24T16:52:56+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "00938e670add3e1d",
+      "titre_original": "Here’s why the debasement trade is boosting bitcoin price more than gold price – StoneX’s Cincotta",
+      "titre_fr": "Voici pourquoi le commerce de débasement stimule plus le prix du bitcoin que celui de l'or – selon Cincotta de StoneX",
+      "resume_fr": "Un analyste de StoneX commente que le commerce de débasement bénéficie davantage au bitcoin qu'à l'or.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD",
+        "BTC"
+      ],
+      "importance": "faible",
+      "justification": "Commentaire d'analyste sans donnée nouvelle ou catalyseur spécifique ; intérêt académique plutôt que moteur de mouvement directif.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Suggestion implicite d'une sous-performance relative de l'or face aux actifs numériques dans un environnement d'inflation monétaire."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T16:58:49+00:00",
+      "dernier_article_le": "2026-09-24T16:58:49+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Here’s why the debasement trade is boosting bitcoin price more than gold price – StoneX’s Cincotta",
+          "source": "Kitco",
+          "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNQ3RMd3Znb20yZlpyTXZEMC1TMjBMX3R5ZDhOejR2dkZrWkQybHhjRndPamt1eHhGODkyUFlfNVJKSVZRcV90ZXRYRXk5WTJYd3p3VDVaRGhjWF9FRU80MkNsVGxPa1hOV3lUTVdNSDBpYmF3U21oQ2E3T0RGcVJaTE85cmZNNUZlZkx3VDNNYmxnXzJXVlRHRnJjT0lyelZDOEE5NEJ1TnQ5Qk9jeDh6SWxCTVNXXzBSU3BR?oc=5",
+          "publie_le": "2026-09-24T16:58:49+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "4a98bcb8edb48a0e",
+      "titre_original": "Gold price dips to $4,268/oz as U.S. new home sales rise 6.4% in August",
+      "titre_fr": "Le prix de l'or baisse à 4 268 $/oz alors que les ventes de maisons neuves aux États-Unis augmentent de 6,4 % en août",
+      "resume_fr": "Les ventes de maisons neuves aux États-Unis ont augmenté de 6,4 % en août, coïncidant avec une baisse du prix de l'or à 4 268 $/oz.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD"
+      ],
+      "importance": "haute",
+      "justification": "Les données économiques américaines positives renforcent le dollar et réduisent l'attrait refuge de l'or ; mouvement de prix constaté.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Une activité immobilière plus forte peut signaler une économie résiliente, réduisant la demande pour l'or comme actif de sécurité et soutenant le dollar."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T17:33:49+00:00",
+      "dernier_article_le": "2026-09-24T17:33:49+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Gold price dips to $4,268/oz as U.S. new home sales rise 6.4% in August",
+          "source": "Kitco",
+          "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPOGR1SnAzWEMzRk1zMDBGQ1BrWkc0NWlBTFNlQk8wQmItcVd4bG1GdU45TVVucnQwQ0NtQk1kYVFhbGhNR3p2TDNVeG0tYjQ3MGJFcVljN0JSc2tXQUs2R1NBTjhRV19UYnRld3NMN0pvMGVVX09SanNsNHN1SDc2aXI1NTZiNEZsQ2ZFNWZpNEFNSzZsYlBjTS1SQlZmRy1MVmNZ?oc=5",
+          "publie_le": "2026-09-24T17:33:49+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "b230b7dc040ad340",
+      "titre_original": "N.Y. senator puts forward bill to reverse Canadian tariffs",
+      "titre_fr": "Un sénateur de New York propose un projet de loi pour annuler les tarifs canadiens",
+      "resume_fr": "Un sénateur de New York a présenté un projet de loi visant à inverser les tarifs imposés au Canada.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les tensions tarifaires affectent le sentiment de risque et la stabilité du dollar ; une annulation signalerait une désescalade.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Une réduction des tensions commerciales réduirait l'aversion au risque, favorisant potentiellement les actifs refuge comme l'or."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T18:00:00+00:00",
+      "dernier_article_le": "2026-09-24T18:00:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "N.Y. senator puts forward bill to reverse Canadian tariffs",
+          "source": "wcax.com",
+          "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOTjRsakFYX3htdEJ1QlZBVmRBa0djY2lqX3BMSU1WUWpVX3BYWl95a2JoYjNVcHVOdV9vUjh2dGNXSXZnOFdVbVJObXNmeUtCU0VkSEJ6bnhHYXdaaXlGNjl3dmw3US1PZDdLVE5OYjY4UmhXMnZMeHFGNGs1QUFZMnI5eUEtVXNoQ3NZdE13NA?oc=5",
+          "publie_le": "2026-09-24T18:00:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "1222e730bdc430ad",
+      "titre_original": "Trump hosting China's Xi at White House with AI and tariffs on the agenda",
+      "titre_fr": "Trump accueille le président chinois Xi à la Maison Blanche avec l'IA et les tarifs à l'ordre du jour",
+      "resume_fr": "Trump organise une rencontre avec Xi à la Maison Blanche avec l'IA et les tarifs comme sujets de discussion.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "haute",
+      "justification": "Les négociations commerciales sino-américaines et les tarifs sont des catalyseurs majeurs de volatilité sur le dollar et l'or ; sentiments de risque géopolitique.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Les tensions tarifaires et l'incertitude géopolitique tendent à augmenter la demande pour l'or comme actif refuge, tout en exerçant une pression baissière sur le dollar."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T18:16:48+00:00",
+      "dernier_article_le": "2026-09-24T18:16:48+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Trump hosting China's Xi at White House with AI and tariffs on the agenda",
+          "source": "Yahoo",
+          "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNMXZmWVV0U1pqN3NzY1VkbjFYRFVxMWdtLVlYYjJWUU9NSXo0eGlMc19mV3c4M1k2QUx4YnBjMS0wOUtHdllpVlNOdXM5dnlweTlucUx1bHE5cmlqbndjSG00YWZQT0FCbEJIVzROWEpLc3lJR3R3c0o3QkZiQWdpYjBsUnk2Vi10R2JFTnBwUQ?oc=5",
+          "publie_le": "2026-09-24T18:16:48+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "426dd126b98b13c0",
+      "titre_original": "Citi Delays Fed Rate-Cut Call to June 2027 After Strong Jobs Data",
+      "titre_fr": "Citi repousse son appel de réduction des taux de la Fed à juin 2027 après des données positives sur l'emploi",
+      "resume_fr": "Citi a repoussé sa prévision d'une baisse des taux de la Réserve fédérale à juin 2027 suite à des données d'emploi robustes.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "haute",
+      "justification": "Les attentes de politique monétaire sont des moteurs majeurs du dollar et de l'or ; un recul des réductions de taux soutient le dollar et affaiblit l'or.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Des taux maintenus plus longtemps à des niveaux élevés renforcent la rémunération du dollar et réduisent l'attrait de l'or non-porteur d'intérêts."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T18:17:00+00:00",
+      "dernier_article_le": "2026-09-24T18:17:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Citi Delays Fed Rate-Cut Call to June 2027 After Strong Jobs Data",
+          "source": "finance.biggo.com",
+          "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTE4zNG9nTWVLdS1PWmVoLXl4R0ZZaGgtdmcwaFVTNGtiRG9pX3o1SFNhdlNORV95aHdzZHo4dXVKZHdEcnZwcmd4eWhtXy1lQ2tfeU1OdTExOXcxSVBpazUyVVFVVUZKMncwYVFVQXVsTlVuRjFFQlE?oc=5",
+          "publie_le": "2026-09-24T18:17:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "7093e6f21e59b16e",
+      "titre_original": "No More ‘Trump Avenue’: Canada’s Capital Moves to Rename Street Amid Tense Trade War",
+      "titre_fr": null,
+      "resume_fr": null,
+      "categorie": "declaration",
+      "actifs": [],
+      "importance": "non évaluée",
+      "justification": null,
+      "interpretation": null,
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T18:27:50+00:00",
+      "dernier_article_le": "2026-09-24T18:27:50+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": false,
+      "articles": [
+        {
+          "titre": "No More ‘Trump Avenue’: Canada’s Capital Moves to Rename Street Amid Tense Trade War",
+          "source": "Time Magazine",
+          "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNMXhNek1xYk42enhNUGJ4RVFPZnQ4N2NuWFVNZ00wVFVUQTJ2ZElBOGFpOVYxRzJFc2dmUDRmbXEyYjBjMmRnQVNTdEV4MVFVQ3J6LWZYaHJuV01lYkV1ZHBnLWFFdDkyWnN2djAtRjFqY0g0aVJGY19wbmN3TmJCWTljYzVMdlQ2UFNrTHRlY1pRYmpMVEdRVEliclRkWUYyVFB2N1NWU1pILUE?oc=5",
+          "publie_le": "2026-09-24T18:27:50+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "245d9f3ec3e600b7",
+      "titre_original": "Federal Reserve Board requests public comment on two proposals related to establishing a regulatory framework for Board-supervised payment stablecoin issuers under the GENIUS Act",
+      "titre_fr": "La Réserve fédérale demande des commentaires publics sur deux propositions relatives à l'établissement d'un cadre réglementaire pour les émetteurs de stablecoins de paiement supervisés par le Conseil selon la loi GENIUS",
+      "resume_fr": "La Réserve fédérale sollicite des commentaires publics sur deux propositions de cadre réglementaire pour les stablecoins de paiement supervisés par la Fed.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "La régulation des stablecoins affecte la politique monétaire et la confiance en la monnaie fiduciaire USD",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Une régulation plus stricte des stablecoins pourrait renforcer la confiance dans le dollar et éventuellement affecter les demandes d'or comme couverture alternative"
+      },
+      "statut": "confirmé",
+      "raison_statut": "communiqué d'une source officielle",
+      "fiabilite": 3,
+      "officiel": true,
+      "publie_le": "2026-09-24T18:30:00+00:00",
+      "dernier_article_le": "2026-09-24T18:30:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Federal Reserve Board requests public comment on two proposals related to establishing a regulatory framework for Board-supervised payment stablecoin issuers under the GENIUS Act",
+          "source": "Réserve fédérale (Fed)",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/bcreg20260924a.htm",
+          "publie_le": "2026-09-24T18:30:00+00:00",
+          "officiel": true
+        }
+      ]
+    },
+    {
+      "id": "93bbd18302ffbf5d",
+      "titre_original": "Japanese Yen Forecast: USD/JPY 4% Rally Challenges Post-Intervention Downtrend",
+      "titre_fr": "Prévisions du yen japonais : un rallye de 4% de l'USD/JPY remet en question la tendance baissière post-intervention",
+      "resume_fr": "L'USD/JPY affiche un rallye de 4% qui défie la tendance baissière suivant les interventions précédentes.",
+      "categorie": "marche",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "La force du dollar face au yen reflète la dynamique globale du dollar et affecte les rendements réels, pertinents pour l'or",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Un dollar plus fort rend l'or plus cher pour les acheteurs étrangers et tend à peser sur les prix de l'or"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T18:33:16+00:00",
+      "dernier_article_le": "2026-09-24T18:33:16+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Japanese Yen Forecast: USD/JPY 4% Rally Challenges Post-Intervention Downtrend",
+          "source": "FOREX.com",
+          "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxOWjJWZE5Kck5fVlNtMGVKTE5Id1Y4dDRockR1S0NzUzdTLVE4cV9lbDB1MlM4U180S2V1U2t6V0NhaEJGZHJSTkd5TkRsZmpyZEhyMWJNQThzQ2hvUzhnLXgyWTNuQl9kbHdNbmxncFVmekN1aVN4bFNuNk9NaWo0OFFJcVRGY1loa2RxT3p1R1VSdzZaRExNUWkwR0tKVU1PdjRETnpSN2J0T1NDQUxwOE1uenlDdnlfUTdKMXZ0a0gxUXdGMHB0MmJkcjVWUQ?oc=5",
+          "publie_le": "2026-09-24T18:33:16+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "b7cdad50586d863e",
+      "titre_original": "US Dollar Index extends its winning streak as Fed speakers line up behind hikes",
+      "titre_fr": "L'indice du dollar américain prolonge sa série de gains alors que les porte-parole de la Fed s'alignent sur les hausses",
+      "resume_fr": "L'indice du dollar poursuit sa hausse tandis que des responsables de la Fed soutiennent des augmentations de taux.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "haute",
+      "justification": "Des signaux hawkish de la Fed soutiennent la force du dollar et pèsent directement sur les prix de l'or",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Un dollar plus fort et des taux potentiellement plus élevés réduisent l'attrait de l'or non rémunéré"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T19:04:21+00:00",
+      "dernier_article_le": "2026-09-24T19:04:21+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "US Dollar Index extends its winning streak as Fed speakers line up behind hikes",
+          "source": "FXStreet",
+          "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQWjVaQW9vYWZHUWY3di1xbkkydWh0QTFiR2lHQU54SEdtQkxkYW1xdFdRMHA3UjBYMWxOS1BiRC1VV1lsNnJNbzdFYmFzN3hIS240VDd5OGYzcm8wY0ZXWEtaODlSY29sRHJOWFdBU1lfeW9hNlplM3I2WWZZQXhabHBJcm1BUy1KcmFCY3pOXzYxVUlYSEdBMDVJWThtUmE1R2s3SnBIS01vMnB3dTJLZF9nT1ZLRm5JTlZQX3hISQ?oc=5",
+          "publie_le": "2026-09-24T19:04:21+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "61162e336595b663",
+      "titre_original": "The Number of Student Loans in Default Is Bad and Likely to Get Worse",
+      "titre_fr": "Le nombre de prêts étudiants en défaut est mauvais et susceptible de s'aggraver",
+      "resume_fr": "Le nombre de prêts étudiants en défaut augmente et devrait continuer à se détériorer.",
+      "categorie": "autre",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Une détérioration des crédits étudiants affecte la stabilité financière et peut influencer les décisions de politique monétaire et les rendements réels",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Des conditions de crédit plus difficiles pourraient inciter la Fed à assouplir sa politique, affaiblissant le dollar et soutenant l'or"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T19:23:00+00:00",
+      "dernier_article_le": "2026-09-24T19:23:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "The Number of Student Loans in Default Is Bad and Likely to Get Worse",
+          "source": "Barron's",
+          "url": "https://news.google.com/rss/articles/CBMiekFVX3lxTE1mVXQ2RkpDbUdNUkhpODFuY2JCYklBNHU5UDFIeEJ3Nl82MWlEcEotVVZvSUhLQmx4WGxaaEZoRGZQTjdkRWkyR1B6SzR4WkJNZFBMSEV3UW4tMGdHckwwRWthLVdGVnpjUFZsNjk2Q05yN3ppNHE4ZWVB?oc=5",
+          "publie_le": "2026-09-24T19:23:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "aec616eb25a6b85c",
+      "titre_original": "Trump Says He Wants To Beat China With Tariffs. He's Made the U.S. Weaker Instead.",
+      "titre_fr": "Trump dit qu'il veut battre la Chine avec les tarifs. Il a rendu les États-Unis plus faibles.",
+      "resume_fr": "Trump affirme vouloir utiliser les tarifs contre la Chine, mais l'analyse suggère que cela affaiblit les États-Unis.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les tensions commerciales et les tarifs affectent la confiance économique, les rendements réels et potentiellement la valeur du dollar",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Une incertitude commerciale accrue et un affaiblissement économique potentiel pourraient soutenir l'or comme valeur refuge"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T19:45:32+00:00",
+      "dernier_article_le": "2026-09-24T19:45:32+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Trump Says He Wants To Beat China With Tariffs. He's Made the U.S. Weaker Instead.",
+          "source": "Reason Magazine",
+          "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPSWNUZ3NIUUZPdUdMNE1lTnkxWkJJT204RHRSdzNmSzlnUC0zMXlCaXhfdy1ScVc2SnlkQmtnUnFuSTV6cVRWRTFBY0tpOTBNSEs2ZkR5a2FyVzM0a2NLcnBpY0FCYk5kdGh1R2YwSUUzQ3NuX0dvaDNVTW82MzdoVTFvSURPamJDbE1ibC05WUF5QTBmcFVYSG9Dd1VNbmtnMGdENTRsMGtVUmU1YUE?oc=5",
+          "publie_le": "2026-09-24T19:45:32+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "e5d4e17d06e58525",
+      "titre_original": "A US diesel export ban would trigger global stock drawdowns, cut US refinery utilisation and risk driving gasoline prices higher",
+      "titre_fr": "Une interdiction d'exportation de diesel américain déclencherait des réductions de stocks mondiaux, réduirait l'utilisation des raffineries américaines et risquerait de faire monter les prix de l'essence",
+      "resume_fr": "Une interdiction d'exportation de diesel américain entraînerait des réductions de stocks mondiaux, réduirait l'utilisation des raffineries américaines et risquerait de faire augmenter les prix de l'essence.",
+      "categorie": "marche",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "haute",
+      "justification": "Une politique commerciale majeure affectant les marchés énergétiques mondiaux peut modifier les attentes d'inflation et le sentiment de risque, impactant le dollar et l'or",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Une hausse des prix de l'essence accroîtrait les anticipations inflationnistes, rendant l'or plus attrayant comme couverture, tout en affaiblissant potentiellement le dollar si la Fed réduit ses taux"
+      },
+      "statut": "confirmé",
+      "raison_statut": "rapporté par 2 médias différents",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T19:54:16+00:00",
+      "dernier_article_le": "2026-09-24T20:49:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "A US diesel export ban would trigger global stock drawdowns, cut US refinery utilisation and risk driving gasoline prices higher",
+          "source": "Wood Mackenzie",
+          "url": "https://news.google.com/rss/articles/CBMi-wFBVV95cUxOeXN6ZmQ1dFUyLWRjaUc5WGVveFFNeHFoZm03VWxGWDZGYjBoTVN6QXpjZGNnUkJVbDJmbU1yY0dvMDd4ZUkyelBkUTktOFZFWlltV2JhaUQ2ZWNlUVFhZDJieHV4bVkwVGhDaEp2RERFTlZHMXE0MDFUbEtXNHh4cnQ3aGxjQ0NoZGFYSnd0WDVFdG5iOUY3X2pRYUJ2OEV3R2k4bWFhNjdPN1hmTGp6T0lpTWlkeHRzdGtqMFBmcTdUMWw2NFRnVExtbTZLdVQ2TEs1NnBUQnNSQXZoMHd5LXR0endONkxaeW5vbWJtM1Z6TGxWYUlDSG9WTQ?oc=5",
+          "publie_le": "2026-09-24T19:54:16+00:00",
+          "officiel": false
+        },
+        {
+          "titre": "Would a diesel export ban work to lower prices?",
+          "source": "cbsnews.com",
+          "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE5HOC1FNzFZWFFTT3FDSlZvOUtpNGdBY3FwRjVmTnVDM196XzJhRXdnOUZPY1JDZzRxR2w1RXcySXl2S0NoZkpIREZqUjBQTllfSmRRa0JOVHlJbXFSaFFlWU5vMTdVbVhEdWc3REFQUVdiZm1KR3FBSXpyb1g?oc=5",
+          "publie_le": "2026-09-24T20:49:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "e4e6ae39f6f0e55b",
+      "titre_original": "The Debate Over a Diesel Export Ban Is Giving Europe Whiplash",
+      "titre_fr": "Le débat sur une interdiction d'exportation de diesel donne le tournis à l'Europe",
+      "resume_fr": "Le débat politique sur une potentielle interdiction d'exportation de diesel américain crée de l'incertitude en Europe.",
+      "categorie": "marche",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "L'incertitude politique sur une politique commerciale majeure peut augmenter la volatilité et la demande de valeurs refuge comme l'or",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "L'incertitude géopolitique et commerciale augmente typiquement la demande pour les actifs refuges, bénéficiant à l'or"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T20:11:00+00:00",
+      "dernier_article_le": "2026-09-24T20:11:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "The Debate Over a Diesel Export Ban Is Giving Europe Whiplash",
+          "source": "WSJ",
+          "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOU2EtdVA1RlUyVFphZTZKb3BvUlkyTmFhbFE4bTNmUy1VcHNrMUlMVG9yRkFCOGltamtSV281TUpUck1ubGcwNmlldk5aSTdYZlFZb3hmblp5TjA5N2I5TTZkV3g4aEptdVZiY0tSc3luNjQ1YmlSWXFUZWJyTlVYRElPVlFvN3JZSW1rdVR3aE5nNGhFYWtmb0U4T1o?oc=5",
+          "publie_le": "2026-09-24T20:11:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "251808ba95a8e20e",
+      "titre_original": "Trump wants a diesel export ban. Australia would be uniquely exposed",
+      "titre_fr": "Trump veut une interdiction d'exportation de diesel. L'Australie serait particulièrement exposée",
+      "resume_fr": "Une proposition d'interdiction d'exportation de diesel américain exposerait particulièrement l'Australie aux impacts commerciaux.",
+      "categorie": "marche",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "Impact commercial sur les producteurs de métaux australiens affecte les perspectives d'approvisionnement des matières premières et la demande mondiale",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Un impact négatif sur les producteurs de métaux australiens pourrait réduire l'offre globale de métaux, mais une contraction économique régionale pourrait réduire la demande"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T20:11:02+00:00",
+      "dernier_article_le": "2026-09-24T20:11:02+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Trump wants a diesel export ban. Australia would be uniquely exposed",
+          "source": "The Conversation",
+          "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxOMFNiRHo4MzJkZFNoYUkwNjR1Vkc1bHB0VGhYX19NYkNKNTJOVlc0WVJocjBZTUhPMEFvUTVZWTJvZjB0Y0dsRXJDekVZdEpfcGI2OEl6anFXOG5GWVRJQWJ3VWJCT2dxb05MTFFUYXFuYWM2UUpWNXVxendhRmlIWlU2Y25zSGlucGR2cHp2NEc1bU00dlhiMkpfenllTV9QTkFZcw?oc=5",
+          "publie_le": "2026-09-24T20:11:02+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "8bfb3b9a2c9950cd",
+      "titre_original": "US diesel export ban could severely impact Latin American metal producers",
+      "titre_fr": "L'interdiction d'exportation de diesel américain pourrait gravement impacter les producteurs de métaux latino-américains",
+      "resume_fr": "Une interdiction d'exportation de diesel américain pourrait impacter gravement les producteurs de métaux en Amérique latine.",
+      "categorie": "marche",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "haute",
+      "justification": "Impact direct sur l'offre mondiale de métaux purs via les producteurs latino-américains, affectant les prix des matières premières et les flux de devises",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Une réduction de la production de métaux due au manque de diesel augmenterait les tensions d'approvisionnement, soutenant les prix de l'or face à une demande inchangée"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "formulé comme une information non vérifiée (« selon des sources »…)",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T20:36:31+00:00",
+      "dernier_article_le": "2026-09-24T20:36:31+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "US diesel export ban could severely impact Latin American metal producers",
+          "source": "S&P Global",
+          "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxQVGwwcTJiclptenh5b2dBeEtjQVZiY29VX2Y4b3pmdkNLVDkxazg4VGVRMWtmN1VrOW1MTnBralNpSWxQS1BvQ2pQT0NsT3ZWWjNGZFJwM3d5bS0zRDFhcGV0ZFFzcW9sSHNZME9wc3oxbmxUTkhnTW5TQVV3dWYyd0JlemFlUE5QaFJJS1BXY2ExSDk3N2pnSmtScVhZNDFBRDZELU9XTXBYMXZqOEZ1djVmdjFVeFVwN2VKQzZUVHZSanN5UkstZEk1QVhpSFZDUThBSTlteDVwcmhfcjhfS2FB?oc=5",
+          "publie_le": "2026-09-24T20:36:31+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "876f70bfc1bd02fa",
+      "titre_original": "Diesel Export Ban Risks Higher Prices, Undercuts Energy Agenda",
+      "titre_fr": "L'interdiction d'exportation de diesel risque d'augmenter les prix et de contrecarrer l'agenda énergétique",
+      "resume_fr": "Une interdiction d'exportation de diesel est envisagée et pourrait augmenter les prix de l'énergie.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les politiques commerciales et énergétiques affectent les anticipations d'inflation et la force du dollar.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Une inflation énergétique potentielle pourrait réduire les taux réels et soutenir l'or comme refuge contre l'inflation."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T20:46:42+00:00",
+      "dernier_article_le": "2026-09-24T20:46:42+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Diesel Export Ban Risks Higher Prices, Undercuts Energy Agenda",
+          "source": "Forbes",
+          "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNeVJLZXlkVEVDay1FSDI1RTE3aFAxNGViMlZMX0RMa2xDNWlHcy0yRGJaUUhjTVZPbkhHcVpOOE14ZFR5ZXh2enVGX080amJYYXVpTzBUbW1FSW5paTFCV3pmZGJtajV6T2cyemRZUkxlNVBsRUx5SVFUOWxjek1sYkNRMEFCQXBrWW9uWlM5RGxHbzQyeHFFZXhFSWFkQm5XeVQ4MnMyWnozSXpnVEY4MGtkalE?oc=5",
+          "publie_le": "2026-09-24T20:46:42+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "11ac05384a7abfe5",
+      "titre_original": "Trump Says He Does Not Care About USMCA as US, Canada Plan Trade Talks",
+      "titre_fr": "Trump dit qu'il ne se soucie pas de l'ALÉNA tandis que les États-Unis et le Canada préparent des discussions commerciales",
+      "resume_fr": "Trump declare ne pas se préoccuper de l'ALÉNA alors que les États-Unis et le Canada planifient des négociations commerciales.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les tensions commerciales et les renégociations d'accords affectent la stabilité du dollar et le sentiment de risque.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "L'incertitude commerciale augmente la demande d'actifs refuge comme l'or."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T20:49:18+00:00",
+      "dernier_article_le": "2026-09-24T20:49:18+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Trump Says He Does Not Care About USMCA as US, Canada Plan Trade Talks",
+          "source": "EnergyNow",
+          "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPUW9JV3ZqZXctbEZTeGh4NUZoX24wbC1XSWJLaVpqVDRpMEsyc2VsM0xQaUFGeEZnaXFNU21ZWUN5WkNqR1VfX0k4WEMzckpfSXNoYTdCVmQyTWl5MWlZVWQ3WWxuYWdveWwwVU84eElDQ2JQZWdwdno4UUFOV2dYZWthSHZmbU5LUm5rOWFPam85SHVFY3V1bjBKOUY0eURv?oc=5",
+          "publie_le": "2026-09-24T20:49:18+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "9d91f54c94dc4093",
+      "titre_original": "Hedge Fund With 235% Return Says Gold Price Decline Is Temporary",
+      "titre_fr": "Un fonds spéculatif affichant 235% de rendement affirme que la baisse du prix de l'or est temporaire",
+      "resume_fr": "Un gestionnaire de fonds spéculatif ayant obtenu 235% de rendement estime que la baisse actuelle du prix de l'or est temporaire.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD"
+      ],
+      "importance": "faible",
+      "justification": "Avis d'un acteur de marché sans donnée macroéconomique ; l'opinion ne change pas les fondamentaux.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Le gestionnaire anticipe une reprise du prix de l'or après la baisse actuelle."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T21:00:00+00:00",
+      "dernier_article_le": "2026-09-25T03:29:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Hedge Fund With 235% Return Says Gold Price Decline Is Temporary",
+          "source": "Bloomberg.com",
+          "url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxPSVp3NDRaQjdTQjZucFQweU94NzdMelJONWZDTS1PYVY4a05FdmxNZzlNQWY3d2tYaTBjWXVXRnRoZnZ1dVVQaV8zLVh5SUIzbEtUN3l0R0RBN2JqMy1ycmxiWUFfN3k0SlNCbkRJdmpNOVQ3dHYxZGxpc1ZOWDgzWGdOLXJ3TmYwTjl2aGpJX0xjRHRkc1lXTDVhVmcyYmhWakxBaDZIbW50TU5wc1BXVi1DSU9FYzNTSVpJcXpVUm1YN0VGUTdqQzlQcC1vNnRQei1HWUtxYw?oc=5",
+          "publie_le": "2026-09-24T21:00:00+00:00",
+          "officiel": false
+        },
+        {
+          "titre": "Hedge Fund With 235% Return Says Gold Decline Is Temporary",
+          "source": "Bloomberg.com",
+          "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNX2xHUld1VU13NlVzZEVRUmhidVhXMzZNZVJsTEwxQkViSVU5blU2OVdMcUhGOW9XX0FWTXNKN0NfcW9tTHZNeFhzN01SMzB5M2JoTmtfWTNBc01WcHBpWW1Pc2cxOHpYTUxjazVGUzBzR0IwX1dUbk4tcjlaZ1l5SGpVVmxLMmx2aVZDSEhNa3g5dkdOMURIal9ZYk5oYmo1MVBqOF82V1R6ZzBnOU1ycmRROGE?oc=5",
+          "publie_le": "2026-09-25T03:29:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "bca0286c30cb63f5",
+      "titre_original": "Why sovereign default isn't always a disaster - and what would it mean for the US?",
+      "titre_fr": "Pourquoi le défaut souverain n'est pas toujours un désastre - et que signifierait-il pour les États-Unis ?",
+      "resume_fr": "Un article analyse les conséquences d'un défaut souverain et ses implications potentielles pour les États-Unis.",
+      "categorie": "crise_bancaire",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "haute",
+      "justification": "Toute discussion sur le défaut souverain américain affecte dramatiquement la confiance en dollar et la demande d'or comme refuge.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Un doute accru sur la viabilité de la dette américaine accroît la demande d'or comme réserve de valeur."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T21:03:31+00:00",
+      "dernier_article_le": "2026-09-24T21:03:31+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Why sovereign default isn't always a disaster - and what would it mean for the US?",
+          "source": "Livewire Markets",
+          "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPblU5Y25la1pwOGMtSkJmd0NnU0RhQUlaRmU1TkhUUFlTakpSN0VXUGJRWjNSZ3BlbkYzRG9mTGQyZEZNX0JzV1hQQ3dybFZ2empHa0NrdTJZbnpRMXhuM0U1aE9peE5rdno2c2I1OFRacm5ZTFU5ZHhjTVYxUjh6QnFwTHJHc3BMc2NJ?oc=5",
+          "publie_le": "2026-09-24T21:03:31+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "159dd3da8617e04b",
+      "titre_original": "Trump Advisers Analyzing Impact of Short-Term Diesel Export Ban",
+      "titre_fr": "Les conseillers de Trump analysent l'impact d'une interdiction temporaire d'exportation de diesel",
+      "resume_fr": "L'équipe de Trump examine les conséquences d'une interdiction d'exportation de diesel de courte durée.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les politique énergétiques et commerciales affectent l'inflation attendue et la trajectoire du dollar.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "L'inflation énergétique réduit les taux réels réels, soutenant l'or."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T21:13:04+00:00",
+      "dernier_article_le": "2026-09-24T21:13:04+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Trump Advisers Analyzing Impact of Short-Term Diesel Export Ban",
+          "source": "Bloomberg.com",
+          "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQbFptanBpdURGa2t4bVdqdG9RS0MyMUhKNXJxdWt6RDNDSW14TkRkc1g5RmVrTm96Ym1ZNnRyMUE5ekNUd1Z2ZmdtRS05M2EtZHlzVjNHTld3VWhLX0poYlZ3TkY0eWRaQ0t5b1NwRThGMi1xVTNVQTYtbDdXRjVaR2IxWkQ4R1dSSi1lVDFwVTJWclEtVVhsMEdiUHdJN2RLVkMwLW41aVZ6bXBiSW5zTWVCczA?oc=5",
+          "publie_le": "2026-09-24T21:13:04+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "0ede993cedf6d954",
+      "titre_original": "Why a U.S. Diesel Export Ban Won't Lower Fuel Prices",
+      "titre_fr": "Pourquoi une interdiction d'exportation de diesel américain ne réduira pas les prix des carburants",
+      "resume_fr": "Une analyse explique que l'interdiction d'exportation de diesel américain n'aurait pas d'effet à la baisse sur les prix des carburants.",
+      "categorie": "marche",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Impact potentiel sur la politique énergétique américaine et les flux commerciaux affectant le dollar",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Stabilité du secteur énergétique soutient la confiance dans le dollar, sans effet direct sur l'or"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T22:00:00+00:00",
+      "dernier_article_le": "2026-09-24T22:00:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Why a U.S. Diesel Export Ban Won't Lower Fuel Prices",
+          "source": "Crude Oil Prices Today | OilPrice.com",
+          "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxNOGNHdVZSRnVUMHJzR211TXVuTEZpV3JJcUV2cW51Ynd5SVluekVrbmUxTC1nNTBEQ2JMdjRmMW96dzhkeXRlVDJvd1hycE9sMFJTTUY5YURNUDRWMjNkenpOYzE4MWZoT2hURVZLS0IxZmRxLXJrMnZOVV9pVzg1TTlyOGZHRzhtUGxPQnNGdHRQM2NxOUJHU2JMY2NYd9IBowFBVV95cUxQRkpoMWdYcFp1cXNDNGM5WW51TkpWcTFVN3ZxZEptUUQwT3c0VkdZc2JEelZHRE90OElET2ZZV1UydnI5b1lrVkRQbjJqWm9FTVQ3czJyenc4VmlGTkhBOURUV3ZaODdzN0VadmpMWXotWHR1Z0tEalNWZEQ5YUNNZE1hSjg0dElyekVFQ2d5SENUV1pzWVhCQmY5MUo1NGdlUFZj?oc=5",
+          "publie_le": "2026-09-24T22:00:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "fc54df0b6c02db65",
+      "titre_original": "Major airline group opposes US diesel export ban, warning it could hike prices",
+      "titre_fr": "Un grand groupe aérien s'oppose à l'interdiction d'exportation de diesel américain, avertissant qu'elle pourrait augmenter les prix",
+      "resume_fr": "Un groupe aérien majeur s'oppose à l'interdiction d'exportation de diesel américain en raison des risques de hausse des prix.",
+      "categorie": "marche",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Débat politique sur la politique commerciale américaine pouvant affecter la stabilité du dollar et les marchés énergétiques",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "L'incertitude réglementaire peut réduire la confiance dans le dollar à court terme, légèrement haussier pour l'or"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "formulé comme une information non vérifiée (« selon des sources »…)",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-24T22:11:43+00:00",
+      "dernier_article_le": "2026-09-24T22:11:43+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Major airline group opposes US diesel export ban, warning it could hike prices",
+          "source": "Reuters",
+          "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPb3FoQkUxQXFNQXFRaW8yYjhXQ1g1MEhwdzQteHg3QllFR201U3dWMldVaVdTUmI0czZyZ3RxejAtbVNXUFRtVmxKc2dyRjIyOWsxbkJON08tOGc1WHFpU0QwdnRrQXlNY2pPZ0k4Qkh1elk3eS1pSmJQZnJKTzM0d1NHS3ZzRGt1TXpjRmx1UjgtUDNXd3FjZUE4c3BuUEp5aFBxSmJtb2gzU3hNNFIzcUxnX2IyaWFnajM2TWxjMA?oc=5",
+          "publie_le": "2026-09-24T22:11:43+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "66a82804c216813f",
+      "titre_original": "LILLEY: Mark Carney's currency comments risk more than trade repercussions",
+      "titre_fr": "Les commentaires de Mark Carney sur la monnaie risquent plus que des répercussions commerciales",
+      "resume_fr": "Un analyste avertit que les déclarations de Mark Carney concernant la monnaie comportent des risques au-delà des seules conséquences commerciales.",
+      "categorie": "autre",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Commentaires sur la politique monétaire et les tensions commerciales pouvant affecter la confiance dans les devises",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "L'incertitude monétaire et les tensions géopolitiques favorisent l'or comme valeur refuge"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T22:12:07+00:00",
+      "dernier_article_le": "2026-09-24T22:12:07+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "LILLEY: Mark Carney's currency comments risk more than trade repercussions",
+          "source": "Toronto Sun",
+          "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQQzNKSXFkMWdGdnVqMjd0TmxYMV9SX3lTVmxITFU5T00wMzVFY19aOHpjaEtoQmhFa0dRd0pnNk9aTWxXVXRoNUxaMzFQczgxS0xwM0NQY1o1UFZzUWVtN3FldkhXNVJSWjNNR1VGZlhkTXdBZWp0WHlhc2VnNWE1OXZKZFUwOHAtVHpvTDFMSldvUEk?oc=5",
+          "publie_le": "2026-09-24T22:12:07+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "4f4c7b8aaf7b2428",
+      "titre_original": "REALITY: Trump Says America Does Not Need Canadian Energy. The Facts, and His Own Policies, Say Otherwise",
+      "titre_fr": "RÉALITÉ : Trump dit que l'Amérique n'a pas besoin d'énergie canadienne. Les faits et ses propres politiques disent le contraire.",
+      "resume_fr": "Une analyse conteste la déclaration selon laquelle les États-Unis n'auraient pas besoin d'énergie canadienne.",
+      "categorie": "declaration",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Tensions commerciales et énergétiques entre les États-Unis et le Canada affectant la stabilité du dollar et les marchés",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Les tensions commerciales et l'incertitude géopolitique soutiennent l'or comme actif refuge"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T22:25:40+00:00",
+      "dernier_article_le": "2026-09-24T22:25:40+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "REALITY: Trump Says America Does Not Need Canadian Energy. The Facts, and His Own Policies, Say Otherwise",
+          "source": "EnergyNow",
+          "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQbzNUMXliTG5UOG5FckJJQ3NBVThuSHdXQVotRmVnbU9CM3RtRlJ1Z25aaUw3SkdYamZHc25YdzNLTm5qeFFkclBHQUd0VnhrLUozYzItV09EQlpyb3JHaVVXNDhNQndHU25tR1FsTWJSZ1I0ZFk4WmlUTnlFY3RRV3NLQV9Ta3AycWYzbklJSThZR3B4QjZHbVltMngwVlZGd2FCNkVDTU1FOTlaMm1rUkJhM2JaSlhqcEpNM2ptZzJITkdtcFhGenNjZw?oc=5",
+          "publie_le": "2026-09-24T22:25:40+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "a3345205ac3617f6",
+      "titre_original": "European Central Bank Cuts Interest Rates",
+      "titre_fr": "La Banque centrale européenne réduit les taux d'intérêt",
+      "resume_fr": "La Banque centrale européenne a baissé ses taux d'intérêt.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "haute",
+      "justification": "Une baisse des taux de la BCE affaiblit l'euro relativement au dollar, renforçant le dollar et ayant un impact direct sur le prix de l'or en dollars.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Une BCE accommodante soutient les actifs de risque et renforce le dollar, créant une pression baissière sur l'or libellé en USD."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-24T23:14:56+00:00",
+      "dernier_article_le": "2026-09-24T23:14:56+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "European Central Bank Cuts Interest Rates",
+          "source": "IR Insider",
+          "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE9fUGlIVjkySlBNb3pXZ2haMGJNVHpDVkxjNFhFdmlOUURPVE9ndVcxdks1VDE4NlNJd282WVBXSk4zZWNkem1SZ1N2TDR2MzkwYzBqSTdxRUNGQ0xUelU3UXFsOHgtVk95Q2liSG1HYzVmMDFtdjlla2M4OGI?oc=5",
+          "publie_le": "2026-09-24T23:14:56+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "8c77149ae4966f2e",
+      "titre_original": "Gold price slides on strong dollar: planning implications for mine projects",
+      "titre_fr": "Le prix de l'or baisse sur un dollar fort : implications de planification pour les projets miniers",
+      "resume_fr": "Le prix de l'or recule en raison de la force du dollar américain.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "La corrélation inverse or-dollar est un moteur quotidien des prix ; pertinent pour les traders XAUUSD.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Un dollar plus fort renchérit l'or pour les acheteurs en devises étrangères, réduisant la demande."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-25T00:00:57+00:00",
+      "dernier_article_le": "2026-09-25T00:00:57+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Gold price slides on strong dollar: planning implications for mine projects",
+          "source": "Geomechanics.io",
+          "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPMVIyNEE1Z1V2amZMVklKLVhuWl95Q0trMUNsN01oSVZPcE1pOWliSW43VldyQTRaVzIxLXF0YXpLRF9oR05WNDZicHU4aW1KeGN2b0xYMEU3QXR2SUs2enRGM0lFQXFxaGlaRVlwWjY4LTVUZmVrQlllQnEtdzlpRXFaN3k2UV91aTNXci1nRGNqLTYxTFRERWg5Z3g0ZGFIbmFLYVA0eWFhV0ZCbmdiUE1GTTBwUQ?oc=5",
+          "publie_le": "2026-09-25T00:00:57+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "844348a0d7abef9f",
+      "titre_original": "Dollar-Yen Set to Extend Gains Toward 159 as U.S. Rate-Hike Bets and Intervention Jitters Pull in Opposite Directions",
+      "titre_fr": "Dollar-Yen se prépare à prolonger les gains vers 159 alors que les paris sur les hausses de taux américains et les inquiétudes concernant les interventions tirent dans des directions opposées",
+      "resume_fr": "Le taux de change dollar-yen pourrait s'étendre vers 159, influencé par les attentes de hausse des taux américains et les préoccupations liées aux interventions de change.",
+      "categorie": "marche",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les dynamiques de taux américains affectent la demande de dollars et indirectement les prix de l'or.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Une hausse des taux américains soutient le dollar mais pèse sur l'or ; l'effet net dépend de la magnitude relative."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-25T00:05:00+00:00",
+      "dernier_article_le": "2026-09-25T00:05:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Dollar-Yen Set to Extend Gains Toward 159 as U.S. Rate-Hike Bets and Intervention Jitters Pull in Opposite Directions",
+          "source": "finance.biggo.com",
+          "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTE95QTVvT3F1bFhrcVQwX0lSZEpFNEZQeGktUlpWQlRSVnZ3UnVvblJEbVNWZnlVRk9iYjFWWVByTThDTnJKS1o2b1JCZlhoWF9NUE5UQ2lwSUVPaEZySXN5a19YeDVtTFg3anpSeEFKMXhDb2hsUVE?oc=5",
+          "publie_le": "2026-09-25T00:05:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "0c77771c039b042d",
+      "titre_original": "Gold (XAUUSD), Silver, Platinum Forecasts – Gold Pulls Back As 30-Year Yield Tests Multi-Decade Highs",
+      "titre_fr": "Prévisions sur l'or (XAUUSD), l'argent, le platine – L'or recule alors que le rendement 30 ans teste des sommets pluridécennaux",
+      "resume_fr": "Le prix de l'or baisse alors que les rendements obligataires à 30 ans atteignent des niveaux très élevés.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD"
+      ],
+      "importance": "haute",
+      "justification": "Les rendements obligataires élevés augmentent le coût d'opportunité de l'or sans coupon ; effet direct et immédiat sur XAUUSD.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Des rendements réels plus élevés rendent les obligations plus attrayantes que l'or, détournant les flux de capitaux."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-25T00:55:00+00:00",
+      "dernier_article_le": "2026-09-25T00:55:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Gold (XAUUSD), Silver, Platinum Forecasts – Gold Pulls Back As 30-Year Yield Tests Multi-Decade Highs",
+          "source": "FXEmpire",
+          "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxQU1U3a0Y3R0h1S0hBbTVxcVhGNkZwOG5RMU9HVHpKNjI4ZmRPbmpFUE5GM2FXZ005YlZYeUZpNzR4RkxwYkc3eDNaNVI5NnVIcGNOUFJDcmRFS1ZBMVdycU1tejdrTUZfbnE5cm1nMUxMQXA1dTBBSndIMUVVcTV3eG01NW5EdGwxa3NERlczbVVYVGlSN1ZJMkNTU3Bmb2lxdEZ1SzhuMlctN19saWhSRHFsNGZqc2o4cERrVGJiZUVRN1M0S19ldHJ3UjlHUzdOamk0c3lOczZ1NzFXVURV?oc=5",
+          "publie_le": "2026-09-25T00:55:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "07593986c2ba338d",
+      "titre_original": "How Investors Are Reacting To Newmont (NEM) As Fed Signals Hit Gold Prices And Sentiment",
+      "titre_fr": "Comment les investisseurs réagissent à Newmont (NEM) alors que les signaux de la Fed frappent les prix de l'or et le sentiment",
+      "resume_fr": "Les signaux de la Réserve fédérale américaine impactent les prix de l'or et le sentiment des investisseurs en actions minières.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "haute",
+      "justification": "Les signaux de la Fed sont des catalyseurs majeurs des mouvements d'or intra-journée ; haute pertinence pour les traders.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Un positionnement de la Fed moins accommodant soutient les taux et le dollar, pénalisant l'or sans coupon."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-25T01:15:00+00:00",
+      "dernier_article_le": "2026-09-25T01:15:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "How Investors Are Reacting To Newmont (NEM) As Fed Signals Hit Gold Prices And Sentiment",
+          "source": "Yahoo Finance",
+          "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQWVVLQk9OV2VnemxTRmJEeWRWaGZHWmtSTWtiMnB2TXROV1NDQnVFNklBRjRMRUpHcC1XY2lEQ19EOGkzS0V2ZVhBeTEyMF9tWHJ6b2NiQ0NqckJIS1NfMUI4U0JaelozbGNPM3VYc1F4U2JzOHZjNDV4NEQ2U2JuQUNhd1J2Tll1X3BiRmtqUi1iM1hxYTBHUzAwSFdpY0xG?oc=5",
+          "publie_le": "2026-09-25T01:15:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "f8789f4eea113acf",
+      "titre_original": "Dollar set for weekly gains as Treasury yields surge, Fed bets build",
+      "titre_fr": "Le dollar se prépare à des gains hebdomadaires alors que les rendements du Trésor montent en flèche et les paris sur la Fed s'accumulent",
+      "resume_fr": "Les rendements des obligations du Trésor américain augmentent et les attentes concernant les taux de la Réserve fédérale soutiennent les gains du dollar.",
+      "categorie": "marche",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "haute",
+      "justification": "Les rendements du Trésor plus élevés renforcent l'attrait du dollar et affectent directement les taux réels qui influencent le prix de l'or.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Des rendements du Trésor plus élevés augmentent le coût d'opportunité de la détention d'or, ce qui pèse sur les prix de l'or."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-25T02:11:00+00:00",
+      "dernier_article_le": "2026-09-25T02:11:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Dollar set for weekly gains as Treasury yields surge, Fed bets build",
+          "source": "Reuters",
+          "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNZEliX2ZMV1UwSDZPa3liWjlRUk4tT192UjJmelY5OEpFcmVSWHlBRHVuUXNHSW5jTEI1TGlxT1kxS2gyZ2RtVGRJampmMndMMjVERnl0WVZ1ZDdhZndLd0htM1BpZlJmM1o0dU1sSDRqRWp0NkVTUTJkVU9fNGw0QndUYlJqV2plRXpySGpOeXBHdTRtcUYxOXlmVDE4MU9Eanc?oc=5",
+          "publie_le": "2026-09-25T02:11:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "994f5ce99b908092",
+      "titre_original": "Japanese Yen recovers from three-week low vs USD amid looming intervention risk",
+      "titre_fr": "Le yen japonais se redresse après son plus bas en trois semaines face à l'USD au milieu du risque d'intervention imminent",
+      "resume_fr": "Le yen japonais remonte après avoir atteint un plus bas en trois semaines, avec un risque d'intervention de la Banque du Japon.",
+      "categorie": "marche",
+      "actifs": [
+        "USD",
+        "JPY"
+      ],
+      "importance": "moyenne",
+      "justification": "L'intervention potentielle de la Banque du Japon affecte la dynamique des devises et peut influencer les flux vers l'or en tant que valeur refuge.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Une intervention du Japon renforcerait le yen, réduisant potentiellement l'attrait relatif de l'or pour les investisseurs de cette région."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-25T02:26:25+00:00",
+      "dernier_article_le": "2026-09-25T02:26:25+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Japanese Yen recovers from three-week low vs USD amid looming intervention risk",
+          "source": "FXStreet",
+          "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxOenlVdEY3OG5iQlVhYXppcEExcW4yOGRFU2JjWXhUak5HdTFSU2lOVHNBOUhyNFJIYzBWWnRfYkVqNXRDUTFFVm5DcENsQTJISTdEbWpCcVJEaGNaeFY3MmRHeDVqSW1mdklfQVRleEZpajJlNk9KUndFclBLdjI4bzhpZnpOOTlzTEtsbmQwbzNFcGpzalV6cmpGU05UVkFya0FXdEJ6X1BaR05td3I4cTM2dmtHcWs1b2kxb3oxQQ?oc=5",
+          "publie_le": "2026-09-25T02:26:25+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "c5ace14ccad023f2",
+      "titre_original": "USD/JPY Q4 2026 Outlook: Hawkish Fed Pricing Clashes With Intervention Risk",
+      "titre_fr": "Perspectives USD/JPY Q4 2026 : Les prix hawkish de la Fed entrent en collision avec le risque d'intervention",
+      "resume_fr": "Les attentes hawkish concernant la Réserve fédérale entrent en conflit avec le risque d'intervention de la Banque du Japon sur le taux de change USD/JPY.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "USD",
+        "JPY",
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "La tension entre la Fed hawkish et les interventions potentielles du Japon crée une volatilité des devises qui affecte les taux réels et l'attractivité de l'or.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Une Fed plus hawkish soutient le dollar et pèse sur l'or, mais l'intervention du Japon pourrait créer une volatilité favorable à l'or comme valeur refuge."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-25T02:28:29+00:00",
+      "dernier_article_le": "2026-09-25T02:28:29+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "USD/JPY Q4 2026 Outlook: Hawkish Fed Pricing Clashes With Intervention Risk",
+          "source": "stonex.com",
+          "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQNGxHaXk1VkNsZW5jZDhzNjBUV3JPNk5XQkpQYmN3NDZ6RE83NkFMZkJxRE1qNk1KQWtvcnRvdTJHOFVVVElkbXNLUW9EcEU1WnpKeWV4d3ptYUdmeFNHTEcwbERvQm9JYUNicUthS3BMQnZqMUwzcE9xcXBkeHZ2ZjhiSUFVRTJncHh5SnlycHBKZXZqSmhxTl9MSzNlWmNZWGRMMFJUemxkUGg0WGF1U3lLbGtodnA3TnNCdFlDcw?oc=5",
+          "publie_le": "2026-09-25T02:28:29+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "9716b6221ff2ca33",
+      "titre_original": "Rupee to navigate US-Iran truce possibility, surging global bond yields",
+      "titre_fr": "La roupie doit naviguer la possibilité d'une trêve États-Unis-Iran et la montée des rendements obligataires mondiaux",
+      "resume_fr": "La roupie indienne est soumise à la possibilité d'une trêve entre États-Unis et Iran et à l'augmentation des rendements obligataires mondiaux.",
+      "categorie": "conflit",
+      "actifs": [
+        "USD",
+        "INR",
+        "XAUUSD"
+      ],
+      "importance": "haute",
+      "justification": "Une résolution du conflit États-Unis-Iran réduirait la prime de risque géopolitique, affectant les rendements obligataires mondiaux et l'attrait de l'or comme valeur refuge.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Une trêve diminuerait la demande d'or comme protection contre les risques géopolitiques et augmenterait les rendements réels, pesant sur l'or."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-25T02:33:00+00:00",
+      "dernier_article_le": "2026-09-25T02:33:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Rupee to navigate US-Iran truce possibility, surging global bond yields",
+          "source": "Reuters",
+          "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPejlReXp5U3VIZmRZLVN4dV91cUl1QzltejQxOWdtaHlyQlNyNUhLdW1EOTBja0EwbEZEcTNQSjJIWTNUdDZuVjNyUi1WOEh6Y3hPOVJ6aV81R1JzUmJGbDkxeFpLX2kxVlJHWnRVYXk3cjIxR1ZqU0FlMERiMUNOdFR0c2hZQVdOTVE0MEtRUWhfM01JSVVxTTZQZmpEZWRackcwRktMYTlkR3VhSDBkLW8zYnI1UQ?oc=5",
+          "publie_le": "2026-09-25T02:33:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "37cbda84b232a0e7",
+      "titre_original": "Yen Remains on Intervention Watch",
+      "titre_fr": "Le Yen reste sous surveillance pour intervention",
+      "resume_fr": "Le yen reste sous surveillance pour une possible intervention des autorités monétaires japonaises.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "L'intervention de la Banque du Japon sur le yen affecte les flux de carry-trade et la dynamique des devises",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Une intervention pour renforcer le yen pourrait réduire les financements en yen portant sur l'or, augmentant la demande relative d'or comme actif refuge"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-25T02:45:00+00:00",
+      "dernier_article_le": "2026-09-25T02:45:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Yen Remains on Intervention Watch",
+          "source": "TradingView",
+          "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNYkIxbTVEQWFnMVl0Zkkzb3UySDB5QlRZZzVIRDJ6Qy0xVW9WVzNLWWdsWEtxOGZJLURjZk5fa3VMTDZjNmE5emZBVEs0Nm9rNTctUzA3X0F0SWJOVUZTdUdXb29KcjdBdlZWRkttbDhLeUN4MVNsaXIyQnUtR2dIVUV3dU05RGc4QXRnMA?oc=5",
+          "publie_le": "2026-09-25T02:45:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "d08aae8a6a708064",
+      "titre_original": "Gold Price Forecast: XAU/USD eyes worst week in a month amid hawkish Fed outlook",
+      "titre_fr": "Prévision du prix de l'or : XAU/USD vise sa pire semaine du mois face aux perspectives hawkish de la Fed",
+      "resume_fr": "Le prix de l'or XAU/USD s'oriente vers sa pire semaine du mois en raison d'une perspective hawkish de la Réserve fédérale.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "haute",
+      "justification": "Perspective hawkish de la Fed renforce directement le dollar et pèse sur l'or dans la journée",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Des taux d'intérêt attendus plus élevés augmentent le coût d'opportunité de détention d'or et renforcent le dollar"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-25T02:47:57+00:00",
+      "dernier_article_le": "2026-09-25T02:47:57+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Gold Price Forecast: XAU/USD eyes worst week in a month amid hawkish Fed outlook",
+          "source": "FXStreet",
+          "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNUEpuZkJfRGhBVk1nVC1ncE1ieUZKSnhmbVhFcl9sRFBINlQ5eVpvUXNVb0FDdkJwTXhqdUh1d3pGQVBGS1lVZFdHdW1IcHlDSlJiZFVRQ19ybFpkZG5QRlNxdFlmMDR2dkwwMUtCWld1UnpwTWM1Vy0taUdFeXdZUE1tTC1MYXE4eV81N3N0V2VwMXhqY1NVVDJ2S1JsTmNxSEtXQW5OT3NVZXQ3S21LVnhVR2xaNW9HbEd4TTRlSzdGWmRu?oc=5",
+          "publie_le": "2026-09-25T02:47:57+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "5cb97bb3176fa32e",
+      "titre_original": "Trump Weighs 90-Day Diesel Export Ban",
+      "titre_fr": "Trump envisage une interdiction d'exportation de diesel de 90 jours",
+      "resume_fr": "Trump envisage une interdiction d'exportation de diesel sur 90 jours.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les mesures commerciales de Trump affectent la dynamique économique et les attentes de politique monétaire, impactant le dollar",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Une restriction commerciale pourrait peser sur la croissance, contrebalançant un soutien potentiel au dollar via le protectionnisme"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "formulé comme une information non vérifiée (« selon des sources »…)",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-25T02:57:10+00:00",
+      "dernier_article_le": "2026-09-25T02:57:10+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Trump Weighs 90-Day Diesel Export Ban",
+          "source": "Hoosier Ag Today",
+          "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQQ0pKT1Q3QUhHTEFwa2F0akxUNXI2YldOc1I4ZUlwZjhXZFM2YmRycnlfSGNlR3REal9kek1QRnhYMnVWdkFtMkFhcFdQdFliRmFoOE1vd0htMlIxVDhWeGJfVjNITWhadTBma1FFLU1iaFAtOFU5eWlXMUVydmtjRERVZUhFQUtESzBtX19BLWF4ckdFZzRHTDFmdS1yZw?oc=5",
+          "publie_le": "2026-09-25T02:57:10+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "ffdefc7cbdbbd9cc",
+      "titre_original": "United States Dollar Index approaches 101.80 as bond yields keep rallying",
+      "titre_fr": "L'indice du dollar américain s'approche de 101,80 alors que les rendements obligataires continuent de progresser",
+      "resume_fr": "L'indice du dollar américain s'approche de 101,80 tandis que les rendements obligataires continuent leur progression.",
+      "categorie": "marche",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "haute",
+      "justification": "La progression des rendements obligataires et du dollar affecte directement le prix de l'or dans la journée",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "La hausse des rendements augmente l'attrait des actifs portant intérêt et renforce le dollar, pesant sur l'or libellé en dollars"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-25T03:22:23+00:00",
+      "dernier_article_le": "2026-09-25T03:22:23+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "United States Dollar Index approaches 101.80 as bond yields keep rallying",
+          "source": "FXStreet",
+          "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPWGZSZ2tLLUN5NW5ZQ3JLNUFMblI0Rl9sSUhfZEc5MUNiN1BQa1JJZk90bUVfenFYSWc0TFVBNGZwbGJ4dXQzQXFraUViU3NJM0t4Qk9SQ0VpekcyZnZESlE4TEZMQUVJUmZVZXVXMjRYUTJZOGJHeER3X29uWk5XM3JMd2dpSFZlcl95Qy1JZUx6Q254ME53aExiQ3NlR203aFVWOXhsTGZ5LThKaG9VOWNDazhoZw?oc=5",
+          "publie_le": "2026-09-25T03:22:23+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "40d4cb19a51a0ffd",
+      "titre_original": "Canada’s Tariffs Cost This Cheesemaker Nearly $1 Million in Sales. Now Its Costs Are Rising at Home",
+      "titre_fr": "Les tarifs du Canada coûtent à ce fromager près d'un million de dollars en ventes. Maintenant ses coûts augmentent à la maison",
+      "resume_fr": "Un fromager canadien subit des pertes de ventes d'environ un million de dollars du fait des tarifs canadiens, tandis que ses coûts domestiques augmentent.",
+      "categorie": "sanctions_commerce",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "faible",
+      "justification": "Cas particulier d'une entreprise ; impact macroéconomique marginal sur les marchés du dollar ou de l'or",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Les tensions commerciales Canada-États-Unis pourraient soutenir le dollar via des craintes géopolitiques, mais l'effet est indirect"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-25T03:56:20+00:00",
+      "dernier_article_le": "2026-09-25T03:56:20+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Canada’s Tariffs Cost This Cheesemaker Nearly $1 Million in Sales. Now Its Costs Are Rising at Home",
+          "source": "inc.com",
+          "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxON3p5VDU0WDFuUE9fWl82WTVNOG1NVVQ0bGN0ajF4UjMwUzk0NUtkZER6b0hEckR5Z1ZtNS1vRUN3NzlWQ09rRXBZbDJDN0hQQlBjU1Q0a0pzSlZ1bVRpWkJaYm1TQXVuOW1kci1iNWRHa2ZUNDI3TkNrUEVjNzlSLVUwcmxhNkRWdFR6SWdELWJIeUVUR2VCcGUyZUc1ZGpDTmlzZ2o4V1loSzZjTGZNeEcwb0szbFUxLUFr?oc=5",
+          "publie_le": "2026-09-25T03:56:20+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "e10953bdd1b577c8",
+      "titre_original": "Gov’t denies default concerns, Finance Ministry will pay Kopdes debt",
+      "titre_fr": "Le gouvernement dément les inquiétudes concernant un défaut de paiement, le ministère des Finances paiera la dette Kopdes",
+      "resume_fr": "Le gouvernement affirme qu'il paiera sa dette Kopdes et dément les préoccupations concernant un possible défaut de paiement.",
+      "categorie": "crise_bancaire",
+      "actifs": [
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les inquiétudes de défaut souverain affectent la dynamique devise/refuge-valeur, mais l'affirmation du paiement réduit le risque immédiat",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "La clarification du gouvernement réduit les tensions géopolitiques et la demande de refuge, pouvant peser sur l'or"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-25T04:10:00+00:00",
+      "dernier_article_le": "2026-09-25T04:10:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Gov’t denies default concerns, Finance Ministry will pay Kopdes debt",
+          "source": "IDNFinancials",
+          "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNSmt4bnhIbEF0Rzk0VlVESC1XczdKbUJGUmxPdE9DaFJWVDhsWHc5d0E0RWs4cThmenVyNTdxZm1RMlVFSzNjb29vN3EzNEwyWnlIUHlFbmRNYUNpcmRsZGdrLS0yOFJ2ZnkyalBKVWE1cm5IZ3dBeUNsOTZuS3VXeDZXaGl1aDFkWGlEanhJMUYzQmVrTHV2UnJCN3lmSHdPdUZKc2FNWDdqc2s?oc=5",
+          "publie_le": "2026-09-25T04:10:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "435ea46e1addbd1e",
+      "titre_original": "Trump Expressed Concerns About Yen Weakness, Japan Finance Minister Says",
+      "titre_fr": "Trump a exprimé des préoccupations concernant la faiblesse du yen, selon le ministre des Finances japonais",
+      "resume_fr": "Trump a exprimé des inquiétudes au sujet de la faiblesse du yen selon le ministre des Finances du Japon.",
+      "categorie": "declaration",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les déclarations de Trump sur la politique monétaire et les devises impactent les perspectives du dollar et par conséquent l'or",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Une potentielle action contre la faiblesse du yen pourrait affecter la dynamique des devises refuges et l'attrait relatif du dollar versus l'or"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-25T04:23:00+00:00",
+      "dernier_article_le": "2026-09-25T04:23:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Trump Expressed Concerns About Yen Weakness, Japan Finance Minister Says",
+          "source": "WSJ",
+          "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOa3VnY0xlZ0NXQzJnSXFtQ0VQTnpnNk13cDA3aDBXWWQ2ckFvdjlqWi1fVGZDbDAwLUo2SFBEbldPRkJjNEhOM3BVZ3FpRkJ5dHBscFdEQUVpUndoR3NuWF9nUmc1OFR5S243Vm8xVmZaQ1luN2dlMkZjeHJYS3d4N3NIakE5NFlXb05KeGIyemoxYVQydlUwTHZpRjRYWHhxczIxRENxYzBvaHhDdU0tQXF2blZxcDkyZVZv?oc=5",
+          "publie_le": "2026-09-25T04:23:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "21cc0d39bf1adee6",
+      "titre_original": "Indian Rupee cushioned by RBI’s likely intervention, outlook remain fragile",
+      "titre_fr": "La roupie indienne soutenue par l'intervention probable de la RBI, les perspectives restent fragiles",
+      "resume_fr": "La Banque de réserve indienne intervient probablement pour soutenir la roupie, mais les perspectives demeurent fragiles.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "USD",
+        "XAUUSD"
+      ],
+      "importance": "moyenne",
+      "justification": "L'intervention d'une banque centrale sur la devise affecte les flux refuge et les dynamiques de l'or dans les monnaies émergentes",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "L'intervention de la RBI pour soutenir la roupie pourrait réduire l'attrait de l'or comme couverture contre la dépréciation, mais les perspectives fragiles soutiennent la demande refuge"
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-25T05:28:55+00:00",
+      "dernier_article_le": "2026-09-25T05:28:55+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Indian Rupee cushioned by RBI’s likely intervention, outlook remain fragile",
+          "source": "FXStreet",
+          "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQdkRIeTdFbEhHdlNiMHF4UXMxM0ZJMlg4NU9fWnJFWDFnVUcxLXRuWVNfajZ5TTQ3UEF6R01jLTRrTnJ4ay1BOFRPb1pJNXpLZDVMaWJPOFNVWDF2WV9sbHk2cTc5cVJiR1BFeHBwbGNLY0tQSmNuLV9zTUNFcXczYmRVWHU0RnFzeGNZSncxNzQydll2ZmlGVkQ5eEdrWGh3bUdTMkY5eWc0elhZMWctODhnWWhZd2s?oc=5",
+          "publie_le": "2026-09-25T05:28:55+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "d2ce293463d5cd23",
+      "titre_original": "Trump warns on weak yen as Japan signals market check - CHOSUNBIZ",
+      "titre_fr": "Trump met en garde contre la faiblesse du yen alors que le Japon signale une vérification du marché",
+      "resume_fr": "Trump met en garde contre la faiblesse du yen tandis que le Japon signale une vérification du marché.",
+      "categorie": "declaration",
+      "actifs": [
+        "USD",
+        "JPY"
+      ],
+      "importance": "haute",
+      "justification": "Déclaration de Trump sur le yen affecte les dynamiques de change et peut influencer les flux vers les valeurs refuges comme l'or.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Une faiblesse du yen pourrait renforcer l'attrait des actifs de refuge comme l'or face aux tensions commerciales."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-25T05:54:00+00:00",
+      "dernier_article_le": "2026-09-25T05:54:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Trump warns on weak yen as Japan signals market check - CHOSUNBIZ",
+          "source": "biz.chosun.com",
+          "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxQMWhIdXhLeUJuWWZJel9ma01ucDVXdzd3aXVHS09HbldvX3FTM29XTU9LbktxU1ZkcUIxdnQxTjVRRjRXY1k3eU10Qm5FMFlYVHZndHRDaHdxWUlla3M1aXNTT1ZUUlBfdVRnbFRsalVOc3hWV3pVcnp1TUFCMDlLamFuNkprRHpI0gGcAUFVX3lxTE4zblpxaGVMVVd0SjNWaUVuUkNqcnNrXy15cnJERnFsYV9ySEY5OFRaTF95dktzRWxERE1HOUp2cW0taEl2M2VFNGlTWUFidnJBZnRLcUgtWHZpV0JCTVA3d1pLVHJIZkhZSnQ0QUNHSXhLMmRDU2xLZktjcGxRaEx2SVRhRF9VWjNNWGM0QnR6SXRlSFhwSnh5a1lndA?oc=5",
+          "publie_le": "2026-09-25T05:54:00+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "7e507a7bb0856a1f",
+      "titre_original": "Iran’s Ghalibaf Warns US of ‘1970s Rates,’ High Gas Prices and Diesel Shortages as Treasury Yield Tops 5.",
+      "titre_fr": "Ghalibaf d'Iran avertit les États-Unis de « taux des années 1970 », de prix élevés du gaz et de pénuries de diesel alors que le rendement du Trésor dépasse 5 %",
+      "resume_fr": "Un responsable iranien avertit des États-Unis concernant des taux élevés et des pénuries énergétiques alors que les rendements du Trésor dépassent 5 %.",
+      "categorie": "declaration",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les tensions géopolitiques avec l'Iran et les rendements du Trésor à 5 % affectent la prime de risque et les rendements réels, influençant la demande d'or.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Les tensions géopolitiques soutiennent la demande de refuge; les rendements nominaux élevés peuvent compresser l'or à court terme mais les tensions prédominent."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-25T06:14:53+00:00",
+      "dernier_article_le": "2026-09-25T06:14:53+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Iran’s Ghalibaf Warns US of ‘1970s Rates,’ High Gas Prices and Diesel Shortages as Treasury Yield Tops 5.",
+          "source": "Benzinga",
+          "url": "https://news.google.com/rss/articles/CBMihwJBVV95cUxNamptNjhJSFpzUUYyVVA0MUJSUVg4dnFFTmRoVklJMy1Ec0I2b3ktUTJsT3lRbTZpMkhwV1NfVUtLbUw0S0o4VUhYUFo2dUo2R2ZBbk1aUWFzc3pHNXZwTC05RU1fZFRZNGZ1NmphNG1CQ05hTmw3N1hpUlVEcmJNQVlHZV9xbGZtdjFwTlFlOHB3SV9XVVgxbk4wd0xtaUtLbVlObWd0bzFGSlpGbWwxQnNISTdiZmpIZVNRZzNjRmxlb1hCWEI1WWNDSlNndUlPc1ZwM3NIdjFPV0JIVkcxYzYzYjR2azNyMWp6TXFPMnM3OGUtbDk5aFFXaTRGQzFpUXJNQUdoRQ?oc=5",
+          "publie_le": "2026-09-25T06:14:53+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "51f3443502f57473",
+      "titre_original": "USD/JPY (USDJPY) Moved Sharply on Sep 25: Are Central Bank Expectations Shifting?",
+      "titre_fr": "USD/JPY s'est fortement déplacé le 25 septembre : les attentes envers la banque centrale changent-elles ?",
+      "resume_fr": "Le USD/JPY a enregistré un mouvement important le 25 septembre, posant la question d'un changement dans les attentes envers la banque centrale.",
+      "categorie": "marche",
+      "actifs": [
+        "USD",
+        "JPY"
+      ],
+      "importance": "moyenne",
+      "justification": "Un changement dans les attentes de politique monétaire affecte les rendements et les flux de capital, impactant indirectement la demande d'or.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Selon la direction du déplacement USD/JPY, cela peut refléter un repricing des taux d'intérêt réels, affectant la compétitivité de l'or."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 1,
+      "officiel": false,
+      "publie_le": "2026-09-25T06:15:16+00:00",
+      "dernier_article_le": "2026-09-25T06:15:16+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "USD/JPY (USDJPY) Moved Sharply on Sep 25: Are Central Bank Expectations Shifting?",
+          "source": "TradingKey",
+          "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNajUwRFREYkFaQ2U3cC1VcXZDYkdKM0JfcXZ2VXhQYjhqWDdNaWJ0eUY1TFJudkNEenpNWHNZcVdOanVWVUNkNGM1NGhCbngzWEdtelRLSzFFcWNEMjRmeE14WURKa1Q3a05IU0xhM3pXQ0ZYUTBFZnQ5R3M1Z1lqX2F1NHk2ZUhzU19IdkVR?oc=5",
+          "publie_le": "2026-09-25T06:15:16+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "05bb62840ddb86b1",
+      "titre_original": "Donald Trump raised weak yen with Sanae Takaichi, Japan finance minister says",
+      "titre_fr": "Donald Trump a abordé la question de la faiblesse du yen avec Sanae Takaichi, ministre des Finances du Japon",
+      "resume_fr": "Trump a soulevé la question de la faiblesse du yen lors d'une discussion avec la ministre des Finances japonaise Sanae Takaichi.",
+      "categorie": "declaration",
+      "actifs": [
+        "USD",
+        "JPY"
+      ],
+      "importance": "haute",
+      "justification": "Les pressions diplomatiques sur la politique monétaire japonaise créent une incertitude sur les taux de change et les flux de refuges vers l'or.",
+      "interpretation": {
+        "direction_or": "haussier",
+        "texte": "Les tensions commerciales et monétaires incitent à rechercher des actifs de refuge; l'or bénéficie de l'incertitude des politiques."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-25T06:22:30+00:00",
+      "dernier_article_le": "2026-09-25T06:22:30+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Donald Trump raised weak yen with Sanae Takaichi, Japan finance minister says",
+          "source": "Financial Times",
+          "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxNNHNueHE3WldVU08xREJoeGhHUzVYNTR4SGRWa09SZTNaWTZ5b0JLRExrZUJ5ek95Y1pXMmVUa2t2aHpKbjlWNlFLSG8xRlFzZzdwWnd3UzM4ZF9udDRRWG1xLUoxalptc29tNnZTSFhDb1B5TWJpOHlIZkZHbU9rVWFmd0Q?oc=5",
+          "publie_le": "2026-09-25T06:22:30+00:00",
+          "officiel": false
+        }
+      ]
+    },
+    {
+      "id": "be081d6b76590544",
+      "titre_original": "Minutes of the Market Participants Group meeting – 24 September 2026",
+      "titre_fr": "Procès-verbal de la réunion du Groupe des participants du marché – 24 septembre 2026",
+      "resume_fr": "Le Groupe des participants du marché de la Banque d'Angleterre a tenu une réunion le 24 septembre 2026 pour discuter de thèmes pertinents sur les marchés financiers.",
+      "categorie": "banque_centrale",
+      "actifs": [
+        "XAUUSD",
+        "USD"
+      ],
+      "importance": "moyenne",
+      "justification": "Les perspectives du forum bancaire central influencent les attentes de politique monétaire et les rendements, affectant la valorisation de l'or.",
+      "interpretation": {
+        "direction_or": "incertain",
+        "texte": "Selon les conclusions du forum, les signaux de politique monétaire plus restrictifs compriment l'or; les signaux accommodants le soutiennent."
+      },
+      "statut": "confirmé",
+      "raison_statut": "communiqué d'une source officielle",
+      "fiabilite": 3,
+      "officiel": true,
+      "publie_le": "2026-09-25T06:30:00+00:00",
+      "dernier_article_le": "2026-09-25T06:30:00+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Minutes of the Market Participants Group meeting – 24 September 2026",
+          "source": "Banque d'Angleterre",
+          "url": "https://www.bankofengland.co.uk/minutes/2026/september/market-participants-group-meeting-25-september-2026",
+          "publie_le": "2026-09-25T06:30:00+00:00",
+          "officiel": true
+        }
+      ]
+    },
+    {
+      "id": "55d45db874eb9a29",
+      "titre_original": "Japanese Yen gains amid intervention watch as JGB 10-year yield hits 30-year highs",
+      "titre_fr": "Le yen japonais gagne du terrain dans un contexte de surveillance d'une intervention tandis que le rendement des JGB à 10 ans atteint des plus hauts depuis 30 ans",
+      "resume_fr": "Le yen japonais se renforce dans une perspective d'intervention potentielle tandis que le rendement des obligations d'État japonaises à 10 ans atteint des niveaux inédits depuis 30 ans.",
+      "categorie": "marche",
+      "actifs": [
+        "XAUUSD",
+        "USD",
+        "JPY"
+      ],
+      "importance": "haute",
+      "justification": "Les rendements obligataires à 30 ans hauts augmentent les taux réels globaux, comprimant l'or; le renforcement du yen complique la position USD/refuge.",
+      "interpretation": {
+        "direction_or": "baissier",
+        "texte": "Des rendements réels plus élevés réduisent l'attrait de l'or sans rendement; le renforcement du yen détourne les flux de refuge vers d'autres actifs."
+      },
+      "statut": "non confirmé",
+      "raison_statut": "une seule source pour l'instant",
+      "fiabilite": 2,
+      "officiel": false,
+      "publie_le": "2026-09-25T06:30:43+00:00",
+      "dernier_article_le": "2026-09-25T06:30:43+00:00",
+      "mise_a_jour": null,
+      "evalue_par_ia": true,
+      "articles": [
+        {
+          "titre": "Japanese Yen gains amid intervention watch as JGB 10-year yield hits 30-year highs",
+          "source": "FXStreet",
+          "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxOSFFEWXR5dlg2U01tTEFhVG5fZFJqN2N6T05iV0NvMGRIcjhtTTAtWnhPcXZaSlVEQ2xsVTZZblh0LWdCTnZLRUppcjA0aFJURHJ1eER5SGRlZndJeXVzSUcya1ZwaVhiTWRvdmRqMF8zQ0hlQ0l4ZWdOZDI4LVlfdlg2eF9MZVpqdHAzbTZpWUdNQk0zbDk5WWU5eHpuQmlzdkdSYzlvSEFRRTFPaXA0VlQ0eGpwMzZHMzR1YkNkVQ?oc=5",
+          "publie_le": "2026-09-25T06:30:43+00:00",
+          "officiel": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,2 +1,4 @@
 __pycache__/
 *.pyc
+supabase/_A_EXECUTER_*.sql
+banc-essai.html

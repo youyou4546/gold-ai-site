@@ -93,11 +93,54 @@
       </div>
     </section>
 
-    <!-- ============ SECTION : CALENDRIER ÉCONOMIQUE ============ -->
+    <!-- ============ SECTION : ANNONCES (actualités urgentes + calendrier + impact probable) ============ -->
     <section class="section" id="section-calendrier">
-      <h2 class="titre-section">Calendrier économique de la semaine</h2>
-      <p style="font-size:12px; color:var(--texte-attenue); margin-top:-6px;" id="date-calendrier"></p>
-      <div id="liste-evenements"></div>
+      <h2 class="titre-section">Annonces</h2>
+
+      <div class="barre-filtres" id="filtres-annonces" role="group" aria-label="Filtres">
+        <button type="button" class="puce-filtre" data-filtre="tout" aria-pressed="true">Tout</button>
+        <button type="button" class="puce-filtre" data-filtre="urgent" aria-pressed="false">⚡ Urgent</button>
+        <button type="button" class="puce-filtre" data-filtre="fort" aria-pressed="false">Fort impact</button>
+        <button type="button" class="puce-filtre" data-filtre="xau" aria-pressed="false">XAUUSD</button>
+        <button type="button" class="puce-filtre" data-filtre="usd" aria-pressed="false">USD</button>
+      </div>
+      <div class="ligne-champs filtres-selects">
+        <div class="champ">
+          <label for="filtre-pays">Pays</label>
+          <select id="filtre-pays"><option value="">Tous les pays</option></select>
+        </div>
+        <div class="champ">
+          <label for="filtre-periode">Période</label>
+          <select id="filtre-periode">
+            <option value="jour">Aujourd'hui</option>
+            <option value="24h">± 24 h</option>
+            <option value="semaine" selected>Cette semaine</option>
+          </select>
+        </div>
+      </div>
+      <label class="case-a-cocher"><input type="checkbox" id="filtre-tous" /> Afficher tous les événements (faible impact, toutes devises, commentaires de marché)</label>
+
+      <details class="details-discrets"><summary>Sources et dernière actualisation</summary><div id="etat-sources-annonces"></div></details>
+
+      <div class="grille-annonces">
+        <aside class="carte encadre-impact" id="encadre-impact" aria-live="polite"><p class="etat-vide">Analyse en cours…</p></aside>
+        <div id="contenu-annonces"><p class="etat-vide">Chargement…</p></div>
+      </div>
+    </section>
+
+    <!-- ============ SECTION : CALCULATEUR ============ -->
+    <section class="section" id="section-calculateur">
+      <h2 class="titre-section">Calculateur</h2>
+      <div class="carte">
+        <div class="champ">
+          <label for="champ-signal">Colle ton signal ici</label>
+          <textarea id="champ-signal" rows="8" placeholder="Sell XAUUSD&#10;Point d'entrée : 4335&#10;TP1 : 4329&#10;TP2 : 4320&#10;SL : 4339"></textarea>
+        </div>
+        <button class="bouton" id="bouton-calculer">Calculer</button>
+        <p class="aide">Solde, risque, répartition des TP et spécifications de l'instrument : Profil › Général. Aucun ordre n'est envoyé : le calcul est seulement affiché.</p>
+      </div>
+      <div id="zone-signal-interprete"></div>
+      <div id="zone-resultat-calcul"></div>
     </section>
 
     <!-- ============ SECTION 3 : ANALYSE DE GRAPHIQUE (placeholder) ============ -->
@@ -133,7 +176,7 @@
 
       <!-- Vue calendrier des trades (masquée tant qu'on n'a pas cliqué sur "Calendrier" ci-dessus) -->
       <div id="journal-calendrier" class="hidden">
-        <button class="lien-retour" id="bouton-retour-journal">‹ Retour</button>
+        <button type="button" class="bouton-retour" id="bouton-retour-journal"><span aria-hidden="true">←</span> Retour</button>
 
         <div class="entete-mois">
           <button id="mois-precedent" aria-label="Mois précédent">‹</button>
@@ -154,11 +197,19 @@
 
       <!-- Vue Performance (masquée tant qu'on n'a pas cliqué sur "Performance" ci-dessus) -->
       <div id="journal-performance" class="hidden">
-        <button class="lien-retour" id="bouton-retour-performance">‹ Retour</button>
+        <button type="button" class="bouton-retour" id="bouton-retour-performance"><span aria-hidden="true">←</span> Retour</button>
 
         <div class="champ" style="display:none;">
           <label for="select-filtre-compte-perf">Filtrer par compte</label>
           <select id="select-filtre-compte-perf"></select>
+        </div>
+
+        <div class="barre-filtres" id="filtres-periode-perf" role="group" aria-label="Période">
+          <button type="button" class="puce-filtre" data-periode="7j" aria-pressed="false">7 jours</button>
+          <button type="button" class="puce-filtre" data-periode="30j" aria-pressed="true">30 jours</button>
+          <button type="button" class="puce-filtre" data-periode="90j" aria-pressed="false">90 jours</button>
+          <button type="button" class="puce-filtre" data-periode="annee" aria-pressed="false">Cette année</button>
+          <button type="button" class="puce-filtre" data-periode="tout" aria-pressed="false">Tout</button>
         </div>
 
         <div id="contenu-performance"></div>
@@ -184,7 +235,7 @@
           </button>
           <button class="tuile-journal" id="bouton-ouvrir-parametres">
             <span class="icone-tuile">⚙️</span>
-            <span>Paramètres</span>
+            <span>Général</span>
           </button>
           <button class="tuile-journal" id="bouton-ouvrir-comptes">
             <span class="icone-tuile">💼</span>
@@ -195,7 +246,7 @@
 
       <!-- Vue Mon compte -->
       <div id="profil-mon-compte" class="hidden">
-        <button class="lien-retour" id="bouton-retour-mon-compte">‹ Retour</button>
+        <button type="button" class="bouton-retour" id="bouton-retour-mon-compte"><span aria-hidden="true">←</span> Retour</button>
 
         <div class="carte" style="text-align:center;">
           <div class="avatar-profil">👤</div>
@@ -230,9 +281,16 @@
 
       <!-- Vue Paramètres -->
       <div id="profil-parametres" class="hidden">
-        <button class="lien-retour" id="bouton-retour-parametres">‹ Retour</button>
+        <button type="button" class="bouton-retour" id="bouton-retour-parametres"><span aria-hidden="true">←</span> Retour</button>
 
         <div class="carte">
+          <h3 class="titre-bloc">Paramètres du calculateur</h3>
+          <div id="zone-parametres-calculateur"></div>
+        </div>
+
+        <div class="carte">
+          <h3 class="titre-bloc">Règles de trading</h3>
+          <div class="hidden" aria-hidden="true">
           <div class="champ">
             <label for="param-solde-compte">Solde du compte ($)</label>
             <input type="number" id="param-solde-compte" inputmode="decimal" placeholder="ex: 100000" />
@@ -257,6 +315,7 @@
               <label for="param-repartition-runner">Runner</label>
               <input type="number" id="param-repartition-runner" inputmode="decimal" />
             </div>
+          </div>
           </div>
 
           <div class="champ">
@@ -289,13 +348,13 @@
 
           <p class="message-succes" id="message-parametres"></p>
 
-          <button class="bouton" id="bouton-sauvegarder-parametres">Sauvegarder</button>
+          <button class="bouton" id="bouton-sauvegarder-parametres">Enregistrer les règles de trading</button>
         </div>
       </div>
 
       <!-- Vue Mes comptes -->
       <div id="profil-comptes" class="hidden">
-        <button class="lien-retour" id="bouton-retour-comptes">‹ Retour</button>
+        <button type="button" class="bouton-retour" id="bouton-retour-comptes"><span aria-hidden="true">←</span> Retour</button>
 
         <button class="bouton" id="bouton-ajouter-compte-trading" style="margin-bottom:14px;">+ Ajouter un compte</button>
 
@@ -338,6 +397,16 @@
         <div class="champ">
           <label for="resultat-nouveau-trade">Résultat ($) — négatif si perte</label>
           <input type="number" id="resultat-nouveau-trade" inputmode="decimal" step="0.01" placeholder="ex: 340 ou -120" />
+        </div>
+        <div class="ligne-champs">
+          <div class="champ">
+            <label for="instrument-nouveau-trade">Instrument (optionnel)</label>
+            <input type="text" id="instrument-nouveau-trade" placeholder="ex: XAUUSD" autocapitalize="characters" />
+          </div>
+          <div class="champ">
+            <label for="frais-nouveau-trade">Frais ($, optionnel)</label>
+            <input type="number" id="frais-nouveau-trade" inputmode="decimal" step="0.01" min="0" placeholder="ex: 7" />
+          </div>
         </div>
         <div class="champ">
           <label for="note-nouveau-trade">Note (optionnel)</label>
@@ -415,8 +484,12 @@
       <span>Chat</span>
     </button>
     <button class="onglet" data-section="calendrier">
-      <span class="icone-onglet">📅</span>
-      <span>Calendrier</span>
+      <span class="icone-onglet">📰</span>
+      <span>Annonces</span>
+    </button>
+    <button class="onglet" data-section="calculateur">
+      <span class="icone-onglet">🧮</span>
+      <span>Calcul</span>
     </button>
     <button class="onglet" data-section="analyse">
       <span class="icone-onglet">📊</span>
@@ -436,10 +509,19 @@
 
 <!-- Bibliothèque Supabase (comptes + base de données) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<!-- Graphiques de la section Performance -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/noyau.js"></script>
+<script src="js/donnees.js"></script>
+<script src="js/cotations.js"></script>
 <script src="js/marche.js"></script>
 <script src="js/chat.js"></script>
-<script src="js/calendrier-eco.js"></script>
+<script src="js/annonces.js"></script>
+<script src="js/impact.js"></script>
+<script src="js/parametres-calculateur.js"></script>
+<script src="js/calculateur.js"></script>
 <script src="js/analyse-graphique.js"></script>
 <script src="js/comptes-trading.js"></script>
 <script src="js/journal.js"></script>

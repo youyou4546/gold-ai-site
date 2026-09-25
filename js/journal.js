@@ -41,7 +41,8 @@
   }
 
   function sommeDuJour(tradesJour) {
-    return (tradesJour || []).reduce((total, t) => total + t.resultat, 0);
+    // Résultat net : frais déduits quand ils sont renseignés (comme dans Performance).
+    return (tradesJour || []).reduce((total, t) => total + t.resultat - (t.frais || 0), 0);
   }
 
   // Renvoie false (et déconnecte proprement) si la session n'est plus valide.
@@ -69,6 +70,8 @@
       resultat: Number(trade.resultat),
       note: trade.note || "",
       compteTradingId: trade.compte_trading_id || null,
+      instrument: trade.instrument || null,
+      frais: trade.frais === null || trade.frais === undefined ? null : Number(trade.frais),
     }));
 
     const parJour = {};
@@ -210,18 +213,54 @@
       return;
     }
 
+    const { esc } = window.GoldAI.utils;
     conteneur.innerHTML = "";
     tradesJour.forEach((trade) => {
       const item = document.createElement("div");
       item.className = "trade-item";
+      const details = [trade.instrument, trade.frais ? `frais ${formaterDollars(-trade.frais)}` : ""].filter(Boolean).join(" · ");
       item.innerHTML = `
-        <div>
+        <div class="infos-trade">
           <div class="resultat-trade ${trade.resultat >= 0 ? "positif" : "negatif"}">${formaterDollars(trade.resultat)}</div>
-          ${trade.note ? `<div class="note-trade">${trade.note}</div>` : ""}
+          ${details ? `<div class="note-trade">${esc(details)}</div>` : ""}
+          ${trade.note ? `<div class="note-trade">${esc(trade.note)}</div>` : ""}
         </div>
-        <button class="supprimer-trade" aria-label="Supprimer">✕</button>
+        <button type="button" class="supprimer-trade" aria-label="Supprimer ce trade">✕</button>
+        <div class="confirmation-suppression hidden" role="alertdialog" aria-label="Confirmer la suppression">
+          <span>Supprimer ce trade définitivement ?</span>
+          <div class="boutons-confirmation">
+            <button type="button" class="bouton secondaire bouton-petit" data-action="annuler">Annuler</button>
+            <button type="button" class="bouton danger bouton-petit" data-action="confirmer">Supprimer</button>
+          </div>
+          <p class="avertissement-erreur" data-role="erreur"></p>
+        </div>
       `;
-      item.querySelector(".supprimer-trade").addEventListener("click", () => supprimerTrade(trade.id));
+      const zoneConfirm = item.querySelector(".confirmation-suppression");
+      // stopPropagation : le clic sur ✕ ne doit rien déclencher d'autre (ouverture, fermeture de la fenêtre…).
+      item.querySelector(".supprimer-trade").addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        zoneConfirm.classList.remove("hidden");
+        zoneConfirm.querySelector("[data-action=confirmer]").focus();
+      });
+      zoneConfirm.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const action = e.target.dataset.action;
+        if (action === "annuler") zoneConfirm.classList.add("hidden");
+        if (action !== "confirmer") return;
+        const bouton = e.target;
+        const zoneErreur = zoneConfirm.querySelector("[data-role=erreur]");
+        bouton.disabled = true;
+        bouton.textContent = "Suppression…";
+        zoneErreur.classList.remove("visible");
+        const resultat = await supprimerTrade(trade.id);
+        if (!resultat.ok) {
+          bouton.disabled = false;
+          bouton.textContent = "Réessayer";
+          zoneErreur.textContent = resultat.message;
+          zoneErreur.classList.add("visible");
+        }
+      });
       conteneur.appendChild(item);
     });
   }
@@ -239,45 +278,81 @@
 
     const note = champNote.value.trim();
     const compteTradingId = champCompte?.value || null;
-    const { data: idTrade, error } = await client().rpc("ajouter_mon_trade", {
-      p_token: token(),
-      p_date: dateJourSelectionne,
-      p_resultat: resultat,
-      p_note: note || null,
-      p_compte_trading_id: compteTradingId,
-    });
+    const instrument = document.getElementById("instrument-nouveau-trade").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "") || null;
+    const fraisBrut = document.getElementById("frais-nouveau-trade").value.trim();
+    const frais = fraisBrut === "" ? null : Math.abs(parseFloat(fraisBrut));
+    if (fraisBrut !== "" && isNaN(frais)) {
+      alert("Frais : indique un nombre (ex : 7) ou laisse vide.");
+      return;
+    }
+    const base = { p_token: token(), p_date: dateJourSelectionne, p_resultat: resultat, p_note: note || null, p_compte_trading_id: compteTradingId };
+    let { data: idTrade, error } = await client().rpc("ajouter_mon_trade", { ...base, p_instrument: instrument, p_frais: frais });
+    let instrumentGarde = instrument, fraisGardes = frais;
+    if (error && (error.code === "PGRST202" || /could not find the function/i.test(error.message || ""))) {
+      // Patch Supabase pas encore installé : enregistre sans instrument ni frais (signalé).
+      ({ data: idTrade, error } = await client().rpc("ajouter_mon_trade", base));
+      if (!error && (instrument || frais !== null)) alert("Trade enregistré, mais sans instrument ni frais : le patch Supabase n'est pas encore installé.");
+      instrumentGarde = null; fraisGardes = null;
+    }
     if (gererErreur(error)) return;
 
     const tousLesTrades = await chargerTousLesTrades();
-    const nouveauTrade = { id: idTrade, date: dateJourSelectionne, resultat, note, compteTradingId };
+    const nouveauTrade = { id: idTrade, date: dateJourSelectionne, resultat, note, compteTradingId, instrument: instrumentGarde, frais: fraisGardes };
     if (!tousLesTrades[dateJourSelectionne]) tousLesTrades[dateJourSelectionne] = [];
     tousLesTrades[dateJourSelectionne].push(nouveauTrade);
     if (cacheTradesBruts) cacheTradesBruts.push(nouveauTrade);
 
     champResultat.value = "";
     champNote.value = "";
+    document.getElementById("frais-nouveau-trade").value = "";
     await rafraichirListeTradesDuJour();
     await afficherMoisCourant();
+    window.dispatchEvent(new CustomEvent("goldai:trades"));
   }
 
+  // Renvoie { ok, message }. Le trade n'est retiré de l'écran QU'APRÈS
+  // confirmation par le serveur : en cas d'échec il reste affiché.
   async function supprimerTrade(idTrade) {
-    const { error } = await client().rpc("supprimer_mon_trade", { p_token: token(), p_trade_id: idTrade });
-    if (gererErreur(error)) return;
-
-    const tousLesTrades = await chargerTousLesTrades();
-    const tradesJour = tousLesTrades[dateJourSelectionne] || [];
-    const index = tradesJour.findIndex((t) => t.id === idTrade);
-    if (index !== -1) tradesJour.splice(index, 1);
-
-    if (tradesJour.length === 0) delete tousLesTrades[dateJourSelectionne];
-
-    if (cacheTradesBruts) {
-      const indexBrut = cacheTradesBruts.findIndex((t) => t.id === idTrade);
-      if (indexBrut !== -1) cacheTradesBruts.splice(indexBrut, 1);
+    const session = token();
+    let data, error;
+    try {
+      ({ data, error } = await client().rpc("supprimer_mon_trade", { p_token: session, p_trade_id: idTrade }));
+    } catch {
+      return { ok: false, message: "Connexion impossible : le trade est conservé. Vérifie ta connexion et réessaie." };
     }
+    if (error) {
+      if (error.message === "SESSION_INVALIDE") {
+        window.GoldAI.auth.forcerDeconnexion("Ta session a expiré, reconnecte-toi.");
+        return { ok: false, message: "Session expirée." };
+      }
+      return { ok: false, message: "Le serveur a refusé la suppression : le trade est conservé. Réessaie." };
+    }
+    if (data === false) {
+      await chargerTousLesTrades(true);
+      await rafraichirListeTradesDuJour();
+      await afficherMoisCourant();
+      return { ok: false, message: "Ce trade n'existe plus côté serveur (déjà supprimé ?) : le journal a été rechargé." };
+    }
+    if (data !== true) {
+      // Ancienne fonction serveur (ne dit pas si la ligne a été supprimée) : on vérifie en relisant.
+      const verif = await client().rpc("lister_mes_trades", { p_token: session });
+      if (verif.error || !Array.isArray(verif.data) || verif.data.some((t) => t.id === idTrade)) {
+        return { ok: false, message: "Suppression non confirmée par le serveur : le trade est conservé." };
+      }
+    }
+    if (token() !== session) return { ok: true };
 
+    cacheTradesBruts = (cacheTradesBruts || []).filter((t) => t.id !== idTrade);
+    if (cacheTrades) {
+      Object.keys(cacheTrades).forEach((jour) => {
+        cacheTrades[jour] = cacheTrades[jour].filter((t) => t.id !== idTrade);
+        if (cacheTrades[jour].length === 0) delete cacheTrades[jour];
+      });
+    }
     await rafraichirListeTradesDuJour();
     await afficherMoisCourant();
+    window.dispatchEvent(new CustomEvent("goldai:trades"));
+    return { ok: true };
   }
 
   function fermerModaleJour() {
