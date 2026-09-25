@@ -221,8 +221,8 @@
         if (pa) return N.scorePriorite({ ...b, type: "annonce", importance: b.impact }, maintenant).score - N.scorePriorite({ ...a, type: "annonce", importance: a.impact }, maintenant).score || msDe(a) - msDe(b);
         return msDe(a) - msDe(b);
       });
-    const sortis = evs.filter((e) => msDe(e) <= maintenant && maintenant - msDe(e) <= 12 * 3600000).sort((a, b) => msDe(b) - msDe(a));
-    const anciens = evs.filter((e) => maintenant - msDe(e) > 12 * 3600000).sort((a, b) => msDe(b) - msDe(a));
+    // Les annonces déjà passées ne sont plus dans la liste : repliées tout en bas.
+    const passees = evs.filter((e) => msDe(e) <= maintenant).sort((a, b) => msDe(b) - msDe(a));
 
     const liste = (arr, vide) => (arr.length ? arr.map((e) => ligneEvenement(e, maintenant)).join("") : `<p class="etat-vide">${vide}</p>`);
 
@@ -236,11 +236,8 @@
         <h2 class="titre-bloc-annonces" id="titre-calendrier">📅 Calendrier économique</h2>
         <p class="aide">Heures affichées dans le fuseau ${esc(U.fuseau())}. Le « résultat publié » n'est jamais remplacé par la prévision ou la valeur précédente.</p>
         ${filtres.mode === "urgent" ? `<p class="etat-vide">Filtre « Urgent » : seules les actualités sont affichées.</p>` : `
-          <h3 class="sous-titre-bloc">Viennent de sortir (12 dernières heures)</h3>
-          ${liste(sortis, "Aucune annonce publiée ces 12 dernières heures pour ces filtres.")}
-          <h3 class="sous-titre-bloc">À venir</h3>
           ${liste(aVenir, jeuCal ? "Aucune annonce à venir pour ces filtres (le flux Forex Factory ne couvre que la semaine en cours)." : "Calendrier indisponible pour l'instant.")}
-          ${anciens.length ? `<details class="details-discrets"><summary>Plus tôt cette semaine (${anciens.length})</summary>${liste(anciens, "")}</details>` : ""}`}
+          ${passees.length ? `<details class="details-discrets"><summary>Annonces déjà passées (${passees.length})</summary>${liste(passees, "")}</details>` : ""}`}
       </section>`;
 
     zone.querySelectorAll(".evenement-v2").forEach((el) => {

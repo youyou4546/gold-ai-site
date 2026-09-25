@@ -39,6 +39,7 @@
       risqueMode: "pourcentage",
       risqueValeur: ancien?.pourcentage_risque ? Number(ancien.pourcentage_risque) : null,
       repartition: rep.length ? rep : [],
+      slRunner: window.GoldAI.noyau.reglesSlRunnerParDefaut(),
       instruments: {},
       fuseau: window.GoldAI.utils.fuseau(),
     };
@@ -96,6 +97,16 @@
     </div>`;
   }
 
+  // Un menu par TP : où placer le SL du runner une fois ce TP touché.
+  function ligneSlRunner(regle, k) {
+    const options = [["garder", "Ne pas bouger"], ["entree", "Entrée (breakeven)"]]
+      .concat(Array.from({ length: k }, (_, i) => [`tp${i + 1}`, `Niveau du TP${i + 1}`]));
+    return `<div class="champ">
+      <label for="sl-runner-${k}">Après TP${k + 1} touché</label>
+      <select id="sl-runner-${k}" class="champ-sl-runner">${options.map(([v, lib]) => `<option value="${v}" ${v === regle ? "selected" : ""}>${lib}</option>`).join("")}</select>
+    </div>`;
+  }
+
   function carteInstrument(sym, spec) {
     return `<div class="carte-instrument" data-instrument="${esc(sym)}">
       <div class="entete-instrument">
@@ -150,6 +161,10 @@
         <span id="total-repartition" class="total-rep"></span>
       </div>
 
+      <label class="label-groupe">SL du runner (TP ouvert)</label>
+      <p class="aide">Où remonter le SL de la portion « TP ouvert » après chaque TP touché. Par défaut, il reste un cran derrière le dernier TP touché.</p>
+      <div class="grille-sl-runner">${(r.slRunner?.length ? r.slRunner : window.GoldAI.noyau.reglesSlRunnerParDefaut()).map(ligneSlRunner).join("")}</div>
+
       <label class="label-groupe">Instruments</label>
       <div id="liste-instruments">${Object.entries(r.instruments || {}).map(([s, spec]) => carteInstrument(s, spec)).join("") || ""}</div>
       <button type="button" class="bouton secondaire bouton-petit" id="ajouter-instrument">+ Ajouter un instrument</button>
@@ -188,6 +203,7 @@
       risqueMode: document.querySelector("input[name=calc-risque-mode]:checked").value,
       risqueValeur: val("calc-risque"),
       repartition: lireRepartition().filter((x) => x !== null),
+      slRunner: [...document.querySelectorAll(".champ-sl-runner")].map((c) => c.value),
       instruments: {},
       fuseau: document.getElementById("calc-fuseau").value,
     };

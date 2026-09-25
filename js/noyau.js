@@ -372,6 +372,36 @@
     lotMin: "lot minimum", lotMax: "lot maximum", pasLot: "pas de lot",
   };
 
+  // --- SL de défense du runner (TP ouvert) ---
+  // regles[k] = où placer le SL une fois TP(k+1) touché :
+  //   "garder" (ne bouge pas), "entree" (breakeven) ou "tpN" (niveau d'un TP déjà touché).
+  // Par défaut le SL reste un cran derrière le dernier TP touché :
+  //   TP1 → entrée, TP2 → TP1, TP3 → TP2…
+  const NB_PALIERS_SL_RUNNER = 5;
+
+  function reglesSlRunnerParDefaut() {
+    return Array.from({ length: NB_PALIERS_SL_RUNNER }, (_, k) => (k === 0 ? "entree" : `tp${k}`));
+  }
+
+  function planSlRunner(signal, regles) {
+    const r = Array.isArray(regles) && regles.length ? regles : reglesSlRunnerParDefaut();
+    const vente = signal.sens === "SELL";
+    // Un SL de défense ne recule jamais : il ne peut que se rapprocher du prix.
+    const plusProtecteur = (a, b) => (vente ? a < b : a > b);
+    let slActuel = signal.sl;
+    return signal.tps.map((tp, k) => {
+      const regle = r[k] || "garder";
+      let cible = null, libelle = "SL inchangé";
+      if (regle === "entree") { cible = signal.entree; libelle = "Entrée (breakeven)"; }
+      const m = /^tp(\d+)$/.exec(regle);
+      if (m && Number(m[1]) <= k) { cible = signal.tps[Number(m[1]) - 1].prix; libelle = `Niveau du TP${m[1]}`; }
+      const bouge = cible !== null && plusProtecteur(cible, slActuel);
+      if (bouge) slActuel = cible;
+      else if (cible !== null) libelle = `${libelle} déjà dépassé : SL inchangé`;
+      return { apres: `TP${tp.numero}`, regle, libelle, sl: slActuel, bouge };
+    });
+  }
+
   // =====================================================================
   // 3. TENDANCES (bougies CLÔTURÉES uniquement)
   // =====================================================================
@@ -676,7 +706,7 @@
 
   const api = {
     lireSignal, nombresDans, versNombre, detecterInstrument,
-    calculerPosition, repartirUnites,
+    calculerPosition, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
     ema, atr, calculerTendance, separerBougies,
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
     scorePriorite, analyserImpact, LIBELLE_TF, LIBELLES_SPEC,

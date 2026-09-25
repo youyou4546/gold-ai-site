@@ -220,3 +220,25 @@ test("impact : sans tendances court terme → analyse insuffisante (même avec d
     correlations: { dollar: { coefficient: -0.6 }, rendement10ans: { coefficient: -0.37 } } });
   assert.equal(r.direction, "analyse insuffisante");
 });
+
+test("SL du runner : par défaut un cran derrière le dernier TP touché", () => {
+  const s = N.lireSignal(SIGNAL_EXEMPLE); // SELL 4335, TP 4329/4320/4312, SL 4339
+  const plan = N.planSlRunner(s, null);
+  assert.deepEqual(plan.map((p) => p.sl), [4335, 4329, 4320]);
+  assert.ok(plan.every((p) => p.bouge));
+});
+
+test("SL du runner : breakeven seulement après TP2, puis TP1", () => {
+  const s = N.lireSignal(SIGNAL_EXEMPLE);
+  const plan = N.planSlRunner(s, ["garder", "entree", "tp1"]);
+  assert.deepEqual(plan.map((p) => p.sl), [4339, 4335, 4329]);
+  assert.deepEqual(plan.map((p) => p.bouge), [false, true, true]);
+});
+
+test("SL du runner : ne recule jamais et n'utilise pas un TP pas encore touché", () => {
+  const s = N.lireSignal(SIGNAL_EXEMPLE);
+  const plan = N.planSlRunner(s, ["entree", "entree", "tp3"]);
+  assert.deepEqual(plan.map((p) => p.sl), [4335, 4335, 4335]);
+  const achat = { sens: "BUY", entree: 100, sl: 95, tps: [{ numero: 1, prix: 105 }, { numero: 2, prix: 110 }] };
+  assert.deepEqual(N.planSlRunner(achat, null).map((p) => p.sl), [100, 105]);
+});

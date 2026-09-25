@@ -2,8 +2,8 @@
 //
 // Le texte est lu par js/noyau.js (lireSignal), le calcul fait par
 // calculerPosition avec les paramètres de Profil › Général. Le signal
-// interprété est TOUJOURS affiché et modifiable sur place avant de faire
-// confiance au résultat. Aucun ordre n'est envoyé nulle part : c'est un
+// interprété est masqué, sauf quand une valeur est ambiguë ou manquante :
+// il apparaît alors pour être corrigé sur place. Aucun ordre n'est envoyé nulle part : c'est un
 // calcul affiché à l'écran, rien de plus.
 (() => {
   const { esc, montant, nombre } = window.GoldAI.utils;
@@ -73,49 +73,61 @@
     return `<div class="carte-stat ${classe}"><div class="label-stat">${label}</div><div class="valeur-stat">${valeur}</div>${sous ? `<div class="sous-valeur-stat">${sous}</div>` : ""}</div>`;
   }
 
+  const prixAffiche = (p) => nombre(p, Math.max(2, (String(p).split(".")[1] || "").length));
+
+  // Plan du SL de la portion « TP ouvert » selon les paliers de Profil › Général.
+  function afficherPlanSlRunner(signal, reglages) {
+    const plan = N.planSlRunner(signal, reglages.slRunner);
+    if (!plan.length) return "";
+    return `
+      <div class="carte">
+        <h3 class="titre-bloc">SL du runner (TP ouvert)</h3>
+        <ul class="liste-plan-sl">${plan.map((p) => `
+          <li><strong>${esc(p.apres)} touché</strong> → SL à <strong>${prixAffiche(p.sl)}</strong> <span class="texte-attenue">${esc(p.libelle)}</span></li>`).join("")}
+        </ul>
+      </div>`;
+  }
+
   function afficherResultat(r, reglages, spec) {
     const d = r.devise;
     const lignes = r.portions.map((p) => `
       <tr>
         <th scope="row">${esc(p.objectif)}</th>
-        <td>${p.prix === null ? "<span class=\"texte-attenue\">sans prix</span>" : nombre(p.prix, Math.max(2, (String(p.prix).split(".")[1] || "").length))}</td>
+        <td>${p.prix === null ? "<span class=\"texte-attenue\">sans prix</span>" : prixAffiche(p.prix)}</td>
         <td>${nombre(p.pctConfigure, 0)} %${Math.abs(p.pctReel - p.pctConfigure) >= 0.5 ? `<br><span class="texte-attenue">réel ${nombre(p.pctReel, 1)} %</span>` : ""}</td>
         <td><strong>${nombre(p.lot, 2)}</strong></td>
         <td class="positif">${p.gainAuTp === null ? "<span class=\"texte-attenue\">non calculable</span>" : `▲ ${montant(p.gainAuTp, d)}`}</td>
-        <td class="negatif">▼ ${montant(p.perteAuSl, d)}</td>
       </tr>`).join("");
-
-    const scenarios = r.scenarios.map((s) => `
-      <li><strong>${esc(s.jusqua)} atteint</strong> : gain cumulé des portions clôturées ${montant(s.gainCumule, d)}
-      ${s.perteRestantAuSl > 0.005 ? ` ; si le reste revient ensuite au SL initial : −${montant(s.perteRestantAuSl, d)} → net <strong>${montant(s.net, d, { signe: true })}</strong>` : " (toute la position est clôturée)"}</li>`).join("");
 
     return `
       <div class="grille-stats-perf">
-        ${carteChiffre("Risque demandé", montant(r.risqueDemande, d), reglages.risqueMode === "montant" ? "montant fixe" : `${nombre(reglages.risqueValeur, 2)} % de ${montant(reglages.solde, d, { decimales: 0 })}`)}
-        ${carteChiffre("Lot total à ouvrir", `${nombre(r.lotTotal, 2)} lot`, `calcul brut ${nombre(r.lotBrut, 4)} → arrondi vers le bas au pas de ${spec.pasLot}`, "carte-mise-en-avant")}
-        ${carteChiffre("Perte totale au SL initial", `<span class="negatif">▼ ${montant(r.perteTotaleSl, d)}</span>`, `${nombre(r.ticksSl, 0)} ticks × ${nombre(r.lotTotal, 2)} lot`)}
-        ${carteChiffre("Risque effectif après arrondi", montant(r.risqueEffectif, d), `${montant(r.risqueNonUtilise, d)} sous le risque demandé`)}
-        ${carteChiffre("Gain si tous les TP chiffrés sont atteints", `<span class="positif">▲ ${montant(r.gainTotalSiTousTps, d)}</span>`, r.contientTpOuvert ? "hors portion « TP ouvert » (sans prix)" : "somme des portions", "carte-stat-large")}
+        ${carteChiffre("Risque demandé", montant(r.risqueDemande, d))}
+        ${carteChiffre("Lot utilisé", `${nombre(r.lotTotal, 2)} lot`, "", "carte-mise-en-avant")}
       </div>
 
       <div class="carte">
-        <h3 class="titre-bloc">Répartition par objectif</h3>
+        <h3 class="titre-bloc">Répartition des objectifs</h3>
         <div class="tableau-defilant">
           <table class="tableau-portions">
-            <thead><tr><th scope="col">Objectif</th><th scope="col">Prix</th><th scope="col">Répartition</th><th scope="col">Lot</th><th scope="col">Gain au TP</th><th scope="col">Perte au SL</th></tr></thead>
-            <tbody>${lignes}</tbody>
-            <tfoot><tr><th scope="row">Total</th><td></td><td>100 %</td><td><strong>${nombre(r.sommeLotsPortions, 2)}</strong></td><td class="positif">▲ ${montant(r.gainTotalSiTousTps, d)}</td><td class="negatif">▼ ${montant(r.perteTotaleSl, d)}</td></tr></tfoot>
+            <thead><tr><th scope="col">Objectif</th><th scope="col">Prix</th><th scope="col">Répartition</th><th scope="col">Lot</th><th scope="col">Résultat</th></tr></thead>
+            <tbody>${lignes}
+              <tr class="ligne-sl">
+                <th scope="row">SL</th>
+                <td>${prixAffiche(signalCourant.sl)}</td>
+                <td>100 %</td>
+                <td><strong>${nombre(r.lotTotal, 2)}</strong></td>
+                <td class="negatif">▼ ${montant(r.perteTotaleSl, d)}</td>
+              </tr>
+            </tbody>
           </table>
         </div>
-        <p class="aide">« Gain au TP » = gain de cette portion seule (son lot × sa distance). La somme des lots des portions (${nombre(r.sommeLotsPortions, 2)}) est égale au lot total.</p>
-        ${scenarios ? `<h4 class="sous-titre-bloc">Gain cumulé des portions clôturées</h4><ul class="liste-scenarios">${scenarios}</ul>` : ""}
       </div>
+
+      ${r.contientTpOuvert ? afficherPlanSlRunner(signalCourant, reglages) : ""}
 
       ${r.avertissements.length ? `<div class="carte">${r.avertissements.map((a) => `<div class="alerte-donnees">${esc(a)}</div>`).join("")}</div>` : ""}
 
-      <p class="note-source">Montants estimés <strong>hors frais, commissions, spread et slippage</strong>. Le SL est supposé rester au niveau initial : aucun passage à breakeven ni déplacement du stop n'est appliqué.
-      ${r.tauxConversion !== 1 && taux ? ` Conversion ${esc(spec.deviseProfit)} → ${esc(d)} au taux ${taux.taux} (${taux.manuel ? "saisi manuellement" : `${esc(taux.source)}, ${window.GoldAI.utils.jourHeure(taux.horodatageMs)}`}).` : ""}
-      Aucun ordre n'est envoyé : ce calcul est seulement affiché.</p>`;
+      ${r.tauxConversion !== 1 && taux ? `<p class="note-source">Conversion ${esc(spec.deviseProfit)} → ${esc(d)} au taux ${taux.taux} (${taux.manuel ? "saisi manuellement" : `${esc(taux.source)}, ${window.GoldAI.utils.jourHeure(taux.horodatageMs)}`}).</p>` : ""}`;
   }
 
   function afficherBlocage(r, reglages, spec) {
@@ -153,7 +165,11 @@
       lectureCourante = N.lireSignal(texte);
       signalCourant = { instrument: lectureCourante.instrument, sens: lectureCourante.sens, entree: lectureCourante.entree, sl: lectureCourante.sl, tps: lectureCourante.tps, tpOuverts: lectureCourante.tpOuverts };
       repartitionForcee = null;
+      // Le signal interprété reste construit (le calcul le relit) mais n'est
+      // montré que si le texte n'a pas pu être lu entièrement.
       zoneSignal.innerHTML = afficherSignalEditable(signalCourant, lectureCourante);
+      const aCorriger = lectureCourante.ambiguites.length > 0 || lectureCourante.aPreciser.length > 0;
+      zoneSignal.classList.toggle("hidden", !aCorriger);
     } else {
       signalCourant = lireSignalEditable();
     }

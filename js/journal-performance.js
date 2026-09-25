@@ -173,9 +173,7 @@
           </table></div>
           ${avecInstrument.length < trades.length ? `<p class="aide">${trades.length - avecInstrument.length} trade(s) sans instrument renseigné ne sont pas dans ce tableau.</p>` : ""}
         </div>` : `<p class="note-source">Résultats par instrument : renseigne l'instrument en ajoutant un trade pour voir cette répartition.</p>`}
-      </div>
-
-      <p class="note-source">Performances réalisées sur trades clôturés uniquement (le journal ne suit pas les positions ouvertes). Montants en ${DEVISE}. Trade à l'équilibre = résultat net de 0,00 $, exclu du taux de réussite.</p>`;
+      </div>`;
 
     if (typeof Chart === "undefined") {
       conteneur.insertAdjacentHTML("beforeend", `<p class="alerte-donnees">Graphiques indisponibles (bibliothèque non chargée — connexion ?). Les chiffres ci-dessus restent exacts.</p>`);
