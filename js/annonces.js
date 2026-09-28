@@ -179,7 +179,9 @@
     const jeuActus = window.GoldAI.donnees.obtenir("actualites");
     const jeuCal = window.GoldAI.donnees.obtenir("calendrier");
 
-    document.getElementById("etat-sources-annonces").innerHTML = `<ul class="liste-sources">${etatSources(jeuActus, "Actualités")}${etatSources(jeuCal, "Calendrier")}
+    // Filtres et liste des sources retirés de la page : valeurs par défaut fixes.
+    const zoneSources = document.getElementById("etat-sources-annonces");
+    if (zoneSources) zoneSources.innerHTML = `<ul class="liste-sources">${etatSources(jeuActus, "Actualités")}${etatSources(jeuCal, "Calendrier")}
       ${jeuActus?.contenu?.ia?.statut === "erreur" ? `<li class="texte-alerte">Tri automatique : ${esc(jeuActus.contenu.ia.note)}</li>` : ""}</ul>`;
 
     // --- Actualités urgentes
@@ -230,6 +232,7 @@
 
   function remplirPays() {
     const select = document.getElementById("filtre-pays");
+    if (!select) return;
     const jeu = window.GoldAI.donnees.obtenir("calendrier");
     const devises = [...new Set((jeu?.contenu?.evenements || []).map((e) => `${e.devise}|${e.pays}`))].sort();
     const actuel = select.value;

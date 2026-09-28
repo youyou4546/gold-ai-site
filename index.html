@@ -89,32 +89,6 @@
       <h2 class="titre-section">Annonces</h2>
 
       <button type="button" class="proposition-notifications hidden" id="proposition-notifications">🔔 Être prévenu 15 min avant les annonces fortes, même app fermée — <strong>Activer</strong></button>
-      <div class="barre-filtres" id="filtres-annonces" role="group" aria-label="Filtres">
-        <button type="button" class="puce-filtre" data-filtre="tout" aria-pressed="true">Tout</button>
-        <button type="button" class="puce-filtre" data-filtre="urgent" aria-pressed="false">⚡ Urgent</button>
-        <button type="button" class="puce-filtre" data-filtre="fort" aria-pressed="false">Fort impact</button>
-        <button type="button" class="puce-filtre" data-filtre="xau" aria-pressed="false">XAUUSD</button>
-        <button type="button" class="puce-filtre" data-filtre="usd" aria-pressed="false">USD</button>
-      </div>
-      <details class="details-discrets"><summary>Plus de filtres et sources</summary>
-        <div class="ligne-champs filtres-selects">
-          <div class="champ">
-            <label for="filtre-pays">Pays</label>
-            <select id="filtre-pays"><option value="">Tous les pays</option></select>
-          </div>
-          <div class="champ">
-            <label for="filtre-periode">Période</label>
-            <select id="filtre-periode">
-              <option value="jour">Aujourd'hui</option>
-              <option value="24h">± 24 h</option>
-              <option value="semaine" selected>Cette semaine</option>
-            </select>
-          </div>
-        </div>
-        <label class="case-a-cocher"><input type="checkbox" id="filtre-tous" /> Afficher tous les événements (faible impact, toutes devises, commentaires de marché)</label>
-        <div id="etat-sources-annonces"></div>
-      </details>
-
       <div class="grille-annonces">
         <aside class="carte encadre-impact" id="encadre-impact" aria-live="polite"><p class="etat-vide">Analyse en cours…</p></aside>
         <div id="contenu-annonces"><p class="etat-vide">Chargement…</p></div>
@@ -356,18 +330,6 @@
             <div class="champ">
               <label for="param-nombre-pertes-arret">Nombre de pertes qui arrête la journée</label>
               <input type="number" id="param-nombre-pertes-arret" inputmode="numeric" placeholder="ex: 2" />
-            </div>
-          </div>
-
-          <label class="label-groupe">Heures de la session</label>
-          <div class="ligne-champs">
-            <div class="champ">
-              <label for="param-heure-debut-session">Début</label>
-              <input type="time" id="param-heure-debut-session" />
-            </div>
-            <div class="champ">
-              <label for="param-heure-fin-session">Fin</label>
-              <input type="time" id="param-heure-fin-session" />
             </div>
           </div>
 

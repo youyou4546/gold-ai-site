@@ -11,8 +11,6 @@
     max_trades_jour: "",
     seuil_gain_arret: "",
     nombre_pertes_arret: "",
-    heure_debut_session: "",
-    heure_fin_session: "",
   };
 
   const CHAMPS = Object.keys(VALEURS_PAR_DEFAUT);
@@ -63,9 +61,7 @@
     CHAMPS.forEach((cle) => {
       const champ = document.getElementById(idChamp(cle));
       const brut = champ.value.trim();
-      if (cle === "heure_debut_session" || cle === "heure_fin_session") {
-        valeurs[cle] = brut || null;
-      } else if (cle === "max_trades_jour" || cle === "nombre_pertes_arret") {
+      if (cle === "max_trades_jour" || cle === "nombre_pertes_arret") {
         valeurs[cle] = brut === "" ? null : parseInt(brut, 10);
       } else {
         valeurs[cle] = brut === "" ? null : parseFloat(brut);
@@ -86,8 +82,9 @@
       p_max_trades_jour: valeurs.max_trades_jour,
       p_seuil_gain_arret: valeurs.seuil_gain_arret,
       p_nombre_pertes_arret: valeurs.nombre_pertes_arret,
-      p_heure_debut_session: valeurs.heure_debut_session,
-      p_heure_fin_session: valeurs.heure_fin_session,
+      // Heures de session retirées de l'interface (jamais utilisées) : envoyées vides.
+      p_heure_debut_session: null,
+      p_heure_fin_session: null,
     });
 
     if (gererErreur(error)) {
