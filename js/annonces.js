@@ -200,18 +200,16 @@
         if (pa) return N.scorePriorite({ ...b, type: "annonce", importance: b.impact }, maintenant).score - N.scorePriorite({ ...a, type: "annonce", importance: a.impact }, maintenant).score || msDe(a) - msDe(b);
         return msDe(a) - msDe(b);
       });
-    // Les annonces déjà passées ne sont plus dans la liste : repliées tout en bas.
-    const passees = evs.filter((e) => msDe(e) <= maintenant).sort((a, b) => msDe(b) - msDe(a));
+    // Les annonces déjà passées ne sont pas affichées du tout : elles
+    // disparaissent d'elles-mêmes au rafraîchissement suivant (30 s).
 
     const liste = (arr, vide) => (arr.length ? arr.map((e) => ligneEvenement(e, maintenant)).join("") : `<p class="etat-vide">${vide}</p>`);
 
-    const passeesOuvertes = document.getElementById("details-passees")?.open;
     zone.innerHTML = `
       <section class="bloc-annonces" aria-labelledby="titre-calendrier">
         <h2 class="titre-bloc-annonces" id="titre-calendrier">📅 Annonces économiques</h2>
         ${filtres.mode === "urgent" ? `<p class="etat-vide">Filtre « Urgent » : seules les actualités sont affichées.</p>` : `
-          ${liste(aVenir, jeuCal ? "Aucune annonce à venir pour ces filtres." : "Calendrier indisponible pour l'instant.")}
-          ${passees.length ? `<details class="details-discrets" id="details-passees"${passeesOuvertes ? " open" : ""}><summary>Déjà publiées (${passees.length})</summary>${liste(passees, "")}</details>` : ""}`}
+          ${liste(aVenir, jeuCal ? "Aucune annonce à venir pour ces filtres." : "Calendrier indisponible pour l'instant.")}`}
       </section>
       <section class="bloc-annonces" aria-labelledby="titre-urgentes">
         <h2 class="titre-bloc-annonces" id="titre-urgentes">⚡ Actualités urgentes</h2>
