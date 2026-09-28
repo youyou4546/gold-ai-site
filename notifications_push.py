@@ -24,7 +24,7 @@ RACINE = Path(__file__).resolve().parent.parent
 CONFIG_PATH = RACINE / "config" / "config.ini"
 CLE_PRIVEE = RACINE / "config" / "vapid_prive.pem"
 # Contact exigé par les services de notification : l'adresse du site (pas d'e-mail personnel).
-CONTACT = "https://youyou4546.github.io/gold-ai-site/"
+CONTACT = "https://youyou4546.github.io"
 
 
 def _config_supabase():
