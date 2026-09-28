@@ -37,10 +37,11 @@
   function ligneActif({ nom, sous, prix, variation, varTexte, fraicheur, correlation, grand = false }) {
     return `
       <div class="ligne-actif${grand ? " ligne-or" : ""}">
-        <div class="nom-ligne">${point(fraicheur)}<span>${esc(nom)}</span>${sous ? `<span class="sous-ligne">${sous}</span>` : ""}</div>
+        <div class="nom-ligne">${point(fraicheur)}<span class="textes-ligne"><span class="titre-ligne">${esc(nom)}${sous ? ` <span class="sous-ligne">${sous}</span>` : ""}</span>${correlation ? `<span class="correl-ligne">${correlation === "inverse"
+          ? "Quand l'or monte, il descend (et inversement)"
+          : "Quand l'or monte, il monte aussi (et inversement)"}</span>` : ""}</span></div>
         <div class="prix-ligne">${prix}</div>
         ${fleche(variation, varTexte)}
-        ${correlation ? `<span class="correl-ligne" title="${correlation === "inverse" ? "Évolue en général à l'inverse de l'or" : "Évolue en général comme l'or"}">${correlation === "inverse" ? "⇅" : "⇄"}</span>` : `<span class="correl-ligne"></span>`}
       </div>`;
   }
 
@@ -55,18 +56,6 @@
     if (c.erreur) html += `<div class="alerte-donnees">${esc(c.erreur)}</div>`;
     else if (c.fraicheur === "ancien") html += `<div class="alerte-donnees">Prix non mis à jour depuis plus de 15 min.</div>`;
     return html;
-  }
-
-  // Tendance de l'or par unité de temps : flèche + couleur.
-  function ligneTendances() {
-    const t = window.GoldAI.cotations.tendances?.() || {};
-    const N = window.GoldAI.noyau;
-    return `<div class="rangee-tf">${["30min", "1h", "4h", "1week"].map((tf) => {
-      const x = t[tf] || {};
-      const etat = x.perimee ? "ancien" : (x.etat || "insuffisant");
-      const [cl, ic] = { haussier: ["positif", "▲"], baissier: ["negatif", "▼"], neutre: ["", "■"] }[etat] || ["texte-attenue", "?"];
-      return `<span class="puce-tf ${cl}">${N.LIBELLE_TF[tf]} <span aria-hidden="true">${ic}</span></span>`;
-    }).join("")}</div>`;
   }
 
   function fraicheurActifPublie(a) {
@@ -108,8 +97,8 @@
 
     const autres = (contenu?.actifs || []).filter((a) => a.cle !== "or");
     liste.innerHTML = `
-      <div class="carte liste-lignes">${ligneOr()}${ligneTendances()}</div>
-      <h3 class="titre-bloc-annonces">Actifs liés <span class="legende-correl">⇅ inverse de l'or · ⇄ comme l'or</span></h3>
+      <div class="carte liste-lignes">${ligneOr()}</div>
+      <h3 class="titre-bloc-annonces">Actifs liés</h3>
       <div class="carte liste-lignes">${autres.map(ligneActifPublie).join("") || '<p class="etat-vide">Chargement…</p>'}</div>`
       + (etatDonnees.erreur ? `<p class="note-source">ⓘ ${esc(etatDonnees.erreur)}</p>` : "");
   }

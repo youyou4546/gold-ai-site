@@ -1,6 +1,6 @@
 // Gold AI — Journal › fiche détaillée d'un trade (ajout ou modification).
 //
-// Champs : compte (Profil › Mes comptes), instrument, prix d'entrée / sortie,
+// Champs : instrument, prix d'entrée / sortie,
 // RR obtenu, profit/perte, frais, captures d'écran, notes.
 // Enregistré dans Supabase (supabase/patch_journal_detaille.sql). Les images
 // sont réduites sur le téléphone avant l'envoi (1600 px max, JPEG) pour rester
@@ -67,15 +67,6 @@
       ? "📷 Ajouter d'autres images" : "📷 Ajouter une ou plusieurs images";
   }
 
-  async function peuplerComptes(valeur) {
-    const select = $("fiche-compte");
-    const comptes = await window.GoldAI.comptesTrading.chargerComptes();
-    select.innerHTML = comptes.length
-      ? `<option value="">— Aucun compte —</option>` + comptes.map((c) => `<option value="${c.id}">${window.GoldAI.utils.esc(c.nom)}</option>`).join("")
-      : `<option value="">Aucun compte (ajoute-en dans Profil › Mes comptes)</option>`;
-    select.value = valeur || "";
-  }
-
   async function ouvrir(trade, date) {
     tradeOuvert = trade || null;
     dateFiche = trade ? trade.date : date;
@@ -96,7 +87,6 @@
     $("fiche-resultat").value = val(trade?.resultat);
     $("fiche-frais").value = val(trade?.frais);
     $("fiche-notes").value = trade?.note || "";
-    await peuplerComptes(trade?.compteTradingId);
 
     afficherGalerie();
     $("modale-fiche-trade").classList.add("visible");
@@ -137,7 +127,7 @@
       date: dateFiche,
       resultat,
       note: $("fiche-notes").value.trim(),
-      compteTradingId: $("fiche-compte").value || null,
+      compteTradingId: tradeOuvert?.compteTradingId || null, // plus demandé : on garde celui déjà enregistré
       instrument: $("fiche-instrument").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "") || null,
       frais,
       prixEntree: champs.entree,
