@@ -380,3 +380,17 @@ test("situation d'un compte : solde automatique avec un seul compte", () => {
   assert.equal(s.solde, 99000);
   assert.equal(s.resultatAujourdhui, 0);
 });
+
+test("alertes de prix : prix unique et zone touchés par une mèche", () => {
+  const prix = { bas: 2650, haut: 2650 };
+  assert.equal(N.alerteTouchee(prix, 2651, 2645), true);   // passe à travers
+  assert.equal(N.alerteTouchee(prix, 2650, 2640), true);   // mèche pile au niveau
+  assert.equal(N.alerteTouchee(prix, 2649.9, 2640), false);
+  const zone = { bas: 2660, haut: 2670 };
+  assert.equal(N.alerteTouchee(zone, 2661, 2655), true);   // entre par le bas
+  assert.equal(N.alerteTouchee(zone, 2680, 2671), false);  // reste au-dessus
+  assert.equal(N.alerteTouchee(zone, 2665, 2664), true);   // déjà dedans
+  assert.deepEqual(N.distanceAlerte(zone, 2675), { distance: 5, position: "dessus" });
+  assert.deepEqual(N.distanceAlerte(zone, 2650), { distance: 10, position: "dessous" });
+  assert.equal(N.distanceAlerte(zone, 2662).position, "dedans");
+});

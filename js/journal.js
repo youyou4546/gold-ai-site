@@ -109,6 +109,7 @@
     cacheTradesBruts = null;
     document.getElementById("journal-calendrier")?.classList.add("hidden");
     document.getElementById("journal-performance")?.classList.add("hidden");
+    document.getElementById("journal-alertes")?.classList.add("hidden");
     document.getElementById("journal-accueil")?.classList.remove("hidden");
   }
 

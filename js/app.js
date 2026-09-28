@@ -5,6 +5,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const sections = document.querySelectorAll("main .section");
 
   function allerA(cible) {
+    // « alertes » = Journal › Suivre le prix (ouvert depuis une notification d'alerte).
+    if (cible === "alertes") {
+      allerA("journal");
+      window.GoldAI?.alertesPrix?.ouvrir();
+      return;
+    }
     onglets.forEach((o) => o.classList.toggle("actif", o.dataset.section === cible));
     sections.forEach((s) => s.classList.toggle("actif", s.id === `section-${cible}`));
 

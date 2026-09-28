@@ -10,7 +10,7 @@
 //  - Bibliothèques du CDN (Supabase, Chart.js) : cache d'abord (versions figées).
 //
 // Change ce numéro à chaque mise à jour pour nettoyer les anciens caches.
-const VERSION = "goldai-v32";
+const VERSION = "goldai-v33";
 
 const FICHIERS_A_METTRE_EN_CACHE = [
   "./",
@@ -36,6 +36,7 @@ const FICHIERS_A_METTRE_EN_CACHE = [
   "./js/notifications.js",
   "./js/accueil-discipline.js",
   "./js/trade-en-cours.js",
+  "./js/alertes-prix.js",
   "./js/journal-performance.js",
   "./js/parametres.js",
   "./js/profil-comptes.js",
@@ -124,7 +125,7 @@ self.addEventListener("notificationclick", (evenement) => {
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((fenetres) => {
       const ouverte = fenetres.find((f) => f.url.startsWith(self.registration.scope));
       if (ouverte) {
-        ouverte.postMessage({ type: "aller", section: "calendrier" });
+        ouverte.postMessage({ type: "aller", section: new URL(url).hash.slice(1) || "calendrier" });
         return ouverte.focus();
       }
       return self.clients.openWindow(url);

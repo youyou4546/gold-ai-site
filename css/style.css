@@ -1691,3 +1691,16 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
   margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--bordure);
 }
 .objectif-atteint { color: var(--vert); font-weight: 700; font-size: 12.5px; }
+
+/* ---------- Journal › Suivre le prix (alertes de prix / zone) ---------- */
+.entete-alertes { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.prix-alertes { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); }
+#formulaire-alerte .bouton { width: 100%; }
+.liste-alertes-prix { list-style: none; padding: 0; margin: 8px 0 0; }
+.liste-alertes-prix li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--bordure); font-variant-numeric: tabular-nums; }
+.liste-alertes-prix li:last-child { border-bottom: none; }
+.liste-alertes-prix li.touchee strong { color: var(--vert); }
+.infos-alerte { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 13.5px; }
+.infos-alerte span { overflow-wrap: anywhere; }
+.liste-alertes-prix .bouton { margin: 0; flex: 0 0 auto; width: auto; min-width: 40px; }
+.infos-alerte { flex: 1; }

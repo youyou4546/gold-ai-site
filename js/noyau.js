@@ -871,6 +871,22 @@
     return { trade: suivant, nouveauxTps, slTouche, slApres: slCourant(suivant), slAvant };
   }
 
+  /**
+   * Alerte de prix (Journal › Suivre le prix) : un prix (bas = haut) ou une zone.
+   * Touchée si la fourchette parcourue [bas, haut] croise la zone — une mèche
+   * suffit. Même règle côté Supabase (supabase/functions/verifications).
+   */
+  function alerteTouchee(alerte, haut, bas) {
+    return Number.isFinite(haut) && Number.isFinite(bas) && haut >= alerte.bas && bas <= alerte.haut;
+  }
+
+  /** Distance du prix à l'alerte (0 si dans la zone) et position : "dessus" / "dessous" / "dedans". */
+  function distanceAlerte(alerte, prix) {
+    if (prix > alerte.haut) return { distance: prix - alerte.haut, position: "dessus" };
+    if (prix < alerte.bas) return { distance: alerte.bas - prix, position: "dessous" };
+    return { distance: 0, position: "dedans" };
+  }
+
   /** Gain / perte estimé : portions des TP touchés clôturées à leur TP, le reste au prix actuel. */
   function pnlEstime(trade, prix) {
     const dir = trade.sens === "SELL" ? -1 : 1;
@@ -914,7 +930,7 @@
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
     scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou,
     OBJECTIF_PAR_DEFAUT, debutPeriode, progressionObjectif, prochaineAnnonceDuJour,
-    slCourant, evaluerTouches, pnlEstime, situationCompte, LIBELLE_TF, LIBELLES_SPEC,
+    slCourant, evaluerTouches, pnlEstime, alerteTouchee, distanceAlerte, situationCompte, LIBELLE_TF, LIBELLES_SPEC,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

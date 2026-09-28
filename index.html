@@ -146,6 +146,50 @@
           <span class="icone-tuile">📊</span>
           <span>Performance</span>
         </button>
+        <button class="tuile-journal" id="bouton-ouvrir-alertes">
+          <span class="icone-tuile">🎯</span>
+          <span>Suivre le prix</span>
+        </button>
+      </div>
+
+      <!-- Vue Suivre le prix : alertes de prix / zone sur l'or (js/alertes-prix.js) -->
+      <div id="journal-alertes" class="hidden">
+        <button type="button" class="bouton-retour" id="bouton-retour-alertes"><span aria-hidden="true">←</span> Retour</button>
+
+        <div class="carte">
+          <div class="entete-alertes">
+            <strong>Nouvelle alerte sur l'or</strong>
+            <span class="prix-alertes" id="alertes-prix-actuel">—</span>
+          </div>
+          <div class="segmente" role="group" aria-label="Type d'alerte">
+            <button type="button" data-type="prix" aria-pressed="true">Un prix</button>
+            <button type="button" data-type="zone" aria-pressed="false">Une zone</button>
+          </div>
+          <form id="formulaire-alerte" novalidate>
+            <div class="ligne-champs">
+              <div class="champ">
+                <label for="alerte-bas" id="libelle-alerte-bas">Prix</label>
+                <input type="number" id="alerte-bas" inputmode="decimal" step="0.01" min="0" placeholder="ex. 2650.50" required>
+              </div>
+              <div class="champ hidden" id="champ-alerte-haut">
+                <label for="alerte-haut">Jusqu'à</label>
+                <input type="number" id="alerte-haut" inputmode="decimal" step="0.01" min="0" placeholder="ex. 2660">
+              </div>
+            </div>
+            <div class="champ">
+              <label for="alerte-note">Note (facultatif)</label>
+              <input type="text" id="alerte-note" maxlength="120" placeholder="ex. zone d'achat H4">
+            </div>
+            <p class="alerte-donnees hidden" id="message-alerte" role="status"></p>
+            <button type="submit" class="bouton" id="bouton-creer-alerte">🔔 Me prévenir quand c'est touché</button>
+          </form>
+          <p class="texte-attenue petit hidden" id="alertes-notif-inactives">
+            Les notifications ne sont pas activées sur cet appareil :
+            <button type="button" class="lien-retour" id="alertes-activer-notifs">les activer dans Profil</button>
+          </p>
+        </div>
+
+        <div id="liste-alertes"></div>
       </div>
 
       <!-- Vue calendrier des trades (masquée tant qu'on n'a pas cliqué sur "Calendrier" ci-dessus) -->
@@ -508,6 +552,7 @@
 <script src="js/notifications.js"></script>
 <script src="js/accueil-discipline.js"></script>
 <script src="js/trade-en-cours.js"></script>
+<script src="js/alertes-prix.js"></script>
 <script src="js/journal-performance.js"></script>
 <script src="js/parametres.js"></script>
 <script src="js/profil-comptes.js"></script>

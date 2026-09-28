@@ -7,6 +7,10 @@
 //     (Forex Factory) et publié pour le site aussi.
 //  2. Trade en cours (« J'entre ») : TP / SL touchés → notification avec le SL
 //     à déplacer (même logique que js/noyau.js › evaluerTouches).
+//  3. Alertes de prix (Journal › Suivre le prix) : prix ou zone touché →
+//     notification (même règle que js/noyau.js › alerteTouchee). Pour ménager
+//     le quota Twelve Data (800/jour), vérifiées toutes les 3 min seulement
+//     s'il n'y a pas de trade en cours ; les bougies 1 min ne ratent aucune mèche.
 // Secrets de la fonction : VAPID_KEYS_B64 (clés de signature JWK, en base64) et
 // CRON_SECRET (seul pg_cron peut la déclencher).
 
@@ -171,7 +175,16 @@ function marcheFerme(d: Date) {
 
 const px = (x: number) => Number(x.toFixed(2)).toString();
 
-async function bougies1min() {
+type Bougie = { debut: number; haut: number; bas: number; cloture: number };
+
+// Une seule requête Twelve Data par passage, partagée entre trades et alertes.
+let bougiesDuPassage: Promise<Bougie[]> | null = null;
+function bougies1min() {
+  if (!bougiesDuPassage) bougiesDuPassage = telechargerBougies();
+  return bougiesDuPassage;
+}
+
+async function telechargerBougies(): Promise<Bougie[]> {
   const { data } = await db.from("config_cotations").select("cle_twelvedata").eq("id", 1).maybeSingle();
   const cle = data?.cle_twelvedata;
   if (!cle) throw new Error("clé Twelve Data absente");
@@ -179,7 +192,7 @@ async function bougies1min() {
   const d = await r.json();
   if (d.status === "error") throw new Error(d.message);
   return (d.values || []).map((v: Record<string, string>) => ({
-    debut: Date.parse(v.datetime.replace(" ", "T") + "Z"), haut: Number(v.high), bas: Number(v.low),
+    debut: Date.parse(v.datetime.replace(" ", "T") + "Z"), haut: Number(v.high), bas: Number(v.low), cloture: Number(v.close),
   }));
 }
 
@@ -189,7 +202,7 @@ async function suiviTrades() {
   if (!ouverts.length) return; // rien à suivre : aucune requête Twelve Data
 
   const maintenant = Date.now();
-  let bougies: { debut: number; haut: number; bas: number }[] | null = null;
+  let bougies: Bougie[] | null = null;
   if (!marcheFerme(new Date())) {
     try { bougies = await bougies1min(); } catch (e) { console.error("prix indisponibles", String(e)); }
   }
@@ -225,6 +238,46 @@ async function suiviTrades() {
   }
 }
 
+// ------------------------------------------------------------------ 3. Alertes de prix
+
+type AlertePrix = { id: string; compte_id: string; bas: number; haut: number; note: string | null; prix_creation: number | null; cree_le: string; derniere_verif: string | null };
+
+async function alertesPrix() {
+  const { data, error } = await db.from("alertes_prix").select("id, compte_id, bas, haut, note, prix_creation, cree_le, derniere_verif").is("touchee_le", null);
+  if (error) throw error;
+  const actives = (data || []) as AlertePrix[];
+  if (!actives.length || marcheFerme(new Date())) return;
+  // Pas de trade en cours (bougies pas encore téléchargées) : une vérification toutes les 3 min.
+  if (!bougiesDuPassage && new Date().getUTCMinutes() % 3 !== 0) return;
+
+  const bougies = await bougies1min();
+  if (!bougies.length) return;
+  const maintenant = new Date().toISOString();
+  const dernier = bougies.reduce((a, b) => (b.debut > a.debut ? b : a));
+
+  for (const a of actives) {
+    const bas = Number(a.bas), haut = Number(a.haut);
+    // Bougies depuis la création (minute de création incluse) ou la dernière vérification.
+    const depuis = Math.max(Date.parse(a.cree_le), a.derniere_verif ? Date.parse(a.derniere_verif) : 0);
+    const utiles = bougies.filter((b) => b.debut + 60000 > depuis);
+    const touchee = utiles.some((b) => b.haut >= bas && b.bas <= haut);
+    if (!touchee) {
+      await db.from("alertes_prix").update({ derniere_verif: maintenant }).eq("id", a.id);
+      continue;
+    }
+    const zone = bas === haut ? `Prix ${px(bas)}` : `Zone ${px(bas)} – ${px(haut)}`;
+    const venue = a.prix_creation ? (Number(a.prix_creation) > haut ? " par le haut" : Number(a.prix_creation) < bas ? " par le bas" : "") : "";
+    // Marquée AVANT l'envoi : jamais deux notifications pour la même alerte.
+    const { data: maj } = await db.from("alertes_prix").update({ touchee_le: maintenant, derniere_verif: maintenant, prix_touche: dernier.cloture })
+      .eq("id", a.id).is("touchee_le", null).select("id");
+    if (!maj?.length) continue;
+    await envoyer(`🎯 ${zone} touché${bas === haut ? "" : "e"}`, `L'or y est arrivé${venue} — il est à ${px(dernier.cloture)} maintenant.${a.note ? ` (${a.note})` : ""}`,
+      { url: "./index.html#alertes", tag: `alerte-${a.id}`, compteId: a.compte_id });
+  }
+  // Alertes touchées gardées 7 jours dans la liste, puis effacées.
+  await db.from("alertes_prix").delete().lt("touchee_le", new Date(Date.now() - 7 * 86400000).toISOString());
+}
+
 // ------------------------------------------------------------------ Point d'entrée
 
 Deno.serve(async (req) => {
@@ -235,7 +288,8 @@ Deno.serve(async (req) => {
     return Response.json({ ok: true, envoyes: n });
   }
   const resultat: Record<string, string> = {};
-  for (const [nom, tache] of [["annonces", alertesAnnonces], ["trades", suiviTrades]] as const) {
+  bougiesDuPassage = null;
+  for (const [nom, tache] of [["annonces", alertesAnnonces], ["trades", suiviTrades], ["alertes_prix", alertesPrix]] as const) {
     try { await tache(); resultat[nom] = "ok"; } catch (e) { resultat[nom] = String(e); console.error(nom, e); }
   }
   // Nettoyage de la mémoire des alertes (plus de 3 jours).

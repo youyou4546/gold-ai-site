@@ -72,8 +72,8 @@ window.GoldAI = window.GoldAI || {};
     // Marché est l'onglet par défaut : charge ses données dès l'affichage de
     // l'app, comme si on venait de cliquer dessus (les autres onglets se
     // chargent à la demande, au clic — voir app.js).
-    // Ouverture depuis une notification d'annonce : adresse "…#calendrier".
-    window.GoldAI.app?.allerA(location.hash === "#calendrier" ? "calendrier" : "marche");
+    // Ouverture depuis une notification : "…#calendrier" (annonce) ou "…#alertes" (alerte de prix).
+    window.GoldAI.app?.allerA(location.hash === "#calendrier" ? "calendrier" : location.hash === "#alertes" ? "alertes" : "marche");
   }
 
   // Appelé par journal.js si une opération renvoie SESSION_INVALIDE
@@ -92,6 +92,7 @@ window.GoldAI = window.GoldAI || {};
     window.GoldAI.impact?.viderCache();
     window.GoldAI.gardeFou?.viderCache();
     window.GoldAI.tradeEnCours?.viderCache();
+    window.GoldAI.alertesPrix?.viderCache();
     reinitialiserSousVues();
     if (message) {
       document.getElementById("erreur-connexion").textContent = message;
@@ -213,6 +214,7 @@ window.GoldAI = window.GoldAI || {};
     window.GoldAI.impact?.viderCache();
     window.GoldAI.gardeFou?.viderCache();
     window.GoldAI.tradeEnCours?.viderCache();
+    window.GoldAI.alertesPrix?.viderCache();
     reinitialiserSousVues();
     document.getElementById("nom-utilisateur").value = "";
     document.getElementById("code-utilisateur").value = "";
