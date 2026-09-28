@@ -77,6 +77,25 @@
         return { data: r, error: null };
       },
       from: () => ({ select: async () => ({ data: [], error: null }) }),
+      // Fonction « tradelocker » simulée (localStorage.banc_tl = connexions enregistrées).
+      functions: {
+        invoke: async (nom, { body }) => {
+          await new Promise((r) => setTimeout(r, 300));
+          const cx = lire("banc_tl", []);
+          if (body.action === "ajouter") {
+            if (body.motDePasse === "faux") return { data: null, error: { context: { json: async () => ({ erreur: "TradeLocker refuse ces identifiants : vérifie l'email, le mot de passe, le serveur et Démo / Réel." }) } } };
+            ecrire("banc_tl", [...cx, { id: crypto.randomUUID(), email: body.email, serveur: body.serveur, environnement: body.environnement }]);
+            return { data: { ok: true }, error: null };
+          }
+          if (body.action === "supprimer") { ecrire("banc_tl", cx.filter((c) => c.id !== body.id)); return { data: { ok: true }, error: null }; }
+          const alea = () => Math.round((Math.random() - 0.4) * 30000) / 100;
+          return { data: { lu_le: new Date().toISOString(), connexions: cx.map((c) => ({ ...c, comptes: [
+            { id: 1, accNum: 1, nom: "NOVA 50K", devise: "USD", statut: "ACTIVE", solde: 50412.5, equite: 50520.1, jourNet: 412.5, jourTrades: 2, ouvertNet: 107.6,
+              positions: [{ id: "p1", symbole: "XAUUSD", sens: "buy", lots: 0.5, prixEntree: 4131.2, pnl: alea() }] },
+            { id: 2, accNum: 2, nom: "NOVA 50K (copie)", devise: "USD", statut: "ACTIVE", solde: 49880, equite: 49880, jourNet: -120, jourTrades: 1, ouvertNet: 0, positions: [] },
+          ] })) }, error: null };
+        },
+      },
       storage: { from: () => ({ upload: async () => ({ error: null }), getPublicUrl: () => ({ data: { publicUrl: "" } }) }) },
     }),
   };

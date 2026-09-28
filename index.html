@@ -150,6 +150,42 @@
           <span class="icone-tuile">🎯</span>
           <span>Suivre le prix</span>
         </button>
+        <button class="tuile-journal" id="bouton-ouvrir-tradelocker">
+          <span class="icone-tuile">💼</span>
+          <span>Mes comptes TradeLocker</span>
+        </button>
+      </div>
+
+      <!-- Vue Mes comptes TradeLocker : solde, résultat du jour, trades ouverts (js/comptes-tradelocker.js) -->
+      <div id="journal-tradelocker" class="hidden">
+        <button type="button" class="bouton-retour" id="bouton-retour-tradelocker"><span aria-hidden="true">←</span> Retour</button>
+        <div id="contenu-tradelocker"></div>
+
+        <details class="carte" id="carte-ajout-tradelocker">
+          <summary><strong>+ Ajouter une connexion TradeLocker</strong></summary>
+          <p class="texte-attenue petit">Les identifiants de connexion à TradeLocker (ceux de ta prop firm). Un seul login suffit pour voir tous les comptes qui y sont rattachés.</p>
+          <form id="formulaire-tradelocker" novalidate>
+            <div class="segmente" role="group" aria-label="Type de compte">
+              <button type="button" data-env="live" aria-pressed="true">Réel / prop firm</button>
+              <button type="button" data-env="demo" aria-pressed="false">Démo</button>
+            </div>
+            <div class="champ">
+              <label for="tl-email">Email TradeLocker</label>
+              <input type="email" id="tl-email" autocomplete="off" required>
+            </div>
+            <div class="champ">
+              <label for="tl-mot-de-passe">Mot de passe TradeLocker</label>
+              <input type="password" id="tl-mot-de-passe" autocomplete="new-password" required>
+            </div>
+            <div class="champ">
+              <label for="tl-serveur">Serveur (affiché sur la page de connexion TradeLocker)</label>
+              <input type="text" id="tl-serveur" autocomplete="off" placeholder="ex. TOP1-LIVE" required>
+            </div>
+            <p class="alerte-donnees hidden" id="message-tradelocker" role="status"></p>
+            <button type="submit" class="bouton" id="bouton-ajouter-tradelocker">Connecter</button>
+          </form>
+          <p class="texte-attenue petit">🔒 Le mot de passe est chiffré chez Supabase et ne sert qu'à <strong>lire</strong> tes comptes : l'app ne passe jamais d'ordre.</p>
+        </details>
       </div>
 
       <!-- Vue Suivre le prix : alertes de prix / zone sur l'or (js/alertes-prix.js) -->
@@ -559,6 +595,7 @@
 <script src="js/accueil-discipline.js"></script>
 <script src="js/trade-en-cours.js"></script>
 <script src="js/alertes-prix.js"></script>
+<script src="js/comptes-tradelocker.js"></script>
 <script src="js/journal-performance.js"></script>
 <script src="js/parametres.js"></script>
 <script src="js/profil-comptes.js"></script>
