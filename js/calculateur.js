@@ -14,6 +14,9 @@
   let repartitionForcee = null; // répartition au prorata choisie pour CE calcul uniquement
   let taux = null;              // { taux, horodatageMs, source, manuel }
   let dernierCalcul = null;     // { r, reglages } du dernier calcul réussi (boutons « Enregistrer » / « J'entre »)
+  // Règle « arrêt après le premier trade gagnant » (Profil › Général) :
+  let calculConfirme = false;     // « Continuer quand même » choisi pour le signal en cours
+  let avertissementGain = null;   // { depuisTexte } tant que l'avertissement attend une réponse
 
   function champ(id, label, valeur, { type = "number", manquant = false, options = null } = {}) {
     const classe = manquant ? "champ a-preciser" : "champ";
@@ -157,12 +160,55 @@
     return html;
   }
 
-  async function calculer({ depuisTexte }) {
+  // Avertissement (pas un blocage) si un trade gagnant est déjà enregistré aujourd'hui
+  // et que l'option est activée (activée par défaut).
+  async function doitAvertirApresGain() {
+    const reglages = await window.GoldAI.reglagesCalculateur.charger();
+    if (reglages.arretPremierGain === false) return false;
+    return (await window.GoldAI.gardeFou?.gainDejaFaitAujourdhui?.()) || false;
+  }
+
+  function afficherAvertissementGain(depuisTexte) {
+    avertissementGain = { depuisTexte };
+    dernierCalcul = null;
+    const zoneSignal = document.getElementById("zone-signal-interprete");
+    zoneSignal.innerHTML = "";
+    zoneSignal.classList.add("hidden");
+    window.GoldAI.discipline?.masquer();
+    document.getElementById("zone-resultat-calcul").innerHTML = `
+      <div class="carte avertissement-gain" role="alertdialog" aria-labelledby="titre-avertissement-gain">
+        <div class="icone-blocage" aria-hidden="true">🏆</div>
+        <p id="titre-avertissement-gain"><strong>Tu as déjà un trade gagnant aujourd'hui. Es-tu sûr de vouloir continuer ?</strong></p>
+        <div class="boutons-confirmation">
+          <button type="button" class="bouton secondaire" id="gain-annuler">Annuler</button>
+          <button type="button" class="bouton" id="gain-continuer">Continuer quand même</button>
+        </div>
+      </div>`;
+    document.getElementById("gain-annuler").focus();
+  }
+
+  async function calculer({ depuisTexte, confirme = false }) {
     const zoneSignal = document.getElementById("zone-signal-interprete");
     const zoneResultat = document.getElementById("zone-resultat-calcul");
 
     // Garde-fou : règle du jour atteinte → pas de calcul (« Journée terminée »).
     if (window.GoldAI.gardeFou && !(await window.GoldAI.gardeFou.calculAutorise())) return;
+
+    // Arrêt après le premier trade gagnant : chaque nouveau calcul redemande
+    // confirmation ; les corrections du même signal, non.
+    if (confirme) calculConfirme = true;
+    else if (depuisTexte) calculConfirme = false;
+    if (avertissementGain && !confirme && !depuisTexte) return; // on attend la réponse
+    avertissementGain = null;
+    if (!calculConfirme && (await doitAvertirApresGain())) {
+      if (depuisTexte && !document.getElementById("champ-signal").value.trim()) {
+        zoneSignal.innerHTML = "";
+        zoneResultat.innerHTML = `<p class="etat-vide">Colle d'abord un signal dans le champ ci-dessus.</p>`;
+        return;
+      }
+      afficherAvertissementGain(depuisTexte);
+      return;
+    }
     window.GoldAI.gardeFou?.afficherAlerteAnnonce();
 
     if (depuisTexte) {
@@ -242,6 +288,12 @@
           note: `${s.sens === "SELL" ? "Vente" : "Achat"} · entrée ${s.entree} · SL ${s.sl} · ${s.tps.map((x) => `TP${x.numero} ${x.prix}`).join(" · ")}
 `,
         });
+      } else if (t.id === "gain-annuler") {
+        // Aucun calcul affiché ; le signal collé reste dans le champ.
+        avertissementGain = null;
+        document.getElementById("zone-resultat-calcul").innerHTML = "";
+      } else if (t.id === "gain-continuer" && avertissementGain) {
+        calculer({ depuisTexte: avertissementGain.depuisTexte, confirme: true });
       } else if (t.id === "aller-general") {
         window.GoldAI.app.allerA("profil");
         document.getElementById("bouton-ouvrir-parametres").click();

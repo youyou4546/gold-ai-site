@@ -394,3 +394,12 @@ test("alertes de prix : prix unique et zone touchés par une mèche", () => {
   assert.deepEqual(N.distanceAlerte(zone, 2650), { distance: 10, position: "dessous" });
   assert.equal(N.distanceAlerte(zone, 2662).position, "dedans");
 });
+
+test("arrêt après le premier trade gagnant : profit net > 0 $ seulement", () => {
+  assert.equal(N.aUnTradeGagnant([]), false);
+  assert.equal(N.aUnTradeGagnant([{ resultat: -120 }, { resultat: 0 }]), false);
+  assert.equal(N.aUnTradeGagnant([{ resultat: -120 }, { resultat: 0.5 }]), true);   // peu importe le montant
+  assert.equal(N.aUnTradeGagnant([{ resultat: 5, frais: 7 }]), false);               // net négatif après frais
+  assert.equal(N.aUnTradeGagnant([{ resultat: null }, { resultat: "" }]), false);    // pas encore de résultat
+  assert.equal(N.aUnTradeGagnant([{ resultat: "250" }]), true);
+});

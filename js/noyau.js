@@ -787,6 +787,16 @@
       aucuneRegle: maxTrades === null && pertesArret === null && seuilGain === null && limite === null };
   }
 
+  /**
+   * Règle « arrêt après le premier trade gagnant » : vrai si un trade du jour
+   * a un profit net (résultat − frais) supérieur à 0 $, quel que soit le compte.
+   * Les trades sans résultat enregistré ne comptent pas.
+   */
+  function aUnTradeGagnant(trades = []) {
+    return trades.some((t) => t.resultat !== null && t.resultat !== undefined && t.resultat !== ""
+      && Number(t.resultat) - (Number(t.frais) || 0) > 0);
+  }
+
   // =====================================================================
   // 9. OBJECTIF DE PROFIT (jour / semaine / mois) et PROCHAINE ANNONCE
   // =====================================================================
@@ -928,7 +938,7 @@
     calculerPosition, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
     ema, atr, calculerTendance, separerBougies,
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
-    scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou,
+    scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou, aUnTradeGagnant,
     OBJECTIF_PAR_DEFAUT, debutPeriode, progressionObjectif, prochaineAnnonceDuJour,
     slCourant, evaluerTouches, pnlEstime, alerteTouchee, distanceAlerte, situationCompte, LIBELLE_TF, LIBELLES_SPEC,
   };

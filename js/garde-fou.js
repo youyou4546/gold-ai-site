@@ -20,6 +20,7 @@
   let etat = null;       // résultat de evaluerGardeFou
   let chargement = null; // promesse en cours
   let jourCalcule = null;
+  let tradesDuJour = [];
 
   const $ = (id) => document.getElementById(id);
   const dollars = (v, signe = false) => U.montant(v, "USD", { signe });
@@ -50,7 +51,8 @@
       if (!regles || rechargerRegles) await Promise.all([chargerRegles(), chargerLimite()]);
       const parJour = await window.GoldAI.journal.chargerTousLesTrades();
       jourCalcule = cleAujourdhui();
-      etat = N.evaluerGardeFou({ trades: parJour[jourCalcule] || [], regles, limitePerte: limite?.montant ?? null });
+      tradesDuJour = parJour[jourCalcule] || [];
+      etat = N.evaluerGardeFou({ trades: tradesDuJour, regles, limitePerte: limite?.montant ?? null });
       afficherBandeau();
       afficherBlocageCalculateur();
       window.dispatchEvent(new CustomEvent("goldai:garde-fou", { detail: etat })); // bloc Discipline de l'accueil
@@ -112,6 +114,13 @@
     return etat?.niveau !== "bloque";
   }
 
+  // Un trade gagnant est-il déjà enregistré aujourd'hui (journée locale) ?
+  async function gainDejaFaitAujourdhui() {
+    if (chargement) await chargement;
+    if (!etat || jourCalcule !== cleAujourdhui()) await recalculer();
+    return N.aUnTradeGagnant(tradesDuJour);
+  }
+
   function annonceProche(maintenant = Date.now()) {
     const evs = window.GoldAI.calendrier?.evenementsCalendrier?.() || [];
     return evs
@@ -145,7 +154,7 @@
   }
 
   function viderCache() {
-    regles = null; limite = null; etat = null; jourCalcule = null;
+    regles = null; limite = null; etat = null; jourCalcule = null; tradesDuJour = [];
     clearInterval(minuterie);
     const zone = $("garde-fou");
     if (zone) { zone.hidden = true; zone.innerHTML = ""; }
@@ -159,5 +168,5 @@
   window.addEventListener("goldai:donnees", () => { if ($("section-calculateur")?.classList.contains("actif")) afficherAlerteAnnonce(); });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.gardeFou = { demarrer, viderCache, recalculer, calculAutorise, afficherAlerteAnnonce, annonceProche, etat: () => etat, cleAujourdhui };
+  window.GoldAI.gardeFou = { demarrer, viderCache, recalculer, calculAutorise, gainDejaFaitAujourdhui, afficherAlerteAnnonce, annonceProche, etat: () => etat, cleAujourdhui };
 })();
