@@ -1,5 +1,5 @@
 """
-Génère les icônes PWA (icon-192.png et icon-512.png) : un simple médaillon
+ANCIENNE icône (remplacée le 2026-09-28 par icone_taureau.py). Génère les icônes PWA : un simple médaillon
 doré sur fond sombre avec "Au" (symbole chimique de l'or) dessus.
 À relancer si tu veux changer le style de l'icône (aucun coût, tourne en local).
 """

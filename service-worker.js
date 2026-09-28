@@ -10,7 +10,7 @@
 //  - Bibliothèques du CDN (Supabase, Chart.js) : cache d'abord (versions figées).
 //
 // Change ce numéro à chaque mise à jour pour nettoyer les anciens caches.
-const VERSION = "goldai-v51";
+const VERSION = "goldai-v52";
 
 const FICHIERS_A_METTRE_EN_CACHE = [
   "./",
@@ -46,6 +46,7 @@ const FICHIERS_A_METTRE_EN_CACHE = [
   "./data/glossaire_annonces.json",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
+  "./icons/apple-touch-icon.png",
 ];
 
 const CDN = ["cdn.jsdelivr.net"];
