@@ -1679,9 +1679,19 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
   border-radius: var(--rayon);
   background: var(--fond-carte);
   border: 1px solid var(--bordure);
+  position: relative;
+  padding-right: 40px; /* place pour la croix */
 }
-/* Rien à montrer (déconnecté) → pas de rectangle vide. */
-.barre-haut:not(:has(> :not([hidden]))) { display: none; }
+/* Rien à montrer (déconnecté) → pas de rectangle vide (la croix ne compte pas). */
+.barre-haut:not(:has(> :not([hidden]):not(.fermer-barre-haut))) { display: none; }
+/* Masqué avec la croix : revient à chaque ouverture de l'app (js/app.js). */
+.barre-haut.masquee { display: none; }
+.fermer-barre-haut {
+  position: absolute; top: 4px; right: 4px; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; border-radius: 8px; color: var(--texte-attenue); font-size: 16px; cursor: pointer;
+}
+.fermer-barre-haut:hover, .fermer-barre-haut:focus-visible { background: var(--fond-carte-survol); color: var(--texte); outline: none; }
 .barre-haut:has(.garde-fou.attention) { border-color: var(--orange); background: rgba(255, 180, 84, 0.10); }
 .barre-haut:has(.garde-fou.bloque) { border-color: var(--rouge); background: var(--rouge-fond); }
 .barre-haut .garde-fou,

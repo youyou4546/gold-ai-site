@@ -43,6 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
     onglet.addEventListener("click", () => allerA(onglet.dataset.section));
   });
 
+  // Rectangle du haut (garde-fou + objectif) : la croix le masque jusqu'à la
+  // prochaine ouverture de l'app (rien n'est enregistré : il revient au
+  // lancement et chaque fois qu'on revient sur l'app).
+  const barreHaut = document.getElementById("barre-haut");
+  document.getElementById("fermer-barre-haut")?.addEventListener("click", () => barreHaut.classList.add("masquee"));
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) barreHaut?.classList.remove("masquee"); });
+
   // Toucher une notification d'annonce (app déjà ouverte) → page Annonces.
   navigator.serviceWorker?.addEventListener("message", (e) => {
     if (e.data?.type === "aller" && window.GoldAI.auth?.getToken()) allerA(e.data.section);
