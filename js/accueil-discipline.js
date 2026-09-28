@@ -95,12 +95,9 @@
     const parJour = await window.GoldAI.journal.chargerTousLesTrades();
     const trades = Object.values(parJour).flat();
     const aujourdhui = window.GoldAI.gardeFou?.cleAujourdhui?.() || U.cleJour(Date.now());
-    const p = N.progressionObjectif(trades, reglages.objectif, aujourdhui);
-    let nomCompte = ""; // « tous mes comptes » : rien d'affiché
-    if (p.compteId) {
-      const c = (await window.GoldAI.comptesTrading.chargerComptes()).find((x) => x.id === p.compteId);
-      nomCompte = c ? c.nom : "compte supprimé";
-    }
+    // Toujours tous les trades (un ancien choix de compte est ignoré).
+    const p = N.progressionObjectif(trades, { ...(reglages.objectif || {}), compteId: "" }, aujourdhui);
+    const nomCompte = "";
     const m = (v) => U.montant(v, "USD");
     zone.className = `bloc-objectif${p.atteint ? " atteint" : ""}`;
     zone.hidden = false;
@@ -121,24 +118,8 @@
   async function remplirReglageObjectif() {
     const r = await window.GoldAI.reglagesCalculateur.charger();
     const o = { ...N.OBJECTIF_PAR_DEFAUT, ...(r.objectif || {}) };
-    const comptes = await window.GoldAI.comptesTrading.chargerComptes();
-    $("objectif-compte").innerHTML = `<option value="">Tous mes comptes combinés</option>`
-      + comptes.map((c) => `<option value="${esc(c.id)}">${esc(c.nom)}</option>`).join("");
     $("objectif-montant").value = o.montant;
     $("objectif-periode").value = o.periode;
-    $("objectif-compte").value = comptes.some((c) => c.id === o.compteId) ? o.compteId : "";
-    await aideCompte();
-  }
-
-  // Les nouveaux trades ne sont plus liés à un compte (champ retiré de la
-  // fiche) : on le signale si un compte précis est choisi.
-  async function aideCompte() {
-    const id = $("objectif-compte").value;
-    const zone = $("aide-objectif-compte");
-    if (!id) { zone.textContent = ""; return; }
-    const parJour = await window.GoldAI.journal.chargerTousLesTrades();
-    const lies = Object.values(parJour).flat().filter((t) => t.compteTradingId === id).length;
-    zone.textContent = `Seuls les trades liés à ce compte sont comptés (${lies} pour l'instant). La fiche de trade ne demande plus le compte : les nouveaux trades ne seront comptés que dans « Tous mes comptes ».`;
   }
 
   async function enregistrerObjectif() {
@@ -147,9 +128,8 @@
     if (!(montant > 0)) { message.textContent = "Indique un montant supérieur à 0."; message.classList.add("succes-visible"); return; }
     const r = await window.GoldAI.reglagesCalculateur.charger();
     const res = await window.GoldAI.reglagesCalculateur.sauvegarder({
-      ...r, objectif: { montant, periode: $("objectif-periode").value, compteId: $("objectif-compte").value },
+      ...r, objectif: { montant, periode: $("objectif-periode").value, compteId: "" }, // toujours tous les trades
     });
-    await aideCompte();
     message.textContent = res.local ? res.message : "✓ Objectif enregistré";
     message.classList.add("succes-visible");
     setTimeout(() => message.classList.remove("succes-visible"), 2500);
@@ -168,7 +148,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     $("tuile-prochaine-annonce")?.addEventListener("click", () => window.GoldAI.app.allerA("calendrier"));
     $("bouton-ouvrir-parametres")?.addEventListener("click", remplirReglageObjectif);
-    ["objectif-montant", "objectif-periode", "objectif-compte"].forEach((id) => $(id)?.addEventListener("change", enregistrerObjectif));
+    ["objectif-montant", "objectif-periode"].forEach((id) => $(id)?.addEventListener("change", enregistrerObjectif));
   });
   document.addEventListener("visibilitychange", () => { if (actif()) demarrerChrono(); });
   // Le garde-fou se calcule à la connexion puis à chaque trade : l'objectif

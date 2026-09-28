@@ -882,6 +882,29 @@
     return Math.round(total * 100) / 100;
   }
 
+  // =====================================================================
+  // 11. SITUATION D'UN COMPTE (Profil › Mes comptes)
+  // =====================================================================
+  //
+  // Les trades ne sont plus liés à un compte dans la fiche. Avec UN SEUL
+  // compte, tous les trades du journal comptent pour lui et son solde est
+  // calculé : taille + résultats nets depuis la date d'activation. Avec
+  // plusieurs comptes : seuls les trades liés à ce compte, solde saisi à la main.
+
+  function situationCompte(compte, nbComptes, trades, aujourdhui) {
+    const net = (t) => Number(t.resultat) - (Number(t.frais) || 0);
+    const seul = nbComptes === 1;
+    const retenus = (trades || []).filter((t) => (seul ? !t.compteTradingId || t.compteTradingId === compte.id : t.compteTradingId === compte.id));
+    const depuis = retenus.filter((t) => !compte.dateActivation || t.date >= compte.dateActivation);
+    const arrondi = (x) => Math.round(x * 100) / 100;
+    return {
+      auto: seul,
+      solde: seul ? arrondi(Number(compte.taille) + depuis.reduce((s, t) => s + net(t), 0)) : Number(compte.soldeActuel),
+      resultatAujourdhui: arrondi(retenus.filter((t) => t.date === aujourdhui).reduce((s, t) => s + net(t), 0)),
+      nbTrades: depuis.length,
+    };
+  }
+
   const LIBELLE_TF = { "30min": "30 min", "1h": "1 h", "4h": "4 h", "1week": "1W" };
 
   const api = {
@@ -891,7 +914,7 @@
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
     scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou,
     OBJECTIF_PAR_DEFAUT, debutPeriode, progressionObjectif, prochaineAnnonceDuJour,
-    slCourant, evaluerTouches, pnlEstime, LIBELLE_TF, LIBELLES_SPEC,
+    slCourant, evaluerTouches, pnlEstime, situationCompte, LIBELLE_TF, LIBELLES_SPEC,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

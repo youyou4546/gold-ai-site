@@ -14,7 +14,7 @@
 (() => {
   const DEVISE = "USD";
   const COULEURS = { gain: "#2fe0a3", perte: "#ff4d6d", equilibre: "#8a9bb0", ligne: "#22d3ee", grille: "rgba(120,137,158,0.18)", texte: "#aab7c8" };
-  const filtre = { periode: "30j", regroupement: "jour", compte: "" };
+  const filtre = { periode: "30j", regroupement: "jour" };
   let graphiques = [];
 
   const U = () => window.GoldAI.utils;
@@ -36,7 +36,6 @@
   function filtrer(trades) {
     const debut = debutPeriode(filtre.periode);
     return trades.filter((t) => {
-      if (filtre.compte && t.compteTradingId !== filtre.compte) return false;
       if (!debut) return true;
       const [a, mo, j] = t.date.split("-").map(Number);
       return new Date(a, mo - 1, j) >= debut;
@@ -200,20 +199,6 @@
     return new Date(a, mo - 1, j).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
   }
 
-  async function peuplerFiltreComptes() {
-    const select = document.getElementById("select-filtre-compte-perf");
-    const comptes = await window.GoldAI.comptesTrading.chargerComptes();
-    select.innerHTML = `<option value="">Tous les comptes</option>`;
-    comptes.forEach((c) => {
-      const option = document.createElement("option");
-      option.value = c.id;
-      option.textContent = c.nom;
-      select.appendChild(option);
-    });
-    select.value = filtre.compte;
-    select.parentElement.style.display = comptes.length > 0 ? "block" : "none";
-  }
-
   async function rafraichir({ recharger = true } = {}) {
     if (recharger) await window.GoldAI.journal.chargerTousLesTrades(true);
     afficher(filtrer(window.GoldAI.journal.obtenirTradesBruts()));
@@ -228,7 +213,6 @@
       document.getElementById("journal-accueil").classList.add("hidden");
       document.getElementById("journal-performance").classList.remove("hidden");
       document.getElementById("contenu-performance").innerHTML = `<p class="etat-vide">Chargement…</p>`;
-      await peuplerFiltreComptes();
       await rafraichir();
     });
 
@@ -238,7 +222,6 @@
       document.getElementById("journal-accueil").classList.remove("hidden");
     });
 
-    document.getElementById("select-filtre-compte-perf")?.addEventListener("change", (e) => { filtre.compte = e.target.value; rafraichir({ recharger: false }); });
     document.getElementById("filtres-periode-perf")?.addEventListener("click", (e) => {
       const b = e.target.closest("[data-periode]");
       if (!b) return;

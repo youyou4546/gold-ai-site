@@ -199,10 +199,6 @@
       <div id="journal-performance" class="hidden">
         <button type="button" class="bouton-retour" id="bouton-retour-performance"><span aria-hidden="true">←</span> Retour</button>
 
-        <div class="champ" style="display:none;">
-          <label for="select-filtre-compte-perf">Filtrer par compte</label>
-          <select id="select-filtre-compte-perf"></select>
-        </div>
 
         <div class="barre-filtres" id="filtres-periode-perf" role="group" aria-label="Période">
           <button type="button" class="puce-filtre" data-periode="7j" aria-pressed="false">7 jours</button>
@@ -309,11 +305,6 @@
               </select>
             </div>
           </div>
-          <div class="champ">
-            <label for="objectif-compte">Compte concerné</label>
-            <select id="objectif-compte"><option value="">Tous mes comptes combinés</option></select>
-          </div>
-          <p class="aide" id="aide-objectif-compte"></p>
           <p class="message-succes" id="message-objectif"></p>
         </div>
 
@@ -470,7 +461,7 @@
         </div>
         <div class="champ">
           <label for="champ-solde-compte-trading">Solde actuel ($)</label>
-          <input type="number" id="champ-solde-compte-trading" inputmode="decimal" />
+          <input type="number" id="champ-solde-compte-trading" inputmode="decimal" placeholder="calculé si un seul compte" />
         </div>
       </div>
 

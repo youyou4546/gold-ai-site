@@ -361,3 +361,22 @@ test("trade en cours : TP touchés, SL qui suit le plan, gain estimé", () => {
   assert.deepEqual(N.evaluerTouches(achat, 4311, 4299).nouveauxTps, ["TP1"]);
   assert.equal(N.evaluerTouches(achat, 4305, 4294).slTouche, true);
 });
+
+test("situation d'un compte : solde automatique avec un seul compte", () => {
+  const compte = { id: "c1", taille: 100000, soldeActuel: 99000, dateActivation: "2026-09-01" };
+  const trades = [
+    { date: "2026-08-30", resultat: 500, frais: 0, compteTradingId: null },   // avant activation
+    { date: "2026-09-10", resultat: 300, frais: 10, compteTradingId: null },
+    { date: "2026-09-28", resultat: -450, frais: 0, compteTradingId: null },
+    { date: "2026-09-28", resultat: 100, frais: 0, compteTradingId: "autre" }, // autre compte
+  ];
+  let s = N.situationCompte(compte, 1, trades, "2026-09-28");
+  assert.equal(s.auto, true);
+  assert.equal(s.solde, 100000 + 290 - 450);
+  assert.equal(s.resultatAujourdhui, -450);
+  // Plusieurs comptes : seulement les trades liés, solde saisi.
+  s = N.situationCompte(compte, 2, trades, "2026-09-28");
+  assert.equal(s.auto, false);
+  assert.equal(s.solde, 99000);
+  assert.equal(s.resultatAujourdhui, 0);
+});

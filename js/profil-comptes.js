@@ -20,18 +20,13 @@
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   }
 
-  async function perteAujourdhuiPourCompte(idCompteTrading) {
+  // Un seul compte : tous les trades du journal comptent pour lui, et son
+  // solde est calculé (taille + résultats depuis la date d'activation).
+  // Voir js/noyau.js › situationCompte.
+  async function creerCarteCompte(compte, nbComptes) {
     await window.GoldAI.journal.chargerTousLesTrades();
-    const trades = window.GoldAI.journal.obtenirTradesBruts();
-    const aujourdhui = aujourdhuiIso();
-    return trades
-      .filter((t) => t.compteTradingId === idCompteTrading && t.date === aujourdhui)
-      .reduce((s, t) => s + t.resultat, 0);
-  }
-
-  async function creerCarteCompte(compte) {
-    const perteAujourdhui = await perteAujourdhuiPourCompte(compte.id);
-    const limites = window.GoldAI.comptesTrading.calculerLimites(compte, perteAujourdhui);
+    const s = window.GoldAI.noyau.situationCompte(compte, nbComptes, window.GoldAI.journal.obtenirTradesBruts(), aujourdhuiIso());
+    const limites = window.GoldAI.comptesTrading.calculerLimites({ ...compte, soldeActuel: s.solde }, s.resultatAujourdhui);
 
     const div = document.createElement("div");
     div.className = "carte-compte-trading";
@@ -45,9 +40,10 @@
       </div>
 
       <div class="ligne-solde-compte">
-        <span class="label-solde">Solde actuel</span>
-        <span class="valeur-solde">${formaterDollars(compte.soldeActuel)}</span>
+        <span class="label-solde">Solde actuel${s.auto ? " <span class=\"texte-attenue petit\">(calculé)</span>" : ""}</span>
+        <span class="valeur-solde">${formaterDollars(s.solde)}</span>
       </div>
+      ${s.auto ? `<p class="aide">Taille du compte + résultats de ton Journal ${compte.dateActivation ? `depuis le ${formaterDate(compte.dateActivation)}` : "(tous tes trades : ajoute une date d'activation pour partir de ce jour)"} · ${s.nbTrades} trade${s.nbTrades > 1 ? "s" : ""}.</p>` : ""}
 
       <div class="bloc-limite">
         <div class="entete-limite">
@@ -95,7 +91,7 @@
 
     conteneur.innerHTML = "";
     for (const compte of comptes) {
-      conteneur.appendChild(await creerCarteCompte(compte));
+      conteneur.appendChild(await creerCarteCompte(compte, comptes.length));
     }
   }
 
@@ -128,8 +124,10 @@
       limiteDrawdownMaxPct: parseFloat(document.getElementById("champ-maxdd-compte-trading").value) || 10,
     };
 
-    if (!champs.nom || isNaN(champs.taille) || isNaN(champs.soldeActuel)) {
-      alert("Renseigne au moins le nom, la taille et le solde actuel du compte.");
+    // Solde laissé vide : on part de la taille (avec un seul compte il est de toute façon calculé).
+    if (isNaN(champs.soldeActuel)) champs.soldeActuel = champs.taille;
+    if (!champs.nom || isNaN(champs.taille)) {
+      alert("Renseigne au moins le nom et la taille du compte.");
       return;
     }
 
