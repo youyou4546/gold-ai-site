@@ -44,7 +44,19 @@ export type Connexion = {
 
 const base = (env: string) => `https://${env === "live" ? "live" : "demo"}.tradelocker.com/backend-api`;
 
-export async function tl(env: string, chemin: string, jeton: string | null,
+const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+// Requête TradeLocker ; si TradeLocker répond « trop de requêtes » (429), on attend et on réessaie (3 fois max).
+export async function tl(env: string, chemin: string, jeton: string | null, options: { methode?: string; corps?: unknown; accNum?: number; params?: Record<string, string | number> } = {}) {
+  for (let essai = 0; ; essai++) {
+    try { return await tlUneFois(env, chemin, jeton, options); } catch (e) {
+      if ((e as { status?: number }).status !== 429 || essai >= 3) throw e;
+      await pause(1200 * (essai + 1));
+    }
+  }
+}
+
+async function tlUneFois(env: string, chemin: string, jeton: string | null,
   { methode = "GET", corps, accNum, params }: { methode?: string; corps?: unknown; accNum?: number; params?: Record<string, string | number> } = {}) {
   const entetes: Record<string, string> = { "Content-Type": "application/json" };
   if (jeton) entetes.Authorization = `Bearer ${jeton}`;

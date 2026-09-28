@@ -39,10 +39,8 @@ async function importerCompte(c: Connexion, jeton: string, a: Record<string, unk
   const debut = Math.min(depuis, derniere) - FENETRE_OUVERTURE_MS;
 
   const cols = await colonnes(env, jeton, accNum);
-  const [histo, posJson] = await Promise.all([
-    tl(env, `/trade/accounts/${id}/ordersHistory`, jeton, { accNum, params: { from: debut, to: Date.now() } }),
-    tl(env, `/trade/accounts/${id}/positions`, jeton, { accNum }),
-  ]);
+  const histo = await tl(env, `/trade/accounts/${id}/ordersHistory`, jeton, { accNum, params: { from: debut, to: Date.now() } });
+  const posJson = await tl(env, `/trade/accounts/${id}/positions`, jeton, { accNum });
   const colsPos = cols.positionsConfig || [];
   const ouvertes = new Set((((posJson.d as Record<string, unknown>)?.positions as unknown[][]) || []).map((v) => String(enObjet(colsPos, v).id)));
 

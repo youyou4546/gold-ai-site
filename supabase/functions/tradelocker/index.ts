@@ -32,10 +32,8 @@ async function detailsCompte(env: string, jeton: string, a: Record<string, unkno
   const base = { id, accNum, nom: String(a.name ?? ""), devise: String(a.currency ?? "USD"), statut: String(a.status ?? ""), solde: nb(a.accountBalance) };
   try {
     const cols = await colonnes(env, jeton, accNum);
-    const [etatJson, posJson] = await Promise.all([
-      tl(env, `/trade/accounts/${id}/state`, jeton, { accNum }),
-      tl(env, `/trade/accounts/${id}/positions`, jeton, { accNum }),
-    ]);
+    const etatJson = await tl(env, `/trade/accounts/${id}/state`, jeton, { accNum });
+    const posJson = await tl(env, `/trade/accounts/${id}/positions`, jeton, { accNum });
     const etat = enObjet(cols.accountDetailsConfig || [], ((etatJson.d as Record<string, unknown>)?.accountDetailsData as unknown[]) || []);
     const brutes = ((posJson.d as Record<string, unknown>)?.positions as unknown[][]) || [];
     const noms = brutes.length ? await symboles(env, jeton, id, accNum) : new Map();
@@ -53,7 +51,7 @@ async function detailsCompte(env: string, jeton: string, a: Record<string, unkno
     };
   } catch (e) {
     console.error("compte", accNum, String(e));
-    return { ...base, erreur: "Détails indisponibles pour ce compte pour l'instant." };
+    return { ...base, erreur: "Détails indisponibles pour ce compte pour l'instant.", detail: String((e as Error)?.message || e).slice(0, 300) };
   }
 }
 
@@ -61,7 +59,10 @@ async function lireConnexion(c: Connexion) {
   const resume = { id: c.id, email: c.email, serveur: c.serveur, environnement: c.environnement, derniere_synchro: c.derniere_synchro ?? null };
   try {
     const { jeton, comptes } = await comptesDuLogin(c);
-    return { ...resume, comptes: await Promise.all(comptes.map((a) => detailsCompte(c.environnement, jeton, a))) };
+    // Un compte après l'autre : TradeLocker limite le nombre de requêtes par seconde.
+    const details = [];
+    for (const a of comptes) details.push(await detailsCompte(c.environnement, jeton, a));
+    return { ...resume, comptes: details };
   } catch (e) {
     console.error("connexion", c.id, String(e));
     return { ...resume, erreur: e instanceof ErreurUtilisateur ? e.message : "TradeLocker ne répond pas pour l'instant. Réessaie dans un moment.", comptes: [] };

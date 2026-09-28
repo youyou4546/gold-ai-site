@@ -96,7 +96,7 @@
           <strong>${esc(c.nom || "Compte")} <span class="texte-attenue">#${esc(c.accNum)}</span></strong>
           ${c.statut && c.statut !== "ACTIVE" ? `<span class="statut-compte-tl">${esc(c.statut)}</span>` : ""}
         </div>
-        ${c.erreur ? `<p class="alerte-donnees">${esc(c.erreur)}</p>` : ""}
+        ${c.erreur ? `<p class="alerte-donnees">${esc(c.erreur)}${c.detail ? `<br><span class="petit texte-attenue">Raison technique : ${esc(c.detail)}</span>` : ""}</p>` : ""}
         <div class="chiffres-trade">
           <div><span class="lib">Solde</span><span class="val">${argent(c.solde, d)}</span></div>
           <div><span class="lib">Équité</span><span class="val">${argent(c.equite, d)}</span></div>
