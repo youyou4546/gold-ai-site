@@ -129,21 +129,13 @@
     const groupes = new Map();
     tries.forEach((t) => { const k = cleGroupe(t.date); groupes.set(k, (groupes.get(k) || 0) + net(t)); });
 
-    const avecInstrument = trades.filter((t) => t.instrument);
-    const parInstrument = new Map();
-    avecInstrument.forEach((t) => {
-      const x = parInstrument.get(t.instrument) || { net: 0, n: 0, g: 0, p: 0 };
-      x.net += net(t); x.n += 1; if (net(t) > 0) x.g += 1; if (net(t) < 0) x.p += 1;
-      parInstrument.set(t.instrument, x);
-    });
 
     conteneur.innerHTML = `
       <div class="grille-stats-perf perf-v2">
-        ${carte("Résultat net réalisé", `<span class="${classeNet}">${signeNet}${m(s.resultatNet, { signe: true })}</span>`, s.avecFrais ? `frais déduits : ${m(s.fraisTotaux)}` : "aucun frais renseigné", "carte-mise-en-avant")}
+        ${carte("Résultat net réalisé", `<span class="${classeNet}">${signeNet}${m(s.resultatNet, { signe: true })}</span>`, s.avecFrais ? `frais déduits : ${m(s.fraisTotaux)}` : "aucun frais renseigné", "carte-mise-en-avant carte-stat-large")}
         ${carte("Taux de réussite", s.tauxReussite === null ? "—" : `${U().nombre(s.tauxReussite, 1)} %`, s.tauxReussite === null ? "aucun trade gagnant ou perdant" : `${s.gagnants} gagnant${s.gagnants > 1 ? "s" : ""} ÷ ${s.gagnants + s.perdants} (équilibre exclu)`)}
         ${carte("Trades clôturés", String(s.nombre), `${s.equilibre} à l'équilibre`)}
         ${carte("Gain moyen / perte moyenne", s.ratio === null ? "—" : s.ratio.toFixed(2), s.ratio === null ? (s.perdants === 0 ? "aucune perte sur la période" : "aucun gain sur la période") : `${m(s.gainMoyen)} / ${m(s.perteMoyenne)}`)}
-        ${carte("RR moyen obtenu", s.rrMoyen === null ? "—" : `<span class="${s.rrMoyen > 0 ? "positif" : s.rrMoyen < 0 ? "negatif" : ""}">${s.rrMoyen.toFixed(2)}</span>`, s.rrMoyen === null ? "renseigne le RR dans la fiche du trade" : `sur ${s.nbAvecRr} trade${s.nbAvecRr > 1 ? "s" : ""} avec RR`)}
         ${carte("Meilleur / pire trade", `<span class="${s.meilleur > 0 ? "positif" : s.meilleur < 0 ? "negatif" : ""}">${m(s.meilleur, { signe: true })}</span>`, `pire : ${m(s.pire, { signe: true })}`)}
       </div>
 
@@ -171,15 +163,6 @@
           </div>
           <div class="zone-graphique"><canvas id="graph-barres" role="img" aria-label="Barres des gains et pertes par ${filtre.regroupement}"></canvas></div>
         </div>
-        ${parInstrument.size ? `
-        <div class="carte carte-graphique large">
-          <h3 class="titre-bloc">Résultats par instrument</h3>
-          <div class="tableau-defilant"><table class="tableau-portions">
-            <thead><tr><th>Instrument</th><th>Trades</th><th>Gagnants / perdants</th><th>Résultat net</th></tr></thead>
-            <tbody>${[...parInstrument.entries()].sort((a, b) => b[1].net - a[1].net).map(([ins, x]) => `<tr><th scope="row">${U().esc(ins)}</th><td>${x.n}</td><td>${x.g} / ${x.p}</td><td class="${x.net > 0 ? "positif" : x.net < 0 ? "negatif" : ""}">${x.net > 0 ? "▲" : x.net < 0 ? "▼" : "="} ${m(x.net, { signe: true })}</td></tr>`).join("")}</tbody>
-          </table></div>
-          ${avecInstrument.length < trades.length ? `<p class="aide">${trades.length - avecInstrument.length} trade(s) sans instrument renseigné ne sont pas dans ce tableau.</p>` : ""}
-        </div>` : `<p class="note-source">Résultats par instrument : renseigne l'instrument en ajoutant un trade pour voir cette répartition.</p>`}
       </div>`;
 
     if (typeof Chart === "undefined") {

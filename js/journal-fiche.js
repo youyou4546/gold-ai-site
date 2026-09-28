@@ -1,6 +1,6 @@
 // Gold AI — Journal › fiche détaillée d'un trade (ajout ou modification).
 //
-// Champs : instrument, prix d'entrée / sortie,
+// Champs : (instrument = XAUUSD automatiquement, RR retiré) prix d'entrée / sortie,
 // RR obtenu, profit/perte, frais, captures d'écran, notes.
 // Enregistré dans Supabase (supabase/patch_journal_detaille.sql). Les images
 // sont réduites sur le téléphone avant l'envoi (1600 px max, JPEG) pour rester
@@ -80,8 +80,6 @@
     $("fiche-date").textContent = new Date(a, m - 1, j).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
     const val = (x) => (x === null || x === undefined ? "" : String(x));
-    $("fiche-instrument").value = val(trade?.instrument);
-    $("fiche-rr").value = val(trade?.rr);
     $("fiche-entree").value = val(trade?.prixEntree);
     $("fiche-sortie").value = val(trade?.prixSortie);
     $("fiche-resultat").value = val(trade?.resultat);
@@ -118,7 +116,7 @@
     afficherErreur("");
     const resultat = nombreOuNull("fiche-resultat");
     if (resultat === null || Number.isNaN(resultat)) { afficherErreur("Indique le profit ou la perte en $ (négatif si perte)."); return; }
-    const champs = { entree: nombreOuNull("fiche-entree"), sortie: nombreOuNull("fiche-sortie"), rr: nombreOuNull("fiche-rr"), frais: nombreOuNull("fiche-frais") };
+    const champs = { entree: nombreOuNull("fiche-entree"), sortie: nombreOuNull("fiche-sortie"), frais: nombreOuNull("fiche-frais") };
     if (Object.values(champs).some(Number.isNaN)) { afficherErreur("Un des champs chiffrés contient autre chose qu'un nombre."); return; }
     const frais = champs.frais === null ? null : Math.abs(champs.frais);
 
@@ -128,11 +126,11 @@
       resultat,
       note: $("fiche-notes").value.trim(),
       compteTradingId: tradeOuvert?.compteTradingId || null, // plus demandé : on garde celui déjà enregistré
-      instrument: $("fiche-instrument").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "") || null,
+      instrument: tradeOuvert?.instrument || "XAUUSD", // on ne trade que l'or : plus demandé
       frais,
       prixEntree: champs.entree,
       prixSortie: champs.sortie,
-      rr: champs.rr,
+      rr: tradeOuvert?.rr ?? null, // RR plus demandé : on garde celui d'un ancien trade
     };
 
     const bouton = $("fiche-enregistrer");

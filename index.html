@@ -132,7 +132,6 @@
       </div>
       <!-- Bloc Discipline (js/accueil-discipline.js) : affiché seulement après un calcul -->
       <div class="bloc-discipline hidden" id="bloc-discipline">
-        <div class="tuile-discipline" id="tuile-trades-restants"><span class="libelle-tuile">Trades restants</span><span class="valeur-tuile">…</span></div>
         <button type="button" class="tuile-discipline tuile-annonce" id="tuile-prochaine-annonce" aria-label="Prochaine annonce importante — ouvrir les annonces"><span class="libelle-tuile">Prochaine annonce</span><span class="valeur-tuile">…</span></button>
       </div>
       <div id="zone-signal-interprete"></div>
@@ -294,7 +293,7 @@
           <div class="ligne-champs">
             <div class="champ">
               <label for="objectif-montant">Montant ($)</label>
-              <input type="number" id="objectif-montant" inputmode="decimal" min="1" step="any" placeholder="100" />
+              <input type="number" id="objectif-montant" min="1" step="any" placeholder="100" />
             </div>
             <div class="champ">
               <label for="objectif-periode">Période</label>
@@ -412,17 +411,6 @@
 
       <div class="ligne-champs">
         <div class="champ">
-          <label for="fiche-instrument">Instrument</label>
-          <input type="text" id="fiche-instrument" placeholder="ex: XAUUSD" autocapitalize="characters" />
-        </div>
-        <div class="champ">
-          <label for="fiche-rr">RR obtenu</label>
-          <input type="number" id="fiche-rr" inputmode="decimal" step="0.01" placeholder="ex: 2.5 ou -1" />
-        </div>
-      </div>
-
-      <div class="ligne-champs">
-        <div class="champ">
           <label for="fiche-entree">Prix d'entrée</label>
           <input type="number" id="fiche-entree" inputmode="decimal" step="any" placeholder="ex: 4335.20" />
         </div>
@@ -435,7 +423,7 @@
       <div class="ligne-champs">
         <div class="champ">
           <label for="fiche-resultat">Profit / perte ($)</label>
-          <input type="number" id="fiche-resultat" inputmode="decimal" step="0.01" placeholder="ex: 340 ou -120" />
+          <input type="number" id="fiche-resultat" step="0.01" placeholder="ex: 340 ou -120" />
         </div>
         <div class="champ">
           <label for="fiche-frais">Frais ($, optionnel)</label>

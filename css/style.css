@@ -1591,7 +1591,7 @@ h2.titre-section { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; t
 .proposition-notifications strong { color: var(--accent); }
 
 /* ---------- Accueil : bloc Discipline + objectif ---------- */
-.bloc-discipline { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-bottom: 10px; }
+.bloc-discipline { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
 .tuile-discipline {
   display: flex; flex-direction: column; gap: 3px; min-width: 0;
   padding: 12px 14px;
