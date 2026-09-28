@@ -18,6 +18,8 @@
   let environnement = "live";
   let minuterie = null;
   let enCours = false;
+  let surnoms = {};        // { "live|123": "Compte principal" } — noms choisis dans l'app seulement
+  let enEdition = null;    // clé du compte en train d'être renommé (pas de rafraîchissement pendant ce temps)
 
   const ouverte = () => !$("profil-tradelocker")?.classList.contains("hidden");
 
@@ -37,6 +39,23 @@
   }
 
   let aRefaire = false;
+  // Surnoms : enregistrés avec les paramètres du calculateur (même stockage par
+  // utilisateur que l'objectif). Ne changent rien chez TradeLocker.
+  async function chargerSurnoms() {
+    const r = await window.GoldAI.reglagesCalculateur.charger();
+    surnoms = { ...(r.surnomsComptes || {}) };
+  }
+
+  async function enregistrerSurnom(cle, nom) {
+    const r = await window.GoldAI.reglagesCalculateur.charger();
+    const tous = { ...(r.surnomsComptes || {}) };
+    if (nom) tous[cle] = nom.slice(0, 40); else delete tous[cle]; // vide = nom d'origine
+    await window.GoldAI.reglagesCalculateur.sauvegarder({ ...r, surnomsComptes: tous });
+    surnoms = tous;
+    enEdition = null;
+    afficher();
+  }
+
   async function charger() {
     if (enCours) { aRefaire = true; return; } // une lecture est déjà en route : on relira juste après
     enCours = true;
@@ -89,15 +108,32 @@
   const argent = (v, devise, signe = false) => (v === null || v === undefined ? "—" : U.montant(v, devise || "USD", { signe }));
   const classe = (v) => (v > 0 ? "positif" : v < 0 ? "negatif" : "");
 
-  function carteCompte(c) {
+  function carteCompte(c, env) {
     const d = c.devise;
     const positions = c.positions || [];
+    const cle = `${env}|${c.id}`;
+    const origine = `${c.nom || "Compte"} #${c.accNum}`;
+    const surnom = surnoms[cle];
+    const entete = enEdition === cle ? `
+        <form class="renommer-compte-tl" data-renommer-form="${esc(cle)}">
+          <input type="text" maxlength="40" value="${esc(surnom || "")}" placeholder="${esc(origine)}" aria-label="Nouveau nom du compte" autofocus>
+          <button type="submit" class="bouton bouton-petit">OK</button>
+          <button type="button" class="bouton secondaire bouton-petit" data-annuler-renommer>Annuler</button>
+        </form>
+        <p class="texte-attenue petit">Nom utilisé seulement dans l'app. Laisse vide pour revenir à « ${esc(origine)} ».</p>` : `
+        <div class="entete-compte-tl">
+          <span>
+            <strong>${esc(surnom || c.nom || "Compte")}</strong>
+            ${surnom ? `<br><span class="texte-attenue petit">${esc(origine)}</span>` : ` <span class="texte-attenue">#${esc(c.accNum)}</span>`}
+          </span>
+          <span>
+            ${c.statut && c.statut !== "ACTIVE" ? `<span class="statut-compte-tl">${esc(c.statut)}</span>` : ""}
+            <button type="button" class="lien-retour" data-renommer="${esc(cle)}">✏️ Renommer</button>
+          </span>
+        </div>`;
     return `
       <div class="carte compte-tl">
-        <div class="entete-compte-tl">
-          <strong>${esc(c.nom || "Compte")} <span class="texte-attenue">#${esc(c.accNum)}</span></strong>
-          ${c.statut && c.statut !== "ACTIVE" ? `<span class="statut-compte-tl">${esc(c.statut)}</span>` : ""}
-        </div>
+        ${entete}
         ${c.erreur ? `<p class="alerte-donnees">${esc(c.erreur)}${c.detail ? `<br><span class="petit texte-attenue">Raison technique : ${esc(c.detail)}</span>` : ""}</p>` : ""}
         <div class="chiffres-trade">
           <div><span class="lib">Solde</span><span class="val">${argent(c.solde, d)}</span></div>
@@ -119,7 +155,7 @@
 
   function afficher() {
     const zone = $("contenu-tradelocker");
-    if (!zone) return;
+    if (!zone || (enEdition && zone.querySelector("[data-renommer-form]"))) return; // ne pas effacer une saisie en cours
     if (!donnees && !erreur) { zone.innerHTML = `<p class="texte-attenue petit">Chargement de tes comptes…</p>`; return; }
     if (erreur && !donnees) { zone.innerHTML = `<p class="alerte-donnees">${esc(erreur)}</p>`; return; }
 
@@ -164,16 +200,29 @@
             </div>
           </div>
           ${cx.erreur ? `<p class="alerte-donnees">${esc(cx.erreur)}</p>` : ""}
-          ${(cx.comptes || []).map(carteCompte).join("")}
+          ${(cx.comptes || []).map((c) => carteCompte(c, cx.environnement)).join("")}
         </div>`).join("")}`;
   }
 
   // ---------------------------------------------------------------- Cycle de vie
 
+  // Redessine même pendant un renommage (ouverture / annulation du champ).
+  function afficherSansGarde() {
+    const garde = enEdition;
+    enEdition = null;
+    const zone = $("contenu-tradelocker");
+    if (zone) zone.querySelectorAll("[data-renommer-form]").forEach((f) => f.remove());
+    enEdition = garde;
+    afficher();
+    zone?.querySelector("[data-renommer-form] input")?.focus();
+  }
+
   function ouvrir() {
     ["profil-accueil", "profil-parametres", "profil-comptes", "profil-mon-compte"].forEach((id) => $(id)?.classList.add("hidden"));
     $("profil-tradelocker").classList.remove("hidden");
     message("");
+    enEdition = null;
+    chargerSurnoms().then(afficher);
     afficher();
     charger();
     clearInterval(minuterie);
@@ -195,6 +244,12 @@
     $("bouton-ouvrir-tradelocker")?.addEventListener("click", ouvrir);
     $("bouton-retour-tradelocker")?.addEventListener("click", fermer);
     $("formulaire-tradelocker")?.addEventListener("submit", ajouter);
+    $("contenu-tradelocker")?.addEventListener("submit", (e) => {
+      const form = e.target.closest("[data-renommer-form]");
+      if (!form) return;
+      e.preventDefault();
+      enregistrerSurnom(form.dataset.renommerForm, form.querySelector("input").value.trim());
+    });
     document.querySelectorAll("#formulaire-tradelocker .segmente button").forEach((b) => b.addEventListener("click", () => {
       environnement = b.dataset.env;
       document.querySelectorAll("#formulaire-tradelocker .segmente button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
@@ -202,6 +257,8 @@
     $("contenu-tradelocker")?.addEventListener("click", (e) => {
       const t = e.target;
       if (t.id === "rafraichir-tradelocker") charger();
+      else if (t.dataset.renommer) { enEdition = t.dataset.renommer; afficherSansGarde(); }
+      else if (t.hasAttribute("data-annuler-renommer")) { enEdition = null; afficherSansGarde(); }
       else if (t.dataset.oublier) document.querySelector(`[data-confirmation="${CSS.escape(t.dataset.oublier)}"]`)?.classList.remove("hidden");
       else if (t.dataset.annulerOubli) document.querySelector(`[data-confirmation="${CSS.escape(t.dataset.annulerOubli)}"]`)?.classList.add("hidden");
       else if (t.dataset.confirmerOubli) supprimer(t.dataset.confirmerOubli);

@@ -208,6 +208,7 @@
       fuseau: document.getElementById("calc-fuseau").value,
       objectif: cache?.objectif, // réglé à part (carte « Objectif de profit »), conservé tel quel
       arretPremierGain: cache?.arretPremierGain, // réglé à part (Règles de trading), conservé tel quel
+      surnomsComptes: cache?.surnomsComptes,     // noms donnés aux comptes TradeLocker (Profil), conservés tels quels
     };
     if (r.risqueMode === "pourcentage" && !(r.solde > 0)) erreurs.push("Indique le solde du compte (nécessaire pour un risque en %).");
     if (!(r.risqueValeur > 0)) erreurs.push("Indique la valeur du risque.");

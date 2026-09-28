@@ -1729,3 +1729,9 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 /* ---------- Journal : filtre « Compte » (Calendrier + Performance) ---------- */
 .choix-compte-journal { max-width: 420px; }
 .choix-compte-journal select { width: 100%; }
+
+/* ---------- Mes comptes TradeLocker : renommer un compte ---------- */
+.renommer-compte-tl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.renommer-compte-tl input { flex: 1; min-width: 160px; padding: 10px 12px; background: var(--fond); border: 1px solid var(--accent); border-radius: 8px; color: var(--texte); font-size: 16px; }
+.renommer-compte-tl .bouton { margin: 0; }
+.entete-compte-tl .lien-retour { margin-left: 6px; }

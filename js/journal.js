@@ -63,6 +63,11 @@
     return chargementRelies;
   }
 
+  let surnoms = {};
+  async function chargerSurnoms() {
+    try { surnoms = (await window.GoldAI.reglagesCalculateur.charger()).surnomsComptes || {}; } catch { surnoms = {}; }
+  }
+
   function comptesDisponibles() {
     const noms = new Map((comptesRelies || []).map((c) => [c.cle, c.nom]));
     let manuels = false;
@@ -70,7 +75,7 @@
       if (t.compteTl) noms.set(t.compteTl, t.compteTlNom || "Compte TradeLocker");
       else manuels = true;
     });
-    const liste = [...noms].map(([cle, nom]) => ({ cle, nom })).sort((a, b) => a.nom.localeCompare(b.nom));
+    const liste = [...noms].map(([cle, nom]) => ({ cle, nom: surnoms[cle] || nom })).sort((a, b) => a.nom.localeCompare(b.nom));
     if (manuels) liste.push({ cle: "manuel", nom: "Trades ajoutés à la main" });
     return liste;
   }
@@ -98,6 +103,7 @@
         ${comptesRelies && !comptesRelies.length ? `<p class="texte-attenue petit">Relie tes comptes dans Profil › Mes comptes TradeLocker pour les choisir ici.</p>` : ""}`;
     };
     dessiner();
+    chargerSurnoms().then(dessiner);
     if (!comptesRelies) chargerComptesRelies()?.then(dessiner);
   }
 
