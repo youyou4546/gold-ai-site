@@ -13,11 +13,14 @@
 //       toutes les 10 s pendant ~50 s à chaque passage → notif en quelques secondes.
 //     - Filet de sécurité : bougies 1 min Twelve Data toutes les 3 min (quota
 //       800/jour), pour les mèches trop rapides entre deux relevés.
+//  4. Import des trades TradeLocker fermés dans le Journal, toutes les 5 min
+//     (_shared/import-tradelocker.ts).
 // Secrets de la fonction : VAPID_KEYS_B64 (clés de signature JWK, en base64) et
 // CRON_SECRET (seul pg_cron peut la déclencher).
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 import * as webpush from "jsr:@negrel/webpush@0.5.0";
+import { importerTout } from "../_shared/import-tradelocker.ts";
 
 const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
   auth: { persistSession: false },
@@ -329,6 +332,12 @@ Deno.serve(async (req) => {
   const direct = alertesPrixDirect().catch((e) => console.error("alertes direct", e));
   // deno-lint-ignore no-explicit-any
   (globalThis as any).EdgeRuntime?.waitUntil(direct);
+  // Import TradeLocker → Journal toutes les 5 min, lui aussi en arrière-plan.
+  if (new Date().getUTCMinutes() % 5 === 0) {
+    const imports = importerTout().then((n) => { if (n) console.log(`${n} trade(s) TradeLocker importé(s)`); }).catch((e) => console.error("import TradeLocker", e));
+    // deno-lint-ignore no-explicit-any
+    (globalThis as any).EdgeRuntime?.waitUntil(imports);
+  }
   for (const [nom, tache] of [["annonces", alertesAnnonces], ["trades", suiviTrades], ["alertes_prix", alertesPrix]] as const) {
     try { await tache(); resultat[nom] = "ok"; } catch (e) { resultat[nom] = String(e); console.error(nom, e); }
   }

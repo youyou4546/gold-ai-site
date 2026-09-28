@@ -89,7 +89,7 @@
           }
           if (body.action === "supprimer") { ecrire("banc_tl", cx.filter((c) => c.id !== body.id)); return { data: { ok: true }, error: null }; }
           const alea = () => Math.round((Math.random() - 0.4) * 30000) / 100;
-          return { data: { lu_le: new Date().toISOString(), connexions: cx.map((c) => ({ ...c, comptes: [
+          return { data: { lu_le: new Date().toISOString(), importes24h: 3, connexions: cx.map((c) => ({ ...c, comptes: [
             { id: 1, accNum: 1, nom: "NOVA 50K", devise: "USD", statut: "ACTIVE", solde: 50412.5, equite: 50520.1, jourNet: 412.5, jourTrades: 2, ouvertNet: 107.6,
               positions: [{ id: "p1", symbole: "XAUUSD", sens: "buy", lots: 0.5, prixEntree: 4131.2, pnl: alea() }] },
             { id: 2, accNum: 2, nom: "NOVA 50K (copie)", devise: "USD", statut: "ACTIVE", solde: 49880, equite: 49880, jourNet: -120, jourTrades: 1, ouvertNet: 0, positions: [] },
