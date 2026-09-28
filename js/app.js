@@ -13,10 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // au clic sur la tuile "Calendrier" de l'accueil du journal (voir journal.js).
     if (cible === "marche" && window.GoldAI?.marche?.charger) {
       window.GoldAI.marche.charger();
-      window.GoldAI.discipline?.afficher();
-    } else {
-      window.GoldAI?.discipline?.arreter();
     }
+    // Trades restants + prochaine annonce : n'apparaissent qu'après un calcul.
+    window.GoldAI?.discipline?.masquer();
     if (cible === "calendrier" && window.GoldAI?.calendrier?.charger) {
       window.GoldAI.calendrier.charger();
     }

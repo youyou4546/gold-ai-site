@@ -77,11 +77,6 @@
     <section class="section actif" id="section-marche">
       <h2 class="titre-section">Marché</h2>
 
-      <!-- Bloc Discipline (js/accueil-discipline.js) -->
-      <div class="bloc-discipline" id="bloc-discipline">
-        <div class="tuile-discipline" id="tuile-trades-restants"><span class="libelle-tuile">Trades restants</span><span class="valeur-tuile">…</span></div>
-        <button type="button" class="tuile-discipline tuile-annonce" id="tuile-prochaine-annonce" aria-label="Prochaine annonce importante — ouvrir les annonces"><span class="libelle-tuile">Prochaine annonce</span><span class="valeur-tuile">…</span></button>
-      </div>
       <p class="petit" id="date-marche"></p>
       <div id="liste-actifs-marche"></div>
     </section>
@@ -134,6 +129,11 @@
           <textarea id="champ-signal" rows="8" placeholder="Sell XAUUSD&#10;Point d'entrée : 4335&#10;TP1 : 4329&#10;TP2 : 4320&#10;SL : 4339"></textarea>
         </div>
         <button class="bouton" id="bouton-calculer">Calculer</button>
+      </div>
+      <!-- Bloc Discipline (js/accueil-discipline.js) : affiché seulement après un calcul -->
+      <div class="bloc-discipline hidden" id="bloc-discipline">
+        <div class="tuile-discipline" id="tuile-trades-restants"><span class="libelle-tuile">Trades restants</span><span class="valeur-tuile">…</span></div>
+        <button type="button" class="tuile-discipline tuile-annonce" id="tuile-prochaine-annonce" aria-label="Prochaine annonce importante — ouvrir les annonces"><span class="libelle-tuile">Prochaine annonce</span><span class="valeur-tuile">…</span></button>
       </div>
       <div id="zone-signal-interprete"></div>
       <div id="zone-resultat-calcul"></div>

@@ -1,4 +1,4 @@
-// Gold AI — Accueil (Marché) : bloc Discipline + barre d'objectif.
+// Gold AI — Calculateur : bloc Discipline (après un calcul) + barre d'objectif.
 //
 // - « Trades restants » : repris du garde-fou du jour (js/garde-fou.js).
 // - Compte à rebours vers la prochaine annonce à impact élevé DU JOUR
@@ -18,7 +18,8 @@
   let prochaine = null;   // { e, ms } ou null
   let tic = null;
 
-  const surAccueil = () => $("section-marche")?.classList.contains("actif") && window.GoldAI.auth?.getToken();
+  // Le bloc n'apparaît que dans le Calculateur, une fois un trade calculé.
+  const surAccueil = () => $("section-calculateur")?.classList.contains("actif") && !$("bloc-discipline")?.classList.contains("hidden") && window.GoldAI.auth?.getToken();
   const actif = () => surAccueil() && !document.hidden; // pas de tic-tac écran éteint / app en arrière-plan
 
   // ---------------------------------------------------------------- Trades restants
@@ -159,6 +160,7 @@
 
   function afficher() {
     if (!$("bloc-discipline")) return;
+    $("bloc-discipline").classList.remove("hidden");
     afficherTradesRestants();
     demarrerChrono();
     afficherObjectif();
@@ -179,5 +181,10 @@
   window.addEventListener("goldai:donnees", () => { prochaine = null; if (surAccueil()) afficherCompteARebours(); });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.discipline = { afficher, arreter: () => clearInterval(tic) };
+  function masquer() {
+    clearInterval(tic);
+    $("bloc-discipline")?.classList.add("hidden");
+  }
+
+  window.GoldAI.discipline = { afficher, masquer, arreter: () => clearInterval(tic) };
 })();

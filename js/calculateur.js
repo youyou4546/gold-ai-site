@@ -198,6 +198,8 @@
 
     const r = N.calculerPosition(signalCourant, reglages, tauxUtilise);
     zoneResultat.innerHTML = r.ok ? afficherResultat(r, reglages, spec) : afficherBlocage(r, reglages, spec);
+    // Trades restants + compte à rebours de la prochaine annonce, avec le résultat.
+    window.GoldAI.discipline?.afficher();
     if (repartitionForcee && r.ok) {
       zoneResultat.insertAdjacentHTML("afterbegin", `<div class="alerte-donnees">Répartition au prorata utilisée pour ce calcul seulement : ${repartitionForcee.map((x) => `${nombre(x, 1)} %`).join(" / ")} (tes paramètres enregistrés ne changent pas).</div>`);
     }
