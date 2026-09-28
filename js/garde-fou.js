@@ -21,6 +21,7 @@
   let chargement = null; // promesse en cours
   let jourCalcule = null;
   let tradesDuJour = [];
+  let objectifAtteint = false; // objectif de profit (Profil › Général) atteint → plus de « X trades sur N »
 
   const $ = (id) => document.getElementById(id);
   const dollars = (v, signe = false) => U.montant(v, "USD", { signe });
@@ -53,6 +54,7 @@
       jourCalcule = cleAujourdhui();
       tradesDuJour = parJour[jourCalcule] || [];
       etat = N.evaluerGardeFou({ trades: tradesDuJour, regles, limitePerte: limite?.montant ?? null });
+      await majObjectifAtteint(parJour);
       afficherBandeau();
       afficherBlocageCalculateur();
       window.dispatchEvent(new CustomEvent("goldai:garde-fou", { detail: etat })); // bloc Discipline de l'accueil
@@ -60,6 +62,15 @@
     })();
     chargement = tache;
     try { return await tache; } finally { if (chargement === tache) chargement = null; }
+  }
+
+  // Même calcul que la barre d'objectif (js/accueil-discipline.js), tous comptes.
+  async function majObjectifAtteint(parJour) {
+    try {
+      const reglages = await window.GoldAI.reglagesCalculateur.charger();
+      const trades = Object.values(parJour || await window.GoldAI.journal.chargerTousLesTrades()).flat();
+      objectifAtteint = N.progressionObjectif(trades, { ...(reglages.objectif || {}), compteId: "" }, cleAujourdhui()).atteint;
+    } catch { objectifAtteint = false; }
   }
 
   function texteAlerte(a) {
@@ -71,14 +82,19 @@
     const zone = $("garde-fou");
     if (!zone || !etat) return;
     // Le résultat en $ n'est pas répété ici : il est affiché juste dessous, dans l'objectif.
-    const morceaux = [`${etat.nb} trade${etat.nb > 1 ? "s" : ""}${etat.maxTrades ? ` sur ${etat.maxTrades}` : ""}`];
+    // Objectif atteint : le compteur de trades (« 2 trades sur 3 ») et son
+    // avertissement « plus qu'un seul trade » disparaissent.
+    const morceaux = objectifAtteint ? [] : [`${etat.nb} trade${etat.nb > 1 ? "s" : ""}${etat.maxTrades ? ` sur ${etat.maxTrades}` : ""}`];
     if (etat.resteAvantLimite !== null) morceaux.push(`reste ${dollars(etat.resteAvantLimite)} avant ta limite`);
-    const principale = etat.alertes[0];
-    zone.className = `garde-fou ${etat.niveau}`;
+    if (!morceaux.length) morceaux.push("objectif atteint ✅");
+    const alertes = objectifAtteint ? etat.alertes.filter((a) => !(a.cle === "trades" && a.niveau !== "bloque")) : etat.alertes;
+    const principale = alertes[0];
+    const niveau = alertes[0]?.niveau || "ok"; // alertes triées : la plus grave en premier
+    zone.className = `garde-fou ${niveau}`;
     zone.innerHTML = `
-      <div class="ligne-garde-fou"><span class="icone-garde-fou" aria-hidden="true">${{ ok: "🛡️", attention: "⚠️", bloque: "⛔" }[etat.niveau]}</span>
+      <div class="ligne-garde-fou"><span class="icone-garde-fou" aria-hidden="true">${{ ok: "🛡️", attention: "⚠️", bloque: "⛔" }[niveau]}</span>
         <span><strong>Aujourd'hui :</strong> ${morceaux.join(" · ")}</span></div>
-      ${principale ? `<div class="raison-garde-fou">${esc(texteAlerte(principale))}${etat.niveau === "bloque" ? " — journée terminée" : ""}</div>` : ""}
+      ${principale ? `<div class="raison-garde-fou">${esc(texteAlerte(principale))}${niveau === "bloque" ? " — journée terminée" : ""}</div>` : ""}
       ${etat.aucuneRegle ? `<button type="button" class="raison-garde-fou lien-garde-fou" id="garde-fou-regles">Définis tes règles dans Profil › Général pour activer le garde-fou</button>` : ""}`;
     zone.hidden = false;
     $("garde-fou-regles")?.addEventListener("click", () => {
@@ -154,7 +170,7 @@
   }
 
   function viderCache() {
-    regles = null; limite = null; etat = null; jourCalcule = null; tradesDuJour = [];
+    regles = null; limite = null; etat = null; jourCalcule = null; tradesDuJour = []; objectifAtteint = false;
     clearInterval(minuterie);
     const zone = $("garde-fou");
     if (zone) { zone.hidden = true; zone.innerHTML = ""; }
@@ -164,6 +180,8 @@
 
   window.addEventListener("goldai:trades", () => recalculer());
   window.addEventListener("goldai:regles", () => recalculer({ rechargerRegles: true }));
+  // Objectif modifié dans Profil › Général.
+  window.addEventListener("goldai:reglages-calculateur", async () => { if (etat) { await majObjectifAtteint(); afficherBandeau(); } });
   window.addEventListener("goldai:comptes", () => recalculer({ rechargerRegles: true }));
   window.addEventListener("goldai:donnees", () => { if ($("section-calculateur")?.classList.contains("actif")) afficherAlerteAnnonce(); });
 
