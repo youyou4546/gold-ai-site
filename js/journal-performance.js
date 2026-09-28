@@ -200,8 +200,10 @@
   }
 
   async function rafraichir({ recharger = true } = {}) {
-    if (recharger) await window.GoldAI.journal.chargerTousLesTrades(true);
-    afficher(filtrer(window.GoldAI.journal.obtenirTradesBruts()));
+    const J = window.GoldAI.journal;
+    if (recharger) await J.chargerTousLesTrades(true);
+    J.afficherSelecteurCompte("choix-compte-performance");
+    afficher(filtrer(J.filtrerParCompte(J.obtenirTradesBruts())));
   }
 
   function visible() {
@@ -213,6 +215,7 @@
       document.getElementById("journal-accueil").classList.add("hidden");
       document.getElementById("journal-performance").classList.remove("hidden");
       document.getElementById("contenu-performance").innerHTML = `<p class="etat-vide">Chargement…</p>`;
+      window.GoldAI.journal.lireFiltreMemorise();
       await rafraichir();
     });
 
@@ -221,6 +224,9 @@
       document.getElementById("journal-performance").classList.add("hidden");
       document.getElementById("journal-accueil").classList.remove("hidden");
     });
+
+    document.getElementById("choix-compte-performance")?.addEventListener("change", (e) => window.GoldAI.journal.changerFiltreCompte(e.target.value));
+    window.addEventListener("goldai:filtre-compte", () => { if (visible()) rafraichir({ recharger: false }); });
 
     document.getElementById("filtres-periode-perf")?.addEventListener("click", (e) => {
       const b = e.target.closest("[data-periode]");

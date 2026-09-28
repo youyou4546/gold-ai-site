@@ -40,6 +40,55 @@
     return `${signe}$${Math.abs(valeur).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
 
+  // ---------------------------------------------------------------- Filtre « Compte »
+  // Partagé par le Calendrier et la Performance : « tous », un compte
+  // TradeLocker ("live|123"), ou « manuel » (trades saisis à la main).
+  // Le garde-fou et l'objectif, eux, comptent toujours TOUS les trades.
+  let filtreCompte = "tous";
+  const cleFiltre = () => `goldai_filtre_compte_${window.GoldAI.auth.getNom() || "anonyme"}`;
+  function lireFiltreMemorise() {
+    try { filtreCompte = localStorage.getItem(cleFiltre()) || "tous"; } catch { filtreCompte = "tous"; }
+  }
+
+  function comptesDisponibles() {
+    const noms = new Map();
+    let manuels = false;
+    (cacheTradesBruts || []).forEach((t) => {
+      if (t.compteTl) noms.set(t.compteTl, t.compteTlNom || "Compte TradeLocker");
+      else manuels = true;
+    });
+    const liste = [...noms].map(([cle, nom]) => ({ cle, nom })).sort((a, b) => a.nom.localeCompare(b.nom));
+    if (manuels && liste.length) liste.push({ cle: "manuel", nom: "Trades ajoutés à la main" });
+    return liste;
+  }
+
+  function filtrerParCompte(trades) {
+    if (filtreCompte === "tous") return trades || [];
+    return (trades || []).filter((t) => (filtreCompte === "manuel" ? !t.compteTl : t.compteTl === filtreCompte));
+  }
+
+  // Menu « Compte » (masqué tant qu'il n'y a qu'une seule source de trades).
+  function afficherSelecteurCompte(idZone) {
+    const zone = document.getElementById(idZone);
+    if (!zone) return;
+    const comptes = comptesDisponibles();
+    if (filtreCompte !== "tous" && !comptes.some((c) => c.cle === filtreCompte)) filtreCompte = "tous";
+    zone.classList.toggle("hidden", comptes.length < 2);
+    if (comptes.length < 2) { zone.innerHTML = ""; return; }
+    const esc = window.GoldAI.utils.esc;
+    zone.innerHTML = `<label for="${idZone}-choix">Compte</label>
+      <select id="${idZone}-choix">
+        <option value="tous">Tous les comptes</option>
+        ${comptes.map((c) => `<option value="${esc(c.cle)}" ${c.cle === filtreCompte ? "selected" : ""}>${esc(c.nom)}</option>`).join("")}
+      </select>`;
+  }
+
+  function changerFiltreCompte(valeur) {
+    filtreCompte = valeur;
+    try { localStorage.setItem(cleFiltre(), valeur); } catch { /* ignoré */ }
+    window.dispatchEvent(new CustomEvent("goldai:filtre-compte"));
+  }
+
   function sommeDuJour(tradesJour) {
     // Résultat net : frais déduits quand ils sont renseignés (comme dans Performance).
     return (tradesJour || []).reduce((total, t) => total + t.resultat - (t.frais || 0), 0);
@@ -70,6 +119,8 @@
       resultat: Number(trade.resultat),
       note: trade.note || "",
       compteTradingId: trade.compte_trading_id || null,
+      compteTl: trade.compte_tl || null,           // compte TradeLocker (trades importés)
+      compteTlNom: trade.compte_tl_nom || null,
       instrument: trade.instrument || null,
       frais: trade.frais === null || trade.frais === undefined ? null : Number(trade.frais),
       prixEntree: trade.prix_entree === null || trade.prix_entree === undefined ? null : Number(trade.prix_entree),
@@ -107,6 +158,7 @@
   function viderCache() {
     cacheTrades = null;
     cacheTradesBruts = null;
+    filtreCompte = "tous";
     document.getElementById("journal-calendrier")?.classList.add("hidden");
     document.getElementById("journal-performance")?.classList.add("hidden");
     document.getElementById("journal-alertes")?.classList.add("hidden");
@@ -118,6 +170,7 @@
     grille.innerHTML = `<p class="etat-vide" style="grid-column:1/-1;">Chargement…</p>`;
 
     const tousLesTrades = await chargerTousLesTrades();
+    afficherSelecteurCompte("choix-compte-calendrier");
 
     document.getElementById("nom-mois-affiche").textContent = `${NOMS_MOIS[moisAffiche]} ${anneeAffichee}`;
 
@@ -142,7 +195,7 @@
 
     for (let jour = 1; jour <= nombreJoursDansLeMois; jour++) {
       const cle = cleDate(anneeAffichee, moisAffiche, jour);
-      const tradesJour = tousLesTrades[cle] || [];
+      const tradesJour = filtrerParCompte(tousLesTrades[cle]);
       const somme = sommeDuJour(tradesJour);
       totalMois += somme; // compte quand même un trade éventuellement noté un week-end
 
@@ -196,7 +249,7 @@
 
   async function rafraichirListeTradesDuJour() {
     const tousLesTrades = await chargerTousLesTrades();
-    const tradesJour = tousLesTrades[dateJourSelectionne] || [];
+    const tradesJour = filtrerParCompte(tousLesTrades[dateJourSelectionne]);
     const conteneur = document.getElementById("liste-trades-jour");
 
     if (tradesJour.length === 0) {
@@ -361,7 +414,14 @@
     // Le calendrier des trades n'est chargé/affiché qu'au clic sur la tuile
     // "Calendrier" de l'accueil du journal (pas dès qu'on ouvre l'onglet Journal
     // — d'autres tuiles viendront s'ajouter à côté à l'avenir).
+    // Le menu est redessiné à chaque affichage : on écoute sur sa zone.
+    document.getElementById("choix-compte-calendrier")?.addEventListener("change", (e) => changerFiltreCompte(e.target.value));
+    window.addEventListener("goldai:filtre-compte", () => {
+      if (!document.getElementById("journal-calendrier").classList.contains("hidden")) afficherMoisCourant();
+    });
+
     document.getElementById("bouton-ouvrir-calendrier-trades").addEventListener("click", () => {
+      lireFiltreMemorise();
       document.getElementById("journal-accueil").classList.add("hidden");
       document.getElementById("journal-calendrier").classList.remove("hidden");
       afficherMoisCourant();
@@ -374,5 +434,6 @@
   });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.journal = { afficherMoisCourant, viderCache, chargerTousLesTrades, obtenirTradesBruts, memoriserTrade };
+  window.GoldAI.journal = { afficherMoisCourant, viderCache, chargerTousLesTrades, obtenirTradesBruts, memoriserTrade,
+    filtrerParCompte, afficherSelecteurCompte, changerFiltreCompte, lireFiltreMemorise };
 })();

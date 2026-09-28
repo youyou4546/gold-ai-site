@@ -90,6 +90,7 @@ async function importerCompte(c: Connexion, jeton: string, a: Record<string, unk
     const autreDevise = det.devise && det.devise !== devise ? ` · profit en ${det.devise}, non converti` : "";
     const { data: trade, error } = await db.from("trades").insert({
       compte_id: c.compte_id, date_trade: jourDans(p.fermeLe, fuseau), resultat, instrument: symbole,
+      compte_tl: `${env}|${id}`, compte_tl_nom: `${String(a.name || "Compte")} #${accNum}`,
       prix_entree: arrondi(entree, 5), prix_sortie: arrondi(sortie, 5),
       note: `Importé de TradeLocker · ${String(a.name || "Compte")} #${accNum} · ${p.sens === "buy" ? "Achat" : "Vente"} ${arrondi(p.lots)} lot · profit calculé (sans commissions ni swap)${autreDevise}`,
     }).select("id").single();

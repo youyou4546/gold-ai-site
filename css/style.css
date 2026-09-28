@@ -1725,3 +1725,7 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .positions-tl .positif { color: var(--vert); font-weight: 700; }
 .positions-tl .negatif { color: var(--rouge); font-weight: 700; }
 @media (max-width: 380px) { .positions-tl li { grid-template-columns: 1fr auto; } .positions-tl li .texte-attenue { display: none; } }
+
+/* ---------- Journal : filtre « Compte » (Calendrier + Performance) ---------- */
+.choix-compte-journal { max-width: 420px; }
+.choix-compte-journal select { width: 100%; }
