@@ -95,6 +95,7 @@
       return;
     }
 
+    window.dispatchEvent(new CustomEvent("goldai:regles")); // le garde-fou relit les règles
     zoneMessage.textContent = "✓ Réglages sauvegardés";
     zoneMessage.classList.add("succes-visible");
     setTimeout(() => zoneMessage.classList.remove("succes-visible"), 2500);

@@ -29,10 +29,10 @@
       return localStorage.banc_patch_absent === "1" ? null : apres.length < avant.length;
     },
     obtenir_mes_parametres: () => lire("banc_params", null),
-    sauvegarder_mes_parametres: (p) => { ecrire("banc_params", p); return null; },
+    sauvegarder_mes_parametres: (p) => { ecrire("banc_params", Object.fromEntries(Object.entries(p).filter(([k]) => k !== "p_token").map(([k, v]) => [k.replace(/^p_/, ""), v]))); return null; },
     obtenir_parametres_calculateur: () => lire("banc_calc", null),
     sauvegarder_parametres_calculateur: (p) => { ecrire("banc_calc", p.p_parametres); return null; },
-    lister_mes_comptes_trading: () => [{ id: "c1", nom: "FTMO 100k", taille: 100000, solde_actuel: 100000, statut: "challenge", dll_pourcentage: 5, max_dd_pourcentage: 10 }],
+    lister_mes_comptes_trading: () => [{ id: "c1", nom: "FTMO 100k", taille: 100000, solde_actuel: 100000, statut: "challenge", limite_perte_quotidienne_pct: 5, limite_drawdown_max_pct: 10 }],
     enregistrer_mon_trade: (p) => {
       if (localStorage.banc_patch_absent === "1") return absent();
       const liste = lire("banc_trades", []);

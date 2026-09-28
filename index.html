@@ -66,6 +66,9 @@
 <!-- ============ APPLICATION PRINCIPALE (visible une fois connecté) ============ -->
 <div id="app-principale" class="hidden">
 
+  <!-- Garde-fou du jour (rempli par js/garde-fou.js), toujours visible en haut -->
+  <div id="garde-fou" class="garde-fou" hidden aria-live="polite"></div>
+
   <main>
 
     <!-- ============ SECTION : SUIVI DU MARCHÉ ============ -->
@@ -114,7 +117,9 @@
     <!-- ============ SECTION : CALCULATEUR ============ -->
     <section class="section" id="section-calculateur">
       <h2 class="titre-section">Calculateur</h2>
-      <div class="carte">
+      <div class="alerte-annonce-calcul hidden" id="alerte-annonce-calcul" role="alert"></div>
+      <div class="carte blocage-calculateur hidden" id="blocage-calculateur"></div>
+      <div class="carte" id="carte-saisie-signal">
         <div class="champ">
           <label for="champ-signal">Colle ton signal ici</label>
           <textarea id="champ-signal" rows="8" placeholder="Sell XAUUSD&#10;Point d'entrée : 4335&#10;TP1 : 4329&#10;TP2 : 4320&#10;SL : 4339"></textarea>
@@ -510,6 +515,7 @@
 <script src="js/comptes-trading.js"></script>
 <script src="js/journal.js"></script>
 <script src="js/journal-fiche.js"></script>
+<script src="js/garde-fou.js"></script>
 <script src="js/journal-performance.js"></script>
 <script src="js/parametres.js"></script>
 <script src="js/profil-comptes.js"></script>

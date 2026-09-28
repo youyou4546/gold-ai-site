@@ -91,6 +91,7 @@
     });
     if (gererErreur(error)) return null;
     await chargerComptes(true);
+    window.dispatchEvent(new CustomEvent("goldai:comptes")); // le garde-fou relit la limite
     return data;
   }
 
@@ -108,6 +109,7 @@
     });
     if (gererErreur(error)) return false;
     await chargerComptes(true);
+    window.dispatchEvent(new CustomEvent("goldai:comptes")); // le garde-fou relit la limite
     return true;
   }
 
@@ -115,6 +117,7 @@
     const { error } = await client().rpc("supprimer_compte_trading", { p_token: token(), p_id: id });
     if (gererErreur(error)) return false;
     await chargerComptes(true);
+    window.dispatchEvent(new CustomEvent("goldai:comptes")); // le garde-fou relit la limite
     return true;
   }
 

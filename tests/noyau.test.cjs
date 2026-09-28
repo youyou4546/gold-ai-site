@@ -261,3 +261,33 @@ test("biais d'une annonce pour l'or (badge)", () => {
   assert.equal(N.biaisAnnonceOr(ev({ prevision: "0.4%", precedent: "0.3%" }), null).biais, "neutre");
   assert.equal(N.biaisAnnonceOr(ev({ prevision: "98K", precedent: "0.3%" }), cpi).biais, "neutre");
 });
+
+test("garde-fou du jour", () => {
+  const t = (resultat, frais = 0) => ({ resultat, frais });
+  const regles = { maxTrades: 3, pertesArret: 2, seuilGain: 1000 };
+  // Journée normale.
+  let g = N.evaluerGardeFou({ trades: [t(200)], regles, limitePerte: 1000 });
+  assert.equal(g.niveau, "ok");
+  assert.equal(g.resteAvantLimite, 1000);
+  // 2 trades sur 3 → attention ; 3 sur 3 → bloqué.
+  assert.equal(N.evaluerGardeFou({ trades: [t(100), t(50)], regles }).niveau, "attention");
+  assert.equal(N.evaluerGardeFou({ trades: [t(100), t(50), t(20)], regles }).niveau, "bloque");
+  // 2 pertes → bloqué, même avec des trades restants.
+  g = N.evaluerGardeFou({ trades: [t(-100), t(-50)], regles: { pertesArret: 2 } });
+  assert.equal(g.niveau, "bloque");
+  assert.equal(g.alertes[0].cle, "pertes");
+  // Frais comptés : +5 de résultat avec 7 de frais = une perte.
+  assert.equal(N.evaluerGardeFou({ trades: [t(5, 7)], regles: { pertesArret: 1 } }).niveau, "bloque");
+  // Objectif de gain atteint → bloqué.
+  assert.equal(N.evaluerGardeFou({ trades: [t(1200)], regles }).alertes[0].cle, "gain");
+  // Limite de perte : 70 % → attention, 100 % → bloqué, reste calculé.
+  g = N.evaluerGardeFou({ trades: [t(-450)], limitePerte: 1000 });
+  assert.equal(g.niveau, "ok");
+  assert.equal(g.resteAvantLimite, 550);
+  assert.equal(N.evaluerGardeFou({ trades: [t(-750)], limitePerte: 1000 }).niveau, "attention");
+  assert.equal(N.evaluerGardeFou({ trades: [t(-1000)], limitePerte: 1000 }).niveau, "bloque");
+  // Aucune règle : jamais bloqué.
+  g = N.evaluerGardeFou({ trades: [t(-5000), t(-1), t(-1), t(-1)] });
+  assert.equal(g.niveau, "ok");
+  assert.equal(g.aucuneRegle, true);
+});

@@ -155,6 +155,10 @@
     const zoneSignal = document.getElementById("zone-signal-interprete");
     const zoneResultat = document.getElementById("zone-resultat-calcul");
 
+    // Garde-fou : règle du jour atteinte → pas de calcul (« Journée terminée »).
+    if (window.GoldAI.gardeFou && !(await window.GoldAI.gardeFou.calculAutorise())) return;
+    window.GoldAI.gardeFou?.afficherAlerteAnnonce();
+
     if (depuisTexte) {
       const texte = document.getElementById("champ-signal").value;
       if (!texte.trim()) {

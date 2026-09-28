@@ -741,6 +741,52 @@
     };
   }
 
+  // =====================================================================
+  // 8. GARDE-FOU DU JOUR (règles de Profil › Général + limite des comptes)
+  // =====================================================================
+  //
+  // Entrées : trades du jour ({ resultat, frais }), règles
+  // { maxTrades, pertesArret, seuilGain } (null = règle non définie) et
+  // limitePerte ($, null si aucun compte). Chaque règle donne un niveau :
+  //   "ok" · "attention" (orange : plus qu'un pas avant la règle, ou 70 % de
+  //   la limite de perte consommée) · "bloque" (rouge : règle atteinte).
+  // Le niveau global est le plus grave ; "bloque" arrête le calculateur.
+
+  function evaluerGardeFou({ trades = [], regles = {}, limitePerte = null } = {}) {
+    const net = Math.round(trades.reduce((s, t) => s + Number(t.resultat) - (Number(t.frais) || 0), 0) * 100) / 100;
+    const nb = trades.length;
+    const pertes = trades.filter((t) => Number(t.resultat) - (Number(t.frais) || 0) < 0).length;
+    const regle = (v) => (v === null || v === undefined || v === "" || !(Number(v) > 0) ? null : Number(v));
+    const maxTrades = regle(regles.maxTrades), pertesArret = regle(regles.pertesArret), seuilGain = regle(regles.seuilGain);
+    const limite = regle(limitePerte);
+    const alertes = [];
+
+    if (maxTrades !== null) {
+      if (nb >= maxTrades) alertes.push({ cle: "trades", niveau: "bloque", texte: `Nombre max de trades atteint (${nb}/${maxTrades})` });
+      else if (nb >= 1 && nb === maxTrades - 1) alertes.push({ cle: "trades", niveau: "attention", texte: "Plus qu'un seul trade autorisé aujourd'hui" });
+    }
+    if (pertesArret !== null) {
+      if (pertes >= pertesArret) alertes.push({ cle: "pertes", niveau: "bloque", texte: `${pertes} perte${pertes > 1 ? "s" : ""} aujourd'hui : ta règle d'arrêt est atteinte` });
+      else if (pertes >= 1 && pertes === pertesArret - 1) alertes.push({ cle: "pertes", niveau: "attention", texte: "Encore une perte et ta journée s'arrête" });
+    }
+    if (seuilGain !== null && net >= seuilGain) {
+      alertes.push({ cle: "gain", niveau: "bloque", texte: `Objectif du jour atteint (+${net}) : on protège le gain` });
+    }
+    let resteAvantLimite = null;
+    if (limite !== null) {
+      const perte = Math.max(0, -net);
+      resteAvantLimite = Math.max(0, Math.round((limite - perte) * 100) / 100);
+      if (perte >= limite) alertes.push({ cle: "limite", niveau: "bloque", texte: "Limite de perte journalière atteinte" });
+      else if (perte >= 0.7 * limite) alertes.push({ cle: "limite", niveau: "attention", texte: `${Math.round((perte / limite) * 100)} % de ta limite de perte journalière déjà utilisée` });
+    }
+
+    const ordre = { ok: 0, attention: 1, bloque: 2 };
+    const niveau = alertes.reduce((n, a) => (ordre[a.niveau] > ordre[n] ? a.niveau : n), "ok");
+    alertes.sort((a, b) => ordre[b.niveau] - ordre[a.niveau]);
+    return { niveau, nb, net, pertes, maxTrades, resteAvantLimite, limite, alertes,
+      aucuneRegle: maxTrades === null && pertesArret === null && seuilGain === null && limite === null };
+  }
+
   const LIBELLE_TF = { "30min": "30 min", "1h": "1 h", "4h": "4 h", "1week": "1W" };
 
   const api = {
@@ -748,7 +794,7 @@
     calculerPosition, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
     ema, atr, calculerTendance, separerBougies,
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
-    scorePriorite, analyserImpact, biaisAnnonceOr, LIBELLE_TF, LIBELLES_SPEC,
+    scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou, LIBELLE_TF, LIBELLES_SPEC,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;
