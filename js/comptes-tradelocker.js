@@ -183,7 +183,7 @@
     zone.innerHTML = `
       <p class="texte-attenue petit maj-tradelocker">${erreur ? `⚠️ ${esc(erreur)} — ` : ""}Mis à jour ${esc(U.heure(donnees.lu_le))} · toutes les 30 s
         <button type="button" class="lien-retour" id="rafraichir-tradelocker">Actualiser</button></p>
-      <p class="texte-attenue petit">🔄 Tes trades fermés arrivent tout seuls dans le <strong>Journal</strong> (toutes les 5 min), modifiables comme les autres.
+      <p class="texte-attenue petit">🔄 Tes trades fermés arrivent tout seuls dans le <strong>Journal</strong> (en moins d'une minute), modifiables comme les autres.
         ${donnees.importes24h ? `<strong>${donnees.importes24h}</strong> importé${donnees.importes24h > 1 ? "s" : ""} ces dernières 24 h.` : ""}
         Profit calculé sans commissions ni swap.</p>
       ${total}

@@ -445,6 +445,21 @@
       if (!document.getElementById("journal-calendrier").classList.contains("hidden")) afficherMoisCourant();
     });
 
+    // Trades importés de TradeLocker en arrière-plan : le Journal se met à jour
+    // tout seul quand il est affiché (toutes les 30 s) et au retour sur l'app.
+    async function relireSiAffiche() {
+      if (document.hidden || !window.GoldAI.auth.getToken()) return;
+      if (!document.getElementById("section-journal")?.classList.contains("actif")) return;
+      const avant = (cacheTradesBruts || []).length;
+      await chargerTousLesTrades(true);
+      if ((cacheTradesBruts || []).length !== avant) window.dispatchEvent(new CustomEvent("goldai:trades"));
+    }
+    setInterval(relireSiAffiche, 30000);
+    document.addEventListener("visibilitychange", relireSiAffiche);
+    window.addEventListener("goldai:trades", () => {
+      if (!document.getElementById("journal-calendrier").classList.contains("hidden")) afficherMoisCourant();
+    });
+
     document.getElementById("bouton-ouvrir-calendrier-trades").addEventListener("click", () => {
       lireFiltreMemorise();
       document.getElementById("journal-accueil").classList.add("hidden");

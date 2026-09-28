@@ -10,7 +10,7 @@
 // Profit CALCULÉ : (sortie − entrée) × lots × taille du lot, dans la devise du prix.
 // TradeLocker ne donne pas le profit réel par trade : commissions et swap ne sont
 // pas inclus (écart possible de quelques $ avec le relevé du courtier).
-// Appelé par « verifications » (toutes les 5 min) et par « tradelocker » (ouverture de la page).
+// Appelé par « verifications » (toutes les ~20 s) et par « tradelocker » (ouverture de la page).
 
 import { colonnes, comptesDuLogin, type Connexion, db, detailsInstrument, enObjet, instruments, nb, tl } from "./tradelocker.ts";
 
