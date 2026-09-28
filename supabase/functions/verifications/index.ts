@@ -8,9 +8,11 @@
 //  2. Trade en cours (« J'entre ») : TP / SL touchés → notification avec le SL
 //     à déplacer (même logique que js/noyau.js › evaluerTouches).
 //  3. Alertes de prix (Journal › Suivre le prix) : prix ou zone touché →
-//     notification (même règle que js/noyau.js › alerteTouchee). Pour ménager
-//     le quota Twelve Data (800/jour), vérifiées toutes les 3 min seulement
-//     s'il n'y a pas de trade en cours ; les bougies 1 min ne ratent aucune mèche.
+//     notification (même règle que js/noyau.js › alerteTouchee).
+//     - En direct : prix gold-api.com (gratuit, sans clé ni limite) relevé
+//       toutes les 10 s pendant ~50 s à chaque passage → notif en quelques secondes.
+//     - Filet de sécurité : bougies 1 min Twelve Data toutes les 3 min (quota
+//       800/jour), pour les mèches trop rapides entre deux relevés.
 // Secrets de la fonction : VAPID_KEYS_B64 (clés de signature JWK, en base64) et
 // CRON_SECRET (seul pg_cron peut la déclencher).
 
@@ -242,10 +244,55 @@ async function suiviTrades() {
 
 type AlertePrix = { id: string; compte_id: string; bas: number; haut: number; note: string | null; prix_creation: number | null; cree_le: string; derniere_verif: string | null };
 
-async function alertesPrix() {
+async function alertesActives() {
   const { data, error } = await db.from("alertes_prix").select("id, compte_id, bas, haut, note, prix_creation, cree_le, derniere_verif").is("touchee_le", null);
   if (error) throw error;
-  const actives = (data || []) as AlertePrix[];
+  return (data || []) as AlertePrix[];
+}
+
+// Marque l'alerte touchée (une seule fois, même si deux vérifications se croisent) puis notifie.
+async function declencher(a: AlertePrix, prix: number) {
+  const bas = Number(a.bas), haut = Number(a.haut);
+  const maintenant = new Date().toISOString();
+  const { data: maj } = await db.from("alertes_prix").update({ touchee_le: maintenant, derniere_verif: maintenant, prix_touche: prix })
+    .eq("id", a.id).is("touchee_le", null).select("id");
+  if (!maj?.length) return;
+  const zone = bas === haut ? `Prix ${px(bas)}` : `Zone ${px(bas)} – ${px(haut)}`;
+  const venue = a.prix_creation ? (Number(a.prix_creation) > haut ? " par le haut" : Number(a.prix_creation) < bas ? " par le bas" : "") : "";
+  await envoyer(`🎯 ${zone} touché${bas === haut ? "" : "e"}`, `L'or y est arrivé${venue} — il est à ${px(prix)} maintenant.${a.note ? ` (${a.note})` : ""}`,
+    { url: "./index.html#alertes", tag: `alerte-${a.id}`, compteId: a.compte_id });
+}
+
+async function prixDirect(): Promise<number | null> {
+  try {
+    const r = await fetch("https://api.gold-api.com/price/XAU", { signal: AbortSignal.timeout(5000) });
+    const d = await r.json();
+    // Prix trop ancien (source figée) : ignoré.
+    if (!(d.price > 0) || Date.now() - Date.parse(d.updatedAt) > 5 * 60000) return null;
+    return Number(d.price);
+  } catch { return null; }
+}
+
+// Relevés toutes les 10 s pendant ~50 s (lancé en arrière-plan à chaque passage de minute).
+async function alertesPrixDirect() {
+  if (marcheFerme(new Date())) return;
+  let actives = await alertesActives();
+  let precedent: number | null = null;
+  for (let i = 0; i < 5 && actives.length; i++) {
+    if (i) await new Promise((r) => setTimeout(r, 10000));
+    const prix = await prixDirect();
+    if (prix === null) continue;
+    // Entre deux relevés le prix est passé par tous les niveaux intermédiaires.
+    const bas = Math.min(prix, precedent ?? prix), haut = Math.max(prix, precedent ?? prix);
+    precedent = prix;
+    for (const a of actives) if (haut >= Number(a.bas) && bas <= Number(a.haut)) await declencher(a, prix);
+    if (i === 2) actives = await alertesActives(); // prend en compte les alertes créées entre-temps
+    else actives = actives.filter((a) => !(haut >= Number(a.bas) && bas <= Number(a.haut)));
+  }
+}
+
+async function alertesPrix() {
+  const actives = await alertesActives();
   if (!actives.length || marcheFerme(new Date())) return;
   // Pas de trade en cours (bougies pas encore téléchargées) : une vérification toutes les 3 min.
   if (!bougiesDuPassage && new Date().getUTCMinutes() % 3 !== 0) return;
@@ -260,19 +307,8 @@ async function alertesPrix() {
     // Bougies depuis la création (minute de création incluse) ou la dernière vérification.
     const depuis = Math.max(Date.parse(a.cree_le), a.derniere_verif ? Date.parse(a.derniere_verif) : 0);
     const utiles = bougies.filter((b) => b.debut + 60000 > depuis);
-    const touchee = utiles.some((b) => b.haut >= bas && b.bas <= haut);
-    if (!touchee) {
-      await db.from("alertes_prix").update({ derniere_verif: maintenant }).eq("id", a.id);
-      continue;
-    }
-    const zone = bas === haut ? `Prix ${px(bas)}` : `Zone ${px(bas)} – ${px(haut)}`;
-    const venue = a.prix_creation ? (Number(a.prix_creation) > haut ? " par le haut" : Number(a.prix_creation) < bas ? " par le bas" : "") : "";
-    // Marquée AVANT l'envoi : jamais deux notifications pour la même alerte.
-    const { data: maj } = await db.from("alertes_prix").update({ touchee_le: maintenant, derniere_verif: maintenant, prix_touche: dernier.cloture })
-      .eq("id", a.id).is("touchee_le", null).select("id");
-    if (!maj?.length) continue;
-    await envoyer(`🎯 ${zone} touché${bas === haut ? "" : "e"}`, `L'or y est arrivé${venue} — il est à ${px(dernier.cloture)} maintenant.${a.note ? ` (${a.note})` : ""}`,
-      { url: "./index.html#alertes", tag: `alerte-${a.id}`, compteId: a.compte_id });
+    if (utiles.some((b) => b.haut >= bas && b.bas <= haut)) await declencher(a, dernier.cloture);
+    else await db.from("alertes_prix").update({ derniere_verif: maintenant }).eq("id", a.id);
   }
   // Alertes touchées gardées 7 jours dans la liste, puis effacées.
   await db.from("alertes_prix").delete().lt("touchee_le", new Date(Date.now() - 7 * 86400000).toISOString());
@@ -289,6 +325,10 @@ Deno.serve(async (req) => {
   }
   const resultat: Record<string, string> = {};
   bougiesDuPassage = null;
+  // Relevés « en direct » en arrière-plan : la réponse part tout de suite (l'horloge attend 25 s max).
+  const direct = alertesPrixDirect().catch((e) => console.error("alertes direct", e));
+  // deno-lint-ignore no-explicit-any
+  (globalThis as any).EdgeRuntime?.waitUntil(direct);
   for (const [nom, tache] of [["annonces", alertesAnnonces], ["trades", suiviTrades], ["alertes_prix", alertesPrix]] as const) {
     try { await tache(); resultat[nom] = "ok"; } catch (e) { resultat[nom] = String(e); console.error(nom, e); }
   }

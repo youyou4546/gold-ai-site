@@ -4,7 +4,7 @@
 // - L'alerte est enregistrée sur ton profil (supabase/patch_alertes_prix.sql).
 // - Supabase (fonction « verifications », chaque minute) regarde les bougies
 //   1 min de l'or et t'envoie une notification quand le prix touche le niveau
-//   ou entre dans la zone — même app et PC fermés. Une seule fois par alerte.
+//   ou entre dans la zone (relevé toutes les 10 s) — même app et PC fermés.
 // - Ici on affiche le prix en direct et la distance à chaque alerte.
 // Règle « touché » : js/noyau.js › alerteTouchee (identique côté Supabase).
 (() => {
@@ -104,7 +104,7 @@
   function texteDistance(a, prix) {
     if (prix === null) return "";
     const d = N.distanceAlerte(a, prix);
-    if (d.position === "dedans") return "l'or y est (notification sous 3 min)";
+    if (d.position === "dedans") return "l'or y est (notification dans quelques secondes)";
     return `à ${px(d.distance)} ${d.position === "dessus" ? "en dessous" : "au-dessus"}`;
   }
 
