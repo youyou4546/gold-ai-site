@@ -1,4 +1,4 @@
-// Gold AI — Journal › Mes comptes TradeLocker : solde, équité, résultat du
+// Gold AI — Profil › Mes comptes TradeLocker : solde, équité, résultat du
 // jour et trades ouverts (avec leur P&L en direct) de TOUS tes comptes
 // TradeLocker, lus par la fonction Supabase « tradelocker »
 // (supabase/functions/tradelocker, table supabase/patch_comptes_tradelocker.sql).
@@ -16,7 +16,7 @@
   let minuterie = null;
   let enCours = false;
 
-  const ouverte = () => !$("journal-tradelocker")?.classList.contains("hidden");
+  const ouverte = () => !$("profil-tradelocker")?.classList.contains("hidden");
 
   // ---------------------------------------------------------------- Appels
 
@@ -156,8 +156,8 @@
   // ---------------------------------------------------------------- Cycle de vie
 
   function ouvrir() {
-    ["journal-accueil", "journal-calendrier", "journal-performance", "journal-alertes"].forEach((id) => $(id)?.classList.add("hidden"));
-    $("journal-tradelocker").classList.remove("hidden");
+    ["profil-accueil", "profil-parametres", "profil-comptes", "profil-mon-compte"].forEach((id) => $(id)?.classList.add("hidden"));
+    $("profil-tradelocker").classList.remove("hidden");
     message("");
     afficher();
     charger();
@@ -167,8 +167,8 @@
 
   function fermer() {
     clearInterval(minuterie);
-    $("journal-tradelocker").classList.add("hidden");
-    $("journal-accueil").classList.remove("hidden");
+    $("profil-tradelocker").classList.add("hidden");
+    $("profil-accueil").classList.remove("hidden");
   }
 
   function viderCache() {

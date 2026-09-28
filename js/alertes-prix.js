@@ -149,7 +149,6 @@
     $("journal-accueil").classList.add("hidden");
     $("journal-calendrier")?.classList.add("hidden");
     $("journal-performance")?.classList.add("hidden");
-    $("journal-tradelocker")?.classList.add("hidden");
     $("journal-alertes").classList.remove("hidden");
     message("");
     afficherPrix();
