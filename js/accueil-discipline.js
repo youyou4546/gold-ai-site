@@ -97,6 +97,7 @@
     const aujourdhui = window.GoldAI.gardeFou?.cleAujourdhui?.() || U.cleJour(Date.now());
     // Toujours tous les trades (un ancien choix de compte est ignoré).
     const p = N.progressionObjectif(trades, { ...(reglages.objectif || {}), compteId: "" }, aujourdhui);
+    window.GoldAI.dernierObjectif = p; // repris par le briefing vocal (js/briefing.js)
     const nomCompte = "";
     const m = (v) => U.montant(v, "USD");
     zone.className = `bloc-objectif${p.atteint ? " atteint" : ""}`;

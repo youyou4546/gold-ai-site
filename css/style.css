@@ -1773,3 +1773,14 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .bloc-challenge .positif { color: var(--vert); }
 .form-regles-challenge .ligne-champs { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 .form-regles-challenge .bouton { width: 100%; }
+
+/* ---------- Analyse › Briefing du jour (voix) ---------- */
+.carte-briefing { margin-top: 16px; }
+.entete-briefing { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.boutons-briefing { display: flex; gap: 10px; margin: 10px 0; }
+.boutons-briefing .bouton { margin: 0; }
+.boutons-briefing #briefing-play { flex: 1; }
+.boutons-briefing #briefing-stop { width: auto; flex: 0 0 auto; }
+.texte-briefing { margin: 8px 0 0; padding-left: 20px; font-size: 14px; line-height: 1.55; }
+.texte-briefing li { padding: 2px 4px; border-radius: 6px; transition: background 0.2s; }
+.texte-briefing li.en-cours { background: var(--fond-carte-survol); color: var(--accent); }

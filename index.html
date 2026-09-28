@@ -131,6 +131,24 @@
         </p>
         <div class="zone-upload-desactivee">📷 Envoi de capture désactivé pour l'instant</div>
       </div>
+
+      <!-- Briefing du jour lu à voix haute (js/briefing.js) — voix gratuite du téléphone -->
+      <div class="carte carte-briefing">
+        <div class="entete-briefing">
+          <strong>🎙️ Briefing du jour</strong>
+          <span class="texte-attenue petit" id="briefing-maj"></span>
+        </div>
+        <p class="texte-attenue petit">L'or, le dollar, les annonces du jour, les actualités et ta journée, lus à voix haute.</p>
+        <div class="boutons-briefing">
+          <button type="button" class="bouton" id="briefing-play">▶️ Écouter le briefing</button>
+          <button type="button" class="bouton secondaire hidden" id="briefing-stop" aria-label="Arrêter la lecture">⏹ Stop</button>
+        </div>
+        <details class="texte-briefing-replie">
+          <summary class="texte-attenue petit">Voir le texte</summary>
+          <ol class="texte-briefing" id="briefing-texte"></ol>
+        </details>
+        <p class="texte-attenue petit" id="briefing-voix"></p>
+      </div>
     </section>
 
     <!-- ============ SECTION 4 : JOURNAL DE TRADING ============ -->
@@ -605,6 +623,7 @@
 <script src="js/comptes-tradelocker.js"></script>
 <script src="js/journal-performance.js"></script>
 <script src="js/challenge-comptes.js"></script>
+<script src="js/briefing.js"></script>
 <script src="js/parametres.js"></script>
 <script src="js/profil-comptes.js"></script>
 <script src="js/profil-mon-compte.js"></script>
