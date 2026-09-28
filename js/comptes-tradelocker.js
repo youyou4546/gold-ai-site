@@ -84,7 +84,7 @@
         </li>`;
       }
       return `<li>
-        <span><strong>${esc(surnom || c.nom)}</strong>${surnom ? `<br><span class="texte-attenue petit">${esc(c.nom)}</span>` : ""}</span>
+        <span><strong>${esc(surnom || c.nom)}</strong></span>
         <button type="button" class="bouton secondaire bouton-petit" data-renommer="${esc(c.cle)}">✏️ Renommer</button>
       </li>`;
     }).join("");
@@ -152,7 +152,7 @@
     const surnom = surnoms[cle];
     return `
       <li>
-        <span><strong>${esc(surnom || origine)}</strong>${surnom ? `<br><span class="texte-attenue petit">${esc(origine)}</span>` : ""}
+        <span><strong>${esc(surnom || origine)}</strong>
           ${c.statut && c.statut !== "ACTIVE" ? ` <span class="statut-compte-tl">${esc(c.statut)}</span>` : ""}</span>
         <span class="solde-compte-tl">${argent(c.solde, c.devise)}</span>
       </li>`;
