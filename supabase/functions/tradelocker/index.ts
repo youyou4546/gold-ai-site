@@ -103,7 +103,9 @@ Deno.serve(async (req) => {
       const comptes = [];
       for (const c of (data || []) as Connexion[]) {
         try {
-          for (const a of (await comptesDuLogin(c)).comptes) comptes.push({ cle: `${c.environnement}|${a.id}`, nom: `${String(a.name || "Compte")} #${a.accNum}` });
+          for (const a of (await comptesDuLogin(c)).comptes) {
+            comptes.push({ cle: `${c.environnement}|${a.id}`, nom: `${String(a.name || "Compte")} #${a.accNum}`, solde: nb(a.accountBalance), devise: String(a.currency || "USD") });
+          }
         } catch (e) { console.error("comptes", c.id, String(e)); }
       }
       return repondre({ comptes });

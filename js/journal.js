@@ -461,5 +461,9 @@
   window.GoldAI = window.GoldAI || {};
   window.GoldAI.journal = { afficherMoisCourant, viderCache, chargerTousLesTrades, obtenirTradesBruts, memoriserTrade,
     filtrerParCompte, afficherSelecteurCompte, changerFiltreCompte, lireFiltreMemorise,
-    oublierComptesRelies: () => { comptesRelies = null; } };
+    oublierComptesRelies: () => { comptesRelies = null; },
+    filtreActuel: () => filtreCompte,
+    // Comptes reliés avec leur solde (rechargés à la demande : le solde change).
+    comptesReliesAJour: async () => { comptesRelies = null; await chargerComptesRelies(); return comptesRelies || []; },
+    surnomDe: (cle) => surnoms[cle] || null };
 })();

@@ -797,6 +797,43 @@
       && Number(t.resultat) - (Number(t.frais) || 0) > 0);
   }
 
+  /**
+   * Suivi d'un compte de prop firm (Journal › Performance) à partir de son solde.
+   * regles = { depart, perteMax, objectif, suiveuse, plusHaut } (montants en $).
+   * - Perte max fixe : niveau de rupture = départ − perte max.
+   * - Perte max « suiveuse » (ex. Nova) : le niveau suit le plus haut atteint
+   *   (moins la perte max) et se bloque au départ.
+   * Même logique que l'écran « Max loss / Profit target » des prop firms.
+   */
+  function etatChallenge(regles, solde) {
+    const depart = Number(regles?.depart), perteMax = Number(regles?.perteMax), objectif = Number(regles?.objectif);
+    if (!(depart > 0) || !Number.isFinite(solde)) return null;
+    const r2 = (x) => Math.round(x * 100) / 100;
+    const res = { solde, depart };
+    if (perteMax > 0) {
+      const plusHaut = Math.max(depart, Number(regles.plusHaut) || 0, solde);
+      const niveau = regles.suiveuse ? Math.min(plusHaut - perteMax, depart) : depart - perteMax;
+      const reference = niveau + perteMax;
+      res.perte = {
+        limite: perteMax, niveau: r2(niveau), plusHaut: r2(plusHaut),
+        perdu: r2(Math.max(0, reference - solde)),
+        marge: r2(solde - niveau),
+        pourcentage: Math.max(0, Math.min(100, ((reference - solde) / perteMax) * 100)),
+        depassee: solde <= niveau,
+      };
+    }
+    if (objectif > 0) {
+      const profit = solde - depart;
+      res.objectif = {
+        montant: objectif, niveau: r2(depart + objectif), profit: r2(profit),
+        restant: r2(Math.max(0, objectif - profit)),
+        pourcentage: Math.max(0, Math.min(100, (profit / objectif) * 100)),
+        atteint: profit >= objectif,
+      };
+    }
+    return res;
+  }
+
   // =====================================================================
   // 9. OBJECTIF DE PROFIT (jour / semaine / mois) et PROCHAINE ANNONCE
   // =====================================================================
@@ -938,7 +975,7 @@
     calculerPosition, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
     ema, atr, calculerTendance, separerBougies,
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
-    scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou, aUnTradeGagnant,
+    scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou, aUnTradeGagnant, etatChallenge,
     OBJECTIF_PAR_DEFAUT, debutPeriode, progressionObjectif, prochaineAnnonceDuJour,
     slCourant, evaluerTouches, pnlEstime, alerteTouchee, distanceAlerte, situationCompte, LIBELLE_TF, LIBELLES_SPEC,
   };

@@ -403,3 +403,20 @@ test("arrêt après le premier trade gagnant : profit net > 0 $ seulement", () =
   assert.equal(N.aUnTradeGagnant([{ resultat: null }, { resultat: "" }]), false);    // pas encore de résultat
   assert.equal(N.aUnTradeGagnant([{ resultat: "250" }]), true);
 });
+
+test("challenge prop firm : perte max fixe / suiveuse et objectif (exemple Top One 100k)", () => {
+  // Capture Top One : départ 100 001, perte max 6 000,06, solde 98 492,74.
+  const fixe = N.etatChallenge({ depart: 100001, perteMax: 6000.06, objectif: 5000.05 }, 98492.74);
+  assert.equal(fixe.perte.perdu, 1508.26);
+  assert.equal(fixe.perte.niveau, 94000.94);
+  assert.equal(fixe.objectif.profit, -1508.26);
+  assert.equal(fixe.objectif.niveau, 105001.05);
+  assert.equal(fixe.objectif.restant, 6508.31);
+  // Suiveuse : monte avec le plus haut, bloquée au départ.
+  const s1 = N.etatChallenge({ depart: 100000, perteMax: 5000, suiveuse: true, plusHaut: 102000 }, 101000);
+  assert.equal(s1.perte.niveau, 97000);
+  assert.equal(s1.perte.perdu, 1000);
+  const s2 = N.etatChallenge({ depart: 100000, perteMax: 5000, suiveuse: true, plusHaut: 108000 }, 107000);
+  assert.equal(s2.perte.niveau, 100000); // bloqué au départ
+  assert.equal(N.etatChallenge({ depart: 0 }, 100), null);
+});

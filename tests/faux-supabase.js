@@ -87,7 +87,7 @@
             ecrire("banc_tl", [...cx, { id: crypto.randomUUID(), email: body.email, serveur: body.serveur, environnement: body.environnement }]);
             return { data: { ok: true }, error: null };
           }
-          if (body.action === "comptes") return { data: { comptes: cx.flatMap(() => [{ cle: "live|1", nom: "NOVA 50K #1" }, { cle: "live|2", nom: "NOVA 50K (copie) #2" }]) }, error: null };
+          if (body.action === "comptes") return { data: { comptes: cx.flatMap(() => [{ cle: "live|1", nom: "NOVA 100K #1", solde: 98492.74, devise: "USD" }, { cle: "live|2", nom: "NOVA 50K (copie) #2", solde: 50880, devise: "USD" }]) }, error: null };
           if (body.action === "supprimer") { ecrire("banc_tl", cx.filter((c) => c.id !== body.id)); return { data: { ok: true }, error: null }; }
           const alea = () => Math.round((Math.random() - 0.4) * 30000) / 100;
           return { data: { lu_le: new Date().toISOString(), importes24h: 3, connexions: cx.map((c) => ({ ...c, comptes: [

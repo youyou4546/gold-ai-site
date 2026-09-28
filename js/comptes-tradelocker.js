@@ -145,40 +145,17 @@
   const argent = (v, devise, signe = false) => (v === null || v === undefined ? "—" : U.montant(v, devise || "USD", { signe }));
   const classe = (v) => (v > 0 ? "positif" : v < 0 ? "negatif" : "");
 
-  function carteCompte(c, env) {
-    const d = c.devise;
-    const positions = c.positions || [];
+  // Une ligne par compte : son nom (ou le nom choisi dans l'app) et son solde actuel.
+  function ligneCompte(c, env) {
     const cle = `${env}|${c.id}`;
     const origine = `${c.nom || "Compte"} #${c.accNum}`;
     const surnom = surnoms[cle];
-    const entete = `
-        <div class="entete-compte-tl">
-          <span>
-            <strong>${esc(surnom || c.nom || "Compte")}</strong>
-            ${surnom ? `<br><span class="texte-attenue petit">${esc(origine)}</span>` : ` <span class="texte-attenue">#${esc(c.accNum)}</span>`}
-          </span>
-          ${c.statut && c.statut !== "ACTIVE" ? `<span class="statut-compte-tl">${esc(c.statut)}</span>` : ""}
-        </div>`;
     return `
-      <div class="carte compte-tl">
-        ${entete}
-        ${c.erreur ? `<p class="alerte-donnees">${esc(c.erreur)}${c.detail ? `<br><span class="petit texte-attenue">Raison technique : ${esc(c.detail)}</span>` : ""}</p>` : ""}
-        <div class="chiffres-trade">
-          <div><span class="lib">Solde</span><span class="val">${argent(c.solde, d)}</span></div>
-          <div><span class="lib">Équité</span><span class="val">${argent(c.equite, d)}</span></div>
-          <div><span class="lib">Résultat du jour${c.jourTrades !== null && c.jourTrades !== undefined ? ` · ${c.jourTrades} trade${c.jourTrades > 1 ? "s" : ""}` : ""}</span><span class="val ${classe(c.jourNet)}">${argent(c.jourNet, d, true)}</span></div>
-          <div><span class="lib">En cours (trades ouverts)</span><span class="val ${classe(c.ouvertNet)}">${argent(c.ouvertNet, d, true)}</span></div>
-        </div>
-        ${positions.length ? `
-          <ul class="positions-tl">
-            ${positions.map((p) => `
-              <li>
-                <span>${p.sens === "sell" ? "🔻" : "🔺"} <strong>${esc(p.symbole)}</strong> ${p.sens === "sell" ? "Vente" : "Achat"} ${U.nombre(p.lots, 2)} lot</span>
-                <span class="texte-attenue">entrée ${p.prixEntree ?? "—"}</span>
-                <span class="${classe(p.pnl)}">${argent(p.pnl, d, true)}</span>
-              </li>`).join("")}
-          </ul>` : c.erreur ? "" : `<p class="texte-attenue petit">Aucun trade ouvert.</p>`}
-      </div>`;
+      <li>
+        <span><strong>${esc(surnom || origine)}</strong>${surnom ? `<br><span class="texte-attenue petit">${esc(origine)}</span>` : ""}
+          ${c.statut && c.statut !== "ACTIVE" ? ` <span class="statut-compte-tl">${esc(c.statut)}</span>` : ""}</span>
+        <span class="solde-compte-tl">${argent(c.solde, c.devise)}</span>
+      </li>`;
   }
 
   function afficher() {
@@ -189,22 +166,18 @@
 
     const connexions = donnees.connexions || [];
     if (!connexions.length) {
-      zone.innerHTML = `<div class="carte"><strong>Aucun compte connecté</strong><p class="texte-attenue petit">Ajoute ta connexion TradeLocker ci-dessous pour voir tous tes comptes ici : solde, résultat du jour et trades ouverts.</p></div>`;
+      zone.innerHTML = `<div class="carte"><strong>Aucun compte connecté</strong><p class="texte-attenue petit">Ajoute ta connexion TradeLocker ci-dessous pour voir le solde de tous tes comptes ici.</p></div>`;
       $("carte-ajout-tradelocker").open = true;
       return;
     }
 
-    // Totaux (seulement si tous les comptes sont dans la même devise).
-    const comptes = connexions.flatMap((c) => c.comptes || []).filter((c) => !c.erreur);
+    // Solde total (seulement si tous les comptes sont dans la même devise).
+    const comptes = connexions.flatMap((c) => c.comptes || []).filter((c) => c.solde !== null && c.solde !== undefined);
     const devises = [...new Set(comptes.map((c) => c.devise))];
-    const somme = (cle) => comptes.reduce((s, c) => s + (Number(c[cle]) || 0), 0);
-    const totaux = comptes.length > 1 && devises.length === 1 ? `
-      <div class="carte">
-        <strong>Tous mes comptes (${comptes.length})</strong>
-        <div class="chiffres-trade">
-          <div><span class="lib">Résultat du jour</span><span class="val ${classe(somme("jourNet"))}">${argent(somme("jourNet"), devises[0], true)}</span></div>
-          <div><span class="lib">En cours</span><span class="val ${classe(somme("ouvertNet"))}">${argent(somme("ouvertNet"), devises[0], true)}</span></div>
-        </div>
+    const total = devises.length === 1 ? `
+      <div class="carte solde-total-tl">
+        <span class="lib">Solde total${comptes.length > 1 ? ` · ${comptes.length} comptes` : ""}</span>
+        <span class="val">${argent(comptes.reduce((t, c) => t + Number(c.solde), 0), devises[0])}</span>
       </div>` : "";
 
     zone.innerHTML = `
@@ -213,7 +186,7 @@
       <p class="texte-attenue petit">🔄 Tes trades fermés arrivent tout seuls dans le <strong>Journal</strong> (toutes les 5 min), modifiables comme les autres.
         ${donnees.importes24h ? `<strong>${donnees.importes24h}</strong> importé${donnees.importes24h > 1 ? "s" : ""} ces dernières 24 h.` : ""}
         Profit calculé sans commissions ni swap.</p>
-      ${totaux}
+      ${total}
       ${connexions.map((cx) => `
         <div class="groupe-connexion-tl">
           <div class="entete-connexion-tl">
@@ -228,7 +201,7 @@
             </div>
           </div>
           ${cx.erreur ? `<p class="alerte-donnees">${esc(cx.erreur)}</p>` : ""}
-          ${(cx.comptes || []).map((c) => carteCompte(c, cx.environnement)).join("")}
+          ${(cx.comptes || []).length ? `<ul class="carte liste-soldes-tl">${cx.comptes.map((c) => ligneCompte(c, cx.environnement)).join("")}</ul>` : ""}
         </div>`).join("")}`;
   }
 
