@@ -70,6 +70,12 @@
 
   // ------------------------------------------------------------------ Actualités
 
+  // Badge or d'une actualité : neutre tant qu'elle n'est pas confirmée.
+  function biaisActualite(n) {
+    const dir = n.interpretation?.direction_or;
+    return n.statut === "confirmé" || n.statut === "en développement" ? ({ haussier: "haussier", baissier: "baissier" }[dir] || "neutre") : "neutre";
+  }
+
   // Carte compacte commune (actualité ou annonce) : lisible en 2 secondes.
   // Ligne du haut : heure + impact. Puis le nom, UNE ligne d'explication, et
   // le gros badge or à droite. Le détail (chiffres, raisonnement,
@@ -102,8 +108,7 @@
   function carteActualite(n, maintenant) {
     const titre = n.titre_fr || n.titre_original;
     const imp = { haute: "high", moyenne: "medium", faible: "low" }[n.importance] || "low";
-    const dir = n.interpretation?.direction_or;
-    const biais = n.statut === "confirmé" || n.statut === "en développement" ? ({ haussier: "haussier", baissier: "baissier" }[dir] || "neutre") : "neutre";
+    const biais = biaisActualite(n);
     const liens = n.articles.map((a) => `<li><a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">${esc(a.source)}</a>${a.officiel ? " (officiel)" : ""} · ${U.heure(a.publie_le)}</li>`).join("");
     const detail = `
       ${n.resume_fr ? `<p><span class="etiquette-mini">Faits</span> ${esc(n.resume_fr)}</p>` : ""}
@@ -180,6 +185,7 @@
     // --- Actualités urgentes
     const actus = (jeuActus?.contenu?.evenements || [])
       .filter((n) => filtrerActualite(n, maintenant))
+      .filter((n) => biaisActualite(n) !== "neutre") // seulement ce qui a un effet clair sur l'or
       .map((n) => ({ n, p: N.scorePriorite({ ...n, type: "actualite" }, maintenant).score }))
       .sort((a, b) => b.p - a.p || Date.parse(b.n.publie_le) - Date.parse(a.n.publie_le));
     const visibles = voirPlusActus ? actus : actus.slice(0, 5);
@@ -192,7 +198,8 @@
     // --- Calendrier
     const evs = evenementsCalendrier().filter((e) => filtrerEvenement(e, maintenant));
     const msDe = (e) => (e.horodatage_utc ? Date.parse(e.horodatage_utc) : Date.parse(`${e.date_utc}T00:00:00Z`));
-    const aVenir = evs.filter((e) => msDe(e) > maintenant)
+    // Les annonces « Neutre » (sans effet clair sur l'or) ne sont pas affichées.
+    const aVenir = evs.filter((e) => msDe(e) > maintenant && N.biaisAnnonceOr(e, trouverExplication(e.titre)).biais !== "neutre")
       .sort((a, b) => {
         // Les 24 prochaines heures classées par priorité, le reste par date.
         const pa = msDe(a) - maintenant < 24 * 3600000, pb = msDe(b) - maintenant < 24 * 3600000;
