@@ -49,6 +49,8 @@
       const n = {}; lire("banc_images", []).forEach((i) => { n[i.trade_id] = (n[i.trade_id] || 0) + 1; });
       return Object.entries(n).map(([trade_id, nombre]) => ({ trade_id, nombre }));
     },
+    definir_mon_trade_en_cours: (p) => { if (localStorage.banc_patch_absent === "1") return absent(); ecrire("banc_trade_en_cours", p.p_contenu); return null; },
+    obtenir_mon_trade_en_cours: () => (localStorage.banc_patch_absent === "1" ? absent() : lire("banc_trade_en_cours", null)),
     lire_donnees: () => absent(),
     obtenir_cle_cotations: () => localStorage.banc_cle_td || null,
     enregistrer_analyse: (p) => { const l = lire("banc_analyses", []); l.unshift({ ...p, cree_le: new Date().toISOString(), actif: p.p_actif, horizon: p.p_horizon, direction: p.p_direction, confiance: p.p_confiance, prix_reference: p.p_prix_reference }); ecrire("banc_analyses", l); return "id"; },

@@ -13,6 +13,7 @@
   let lectureCourante = null;   // résultat brut de lireSignal (ambiguïtés, lignes ignorées)
   let repartitionForcee = null; // répartition au prorata choisie pour CE calcul uniquement
   let taux = null;              // { taux, horodatageMs, source, manuel }
+  let dernierCalcul = null;     // { r, reglages } du dernier calcul réussi (boutons « Enregistrer » / « J'entre »)
 
   function champ(id, label, valeur, { type = "number", manquant = false, options = null } = {}) {
     const classe = manquant ? "champ a-preciser" : "champ";
@@ -123,6 +124,11 @@
         </div>
       </div>
 
+      <div class="actions-calcul">
+        <button type="button" class="bouton" id="calc-entrer">▶ J'entre</button>
+        <button type="button" class="bouton secondaire" id="calc-enregistrer">📓 Enregistrer ce trade</button>
+      </div>
+
       ${r.contientTpOuvert ? afficherPlanSlRunner(signalCourant, reglages) : ""}
 
       ${r.avertissements.length ? `<div class="carte">${r.avertissements.map((a) => `<div class="alerte-donnees">${esc(a)}</div>`).join("")}</div>` : ""}
@@ -197,6 +203,7 @@
     }
 
     const r = N.calculerPosition(signalCourant, reglages, tauxUtilise);
+    dernierCalcul = r.ok ? { r, reglages, signal: { ...signalCourant } } : null;
     zoneResultat.innerHTML = r.ok ? afficherResultat(r, reglages, spec) : afficherBlocage(r, reglages, spec);
     // Trades restants + compte à rebours de la prochaine annonce, avec le résultat.
     window.GoldAI.discipline?.afficher();
@@ -223,6 +230,18 @@
         const liste = document.getElementById("sig-liste-tps");
         const n = liste.querySelectorAll("input").length;
         liste.insertAdjacentHTML("beforeend", champ(`sig-tp-${n}`, `TP${n + 1}`, null));
+      } else if (t.id === "calc-entrer" && dernierCalcul) {
+        // Suivi en direct + notifications TP / SL (js/trade-en-cours.js).
+        await window.GoldAI.tradeEnCours.entrer(dernierCalcul.signal, dernierCalcul.r, dernierCalcul.reglages);
+      } else if (t.id === "calc-enregistrer" && dernierCalcul) {
+        // Fiche du Journal déjà remplie avec l'entrée et le plan du signal.
+        const s = dernierCalcul.signal;
+        const aujourdhui = window.GoldAI.gardeFou?.cleAujourdhui?.() || window.GoldAI.utils.cleJour(Date.now());
+        window.GoldAI.ficheTrade.ouvrir(null, aujourdhui, {
+          prixEntree: s.entree,
+          note: `${s.sens === "SELL" ? "Vente" : "Achat"} · entrée ${s.entree} · SL ${s.sl} · ${s.tps.map((x) => `TP${x.numero} ${x.prix}`).join(" · ")}
+`,
+        });
       } else if (t.id === "aller-general") {
         window.GoldAI.app.allerA("profil");
         document.getElementById("bouton-ouvrir-parametres").click();

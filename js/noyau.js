@@ -833,6 +833,55 @@
       .sort((a, b) => a.ms - b.ms)[0] || null;
   }
 
+  // =====================================================================
+  // 10. TRADE EN COURS (suivi après « J'entre »)
+  // =====================================================================
+  //
+  // trade = { sens, entree, sl, tps:[{numero, prix}], plan:[{apres:"TP1", sl}],
+  //           portions:[{objectif, type, prix, lot}], valeurPoint, touches:["TP1"…],
+  //           slTouche }
+  // valeurPoint = gain/perte pour 1 lot quand le prix bouge de 1,00 (devise du compte).
+  // Le SL suit le plan de Profil › Général : après TPk touché → plan[k-1].sl.
+  // La logique est recopiée côté PC dans site/suivre_trades.py (notifications).
+
+  function slCourant(trade) {
+    let sl = trade.sl;
+    (trade.plan || []).forEach((p) => { if ((trade.touches || []).includes(p.apres)) sl = p.sl; });
+    return sl;
+  }
+
+  /** Nouveaux niveaux touchés entre `haut` et `bas` (prix extrêmes observés). */
+  function evaluerTouches(trade, haut, bas) {
+    const vente = trade.sens === "SELL";
+    const touches = [...(trade.touches || [])];
+    const nouveauxTps = [];
+    const slAvant = slCourant(trade);
+    // SL vérifié avec le niveau en place AVANT cette période (un TP touché
+    // dans la même minute ne protège pas rétroactivement).
+    const slTouche = !trade.slTouche && (vente ? haut >= slAvant : bas <= slAvant);
+    (trade.tps || []).forEach((tp) => {
+      const nom = `TP${tp.numero}`;
+      if (touches.includes(nom)) return;
+      if (vente ? bas <= tp.prix : haut >= tp.prix) { touches.push(nom); nouveauxTps.push(nom); }
+    });
+    const suivant = { ...trade, touches, slTouche: trade.slTouche || slTouche };
+    const tousTps = (trade.tps || []).length > 0 && (trade.tps || []).every((tp) => touches.includes(`TP${tp.numero}`));
+    const aRunner = (trade.portions || []).some((p) => p.type !== "tp");
+    suivant.statut = suivant.slTouche ? "sl" : tousTps && !aRunner ? "termine" : "ouvert";
+    return { trade: suivant, nouveauxTps, slTouche, slApres: slCourant(suivant), slAvant };
+  }
+
+  /** Gain / perte estimé : portions des TP touchés clôturées à leur TP, le reste au prix actuel. */
+  function pnlEstime(trade, prix) {
+    const dir = trade.sens === "SELL" ? -1 : 1;
+    const touches = trade.touches || [];
+    const total = (trade.portions || []).reduce((s, p) => {
+      const sortie = p.type === "tp" && touches.includes(p.objectif) ? p.prix : prix;
+      return s + (sortie - trade.entree) * dir * p.lot * trade.valeurPoint;
+    }, 0);
+    return Math.round(total * 100) / 100;
+  }
+
   const LIBELLE_TF = { "30min": "30 min", "1h": "1 h", "4h": "4 h", "1week": "1W" };
 
   const api = {
@@ -841,7 +890,8 @@
     ema, atr, calculerTendance, separerBougies,
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
     scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou,
-    OBJECTIF_PAR_DEFAUT, debutPeriode, progressionObjectif, prochaineAnnonceDuJour, LIBELLE_TF, LIBELLES_SPEC,
+    OBJECTIF_PAR_DEFAUT, debutPeriode, progressionObjectif, prochaineAnnonceDuJour,
+    slCourant, evaluerTouches, pnlEstime, LIBELLE_TF, LIBELLES_SPEC,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

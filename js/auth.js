@@ -67,6 +67,8 @@ window.GoldAI = window.GoldAI || {};
     window.GoldAI.cotations?.demarrer();
     // Garde-fou du jour : bandeau en haut + blocage du calculateur (js/garde-fou.js).
     window.GoldAI.gardeFou?.demarrer();
+    // Trade en cours (bouton « J'entre ») : carte de suivi dans le Calculateur.
+    window.GoldAI.tradeEnCours?.demarrer();
     // Marché est l'onglet par défaut : charge ses données dès l'affichage de
     // l'app, comme si on venait de cliquer dessus (les autres onglets se
     // chargent à la demande, au clic — voir app.js).
@@ -89,6 +91,7 @@ window.GoldAI = window.GoldAI || {};
     window.GoldAI.reglagesCalculateur?.viderCache();
     window.GoldAI.impact?.viderCache();
     window.GoldAI.gardeFou?.viderCache();
+    window.GoldAI.tradeEnCours?.viderCache();
     reinitialiserSousVues();
     if (message) {
       document.getElementById("erreur-connexion").textContent = message;
@@ -209,6 +212,7 @@ window.GoldAI = window.GoldAI || {};
     window.GoldAI.reglagesCalculateur?.viderCache();
     window.GoldAI.impact?.viderCache();
     window.GoldAI.gardeFou?.viderCache();
+    window.GoldAI.tradeEnCours?.viderCache();
     reinitialiserSousVues();
     document.getElementById("nom-utilisateur").value = "";
     document.getElementById("code-utilisateur").value = "";

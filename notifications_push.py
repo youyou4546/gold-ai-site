@@ -70,7 +70,10 @@ def creer_cles_si_absentes():
     return cle_publique()
 
 
-def lister_abonnements():
+def lister_abonnements(compte_id=None):
+    """Tous les téléphones abonnés, ou seulement ceux d'un utilisateur (compte_id)."""
+    if compte_id:
+        return _rpc("lister_abonnements_push_compte", {"p_compte_id": compte_id}) or []
     return _rpc("lister_abonnements_push", {}) or []
 
 
@@ -78,20 +81,21 @@ def retirer_abonnement(endpoint):
     _rpc("retirer_abonnement_push", {"p_endpoint": endpoint})
 
 
-def envoyer_a_tous(titre, texte, url="./index.html#calendrier", etiquette=None):
-    """Envoie la notification à tous les téléphones abonnés. Renvoie (envoyés, échecs)."""
+def envoyer_a_tous(titre, texte, url="./index.html#calendrier", etiquette=None, compte_id=None):
+    """Envoie la notification à tous les téléphones abonnés (ou à ceux de
+    `compte_id` seulement). Renvoie (envoyés, échecs)."""
     from pywebpush import WebPushException, webpush
 
     envoyes, echecs = 0, 0
     charge = json.dumps({"titre": titre, "texte": texte, "url": url, "tag": etiquette}, ensure_ascii=False)
-    for ab in lister_abonnements():
+    for ab in lister_abonnements(compte_id):
         try:
             webpush(
                 subscription_info={"endpoint": ab["endpoint"], "keys": {"p256dh": ab["p256dh"], "auth": ab["auth"]}},
                 data=charge,
                 vapid_private_key=str(CLE_PRIVEE),
                 vapid_claims={"sub": CONTACT},
-                ttl=15 * 60,  # inutile de livrer une alerte d'annonce après l'annonce
+                ttl=15 * 60,  # une alerte vieille de plus de 15 min ne sert plus à rien
             )
             envoyes += 1
         except WebPushException as e:

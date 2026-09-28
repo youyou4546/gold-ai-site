@@ -67,8 +67,13 @@
       ? "📷 Ajouter d'autres images" : "📷 Ajouter une ou plusieurs images";
   }
 
-  async function ouvrir(trade, date) {
+  let apresEnregistrement = null; // action à faire une fois le trade enregistré (ex. arrêter le suivi)
+
+  // `prerempli` (nouveau trade seulement) : { prixEntree, prixSortie, resultat, note }
+  // venant du calculateur ou du trade en cours.
+  async function ouvrir(trade, date, prerempli = null, apres = null) {
     tradeOuvert = trade || null;
+    apresEnregistrement = apres;
     dateFiche = trade ? trade.date : date;
     imagesExistantes = [];
     imagesASupprimer = new Set();
@@ -80,11 +85,12 @@
     $("fiche-date").textContent = new Date(a, m - 1, j).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
     const val = (x) => (x === null || x === undefined ? "" : String(x));
-    $("fiche-entree").value = val(trade?.prixEntree);
-    $("fiche-sortie").value = val(trade?.prixSortie);
-    $("fiche-resultat").value = val(trade?.resultat);
+    const source = trade || prerempli || {};
+    $("fiche-entree").value = val(source.prixEntree);
+    $("fiche-sortie").value = val(source.prixSortie);
+    $("fiche-resultat").value = val(source.resultat);
     $("fiche-frais").value = val(trade?.frais);
-    $("fiche-notes").value = trade?.note || "";
+    $("fiche-notes").value = source.note || "";
 
     afficherGalerie();
     $("modale-fiche-trade").classList.add("visible");
@@ -103,6 +109,7 @@
   function fermer() {
     $("modale-fiche-trade").classList.remove("visible");
     tradeOuvert = null;
+    apresEnregistrement = null;
   }
 
   function nombreOuNull(id) {
@@ -178,6 +185,7 @@
         : imagesExistantes.filter((i) => !imagesASupprimer.has(i.id)).length + imagesNouvelles.length - echecsImages;
 
       await window.GoldAI.journal.memoriserTrade(trade);
+      if (apresEnregistrement) { try { await apresEnregistrement(trade); } catch { /* sans effet sur l'enregistrement */ } }
       if (patchAbsent) {
         alert("Trade enregistré, mais sans prix, RR ni images : le patch Supabase (patch_journal_detaille.sql) n'est pas encore installé.");
       } else if (echecsImages) {

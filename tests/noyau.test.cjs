@@ -330,3 +330,34 @@ test("prochaine annonce à impact élevé du jour", () => {
   assert.equal(N.prochaineAnnonceDuJour(evs, maintenant, jourDe).e.id, "a");
   assert.equal(N.prochaineAnnonceDuJour(evs, Date.parse("2026-09-30T19:00:00Z"), jourDe), null);
 });
+
+test("trade en cours : TP touchés, SL qui suit le plan, gain estimé", () => {
+  const trade = {
+    sens: "SELL", entree: 4335, sl: 4339,
+    tps: [{ numero: 1, prix: 4329 }, { numero: 2, prix: 4320 }],
+    plan: [{ apres: "TP1", sl: 4335 }, { apres: "TP2", sl: 4329 }],
+    portions: [{ objectif: "TP1", type: "tp", prix: 4329, lot: 1 }, { objectif: "TP2", type: "tp", prix: 4320, lot: 1 }, { objectif: "TP ouvert", type: "ouvert", prix: null, lot: 1 }],
+    valeurPoint: 100, touches: [], slTouche: false,
+  };
+  assert.equal(N.slCourant(trade), 4339);
+  assert.equal(N.pnlEstime(trade, 4333), 600); // 3 lots × 2 points × 100
+  // Le prix descend à 4328 : TP1 touché, SL → entrée.
+  let r = N.evaluerTouches(trade, 4334, 4328);
+  assert.deepEqual(r.nouveauxTps, ["TP1"]);
+  assert.equal(r.slTouche, false);
+  assert.equal(r.slApres, 4335);
+  assert.equal(r.trade.statut, "ouvert");
+  // Gain estimé à 4330 : TP1 fermé à 4329 (+600), 2 lots à 4330 (+1000).
+  assert.equal(N.pnlEstime(r.trade, 4330), 1600);
+  // Remontée à 4335 : SL (breakeven) touché.
+  r = N.evaluerTouches(r.trade, 4335, 4331);
+  assert.equal(r.slTouche, true);
+  assert.equal(r.trade.statut, "sl");
+  // Pas de runner : tous les TP touchés → terminé.
+  const sansRunner = { ...trade, portions: trade.portions.slice(0, 2) };
+  assert.equal(N.evaluerTouches(sansRunner, 4330, 4319).trade.statut, "termine");
+  // Achat : sens inversé.
+  const achat = { ...trade, sens: "BUY", entree: 4300, sl: 4295, tps: [{ numero: 1, prix: 4310 }], plan: [{ apres: "TP1", sl: 4300 }], touches: [] };
+  assert.deepEqual(N.evaluerTouches(achat, 4311, 4299).nouveauxTps, ["TP1"]);
+  assert.equal(N.evaluerTouches(achat, 4305, 4294).slTouche, true);
+});
