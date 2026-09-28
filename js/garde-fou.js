@@ -68,10 +68,8 @@
   function afficherBandeau() {
     const zone = $("garde-fou");
     if (!zone || !etat) return;
-    const morceaux = [
-      `${etat.nb} trade${etat.nb > 1 ? "s" : ""}${etat.maxTrades ? ` sur ${etat.maxTrades}` : ""}`,
-      `<span class="${etat.net > 0 ? "positif" : etat.net < 0 ? "negatif" : ""}">${dollars(etat.net, true)}</span>`,
-    ];
+    // Le résultat en $ n'est pas répété ici : il est affiché juste dessous, dans l'objectif.
+    const morceaux = [`${etat.nb} trade${etat.nb > 1 ? "s" : ""}${etat.maxTrades ? ` sur ${etat.maxTrades}` : ""}`];
     if (etat.resteAvantLimite !== null) morceaux.push(`reste ${dollars(etat.resteAvantLimite)} avant ta limite`);
     const principale = etat.alertes[0];
     zone.className = `garde-fou ${etat.niveau}`;

@@ -96,7 +96,7 @@
     const trades = Object.values(parJour).flat();
     const aujourdhui = window.GoldAI.gardeFou?.cleAujourdhui?.() || U.cleJour(Date.now());
     const p = N.progressionObjectif(trades, reglages.objectif, aujourdhui);
-    let nomCompte = "tous mes comptes";
+    let nomCompte = ""; // « tous mes comptes » : rien d'affiché
     if (p.compteId) {
       const c = (await window.GoldAI.comptesTrading.chargerComptes()).find((x) => x.id === p.compteId);
       nomCompte = c ? c.nom : "compte supprimé";
@@ -106,13 +106,12 @@
     zone.hidden = false;
     zone.innerHTML = `
       <div class="entete-objectif">
-        <span>🎯 Objectif ${LIBELLE_PERIODE[p.periode] || ""} <span class="texte-attenue petit">· ${esc(nomCompte)}</span></span>
+        <span>🎯 Objectif ${LIBELLE_PERIODE[p.periode] || ""}${nomCompte ? ` <span class="texte-attenue petit">· ${esc(nomCompte)}</span>` : ""}${p.atteint ? ` <span class="objectif-atteint">✅ atteint</span>` : ""}</span>
         <strong class="${p.realise < 0 ? "negatif" : ""}">${m(p.realise)} / ${m(p.montant)}</strong>
       </div>
       <div class="barre-objectif" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(p.pourcentage)}">
         <div class="remplissage-objectif" style="width:${p.pourcentage}%"></div>
-      </div>
-      <div class="pied-objectif">${p.atteint ? "✅ Objectif atteint" : p.realise < 0 ? "En négatif sur la période" : `${Math.round(p.pourcentage)} % — encore ${m(p.montant - p.realise)}`}</div>`;
+      </div>`;
   }
 
   // ---------------------------------------------------------------- Réglage (Profil › Général)
