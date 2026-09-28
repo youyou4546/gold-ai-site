@@ -93,7 +93,7 @@
   }
 
   function rendu({ analyse, cotation, tendances, prochaine, recente, actualites, maintenant }) {
-    const lignesTf = ["30min", "1h", "4h", "1week"].map((tf) => {
+    const lignesTf = ["30min", "1h", "4h"].map((tf) => {
       const t = tendances[tf] || {};
       const etat = t.perimee ? "données anciennes" : (t.etat || "insuffisant");
       const ic = { haussier: "▲", baissier: "▼", neutre: "■" }[etat] || "?";
@@ -144,7 +144,7 @@
         <h2 class="titre-bloc-annonces">🧭 Tendance de l'or</h2>
         <span class="badge-or ${badge[0]}">${esc(badge[1])}</span>
       </div>
-      <div class="rangee-tf">${["30min", "1h", "4h", "1week"].map(puceTf).join("")}</div>
+      <div class="rangee-tf">${["30min", "1h", "4h"].map(puceTf).join("")}</div>
       <p class="ligne-annonce">Confiance ${esc(analyse.confiance)} · horizon ${esc(analyse.horizon)}${prochaine ? ` · annonce ${esc(prochaine.titre)} ${U.compteARebours(prochaine.horodatage_utc, maintenant) || ""}` : ""}</p>
       <details class="details-discrets" id="details-impact"><summary>Voir le détail</summary>
       ${analyse.raisonInsuffisance ? `<div class="alerte-donnees">${esc(analyse.raisonInsuffisance)}</div>` : ""}
