@@ -145,6 +145,8 @@
       compteTradingId: trade.compte_trading_id || null,
       compteTl: trade.compte_tl || null,           // compte TradeLocker (trades importés)
       compteTlNom: trade.compte_tl_nom || null,
+      ouvertLe: trade.ouvert_le || null,           // heure d'ouverture du signal (trades importés)
+      sens: trade.sens || null,
       instrument: trade.instrument || null,
       frais: trade.frais === null || trade.frais === undefined ? null : Number(trade.frais),
       prixEntree: trade.prix_entree === null || trade.prix_entree === undefined ? null : Number(trade.prix_entree),

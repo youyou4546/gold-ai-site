@@ -420,3 +420,13 @@ test("challenge prop firm : perte max fixe / suiveuse et objectif (exemple Top O
   assert.equal(s2.perte.niveau, 100000); // bloqué au départ
   assert.equal(N.etatChallenge({ depart: 0 }, 100), null);
 });
+
+test("garde-fou : un signal copié sur 2 comptes compte pour 1 trade", () => {
+  const imp = (compte, min, resultat) => ({ resultat, instrument: "XAUUSD", sens: "sell", compteTl: compte, ouvertLe: `2026-09-28T14:0${min}:00Z` });
+  const trades = [imp("live|2", 0, 120), imp("live|3", 1, 118), imp("live|2", 5, -60), imp("live|3", 5, -61), { resultat: 40 }];
+  assert.equal(N.regrouperSignaux(trades).length, 3);          // 2 signaux copiés + 1 trade à la main
+  const g = N.evaluerGardeFou({ trades, regles: { maxTrades: 3, pertesArret: 2 } });
+  assert.equal(g.nb, 3);
+  assert.equal(g.pertes, 1);                                    // la perte copiée sur 2 comptes = 1 perte
+  assert.equal(g.niveau, "bloque");                             // 3 sur 3
+});

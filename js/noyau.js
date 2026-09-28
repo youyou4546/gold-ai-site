@@ -752,10 +752,31 @@
   //   la limite de perte consommée) · "bloque" (rouge : règle atteinte).
   // Le niveau global est le plus grave ; "bloque" arrête le calculateur.
 
+  /**
+   * Regroupe les trades en SIGNAUX : un même signal copié sur plusieurs comptes
+   * (trades importés de TradeLocker : même instrument, même sens, ouverts à
+   * moins de 2 min d'écart) ne compte qu'une fois. Un trade saisi à la main =
+   * un signal. Renvoie [{ trades, net }].
+   */
+  function regrouperSignaux(trades = [], ecartMs = 2 * 60000) {
+    const net = (t) => Number(t.resultat) - (Number(t.frais) || 0);
+    const groupes = [];
+    const avecHeure = trades.filter((t) => t.ouvertLe).sort((a, b) => Date.parse(a.ouvertLe) - Date.parse(b.ouvertLe));
+    for (const t of avecHeure) {
+      const debut = Date.parse(t.ouvertLe);
+      const g = groupes.find((x) => x.instrument === (t.instrument || "") && x.sens === (t.sens || "") && debut - x.debut <= ecartMs);
+      if (g) g.trades.push(t); else groupes.push({ instrument: t.instrument || "", sens: t.sens || "", debut, trades: [t] });
+    }
+    trades.filter((t) => !t.ouvertLe).forEach((t) => groupes.push({ trades: [t] }));
+    return groupes.map((g) => ({ trades: g.trades, net: Math.round(g.trades.reduce((s, t) => s + net(t), 0) * 100) / 100 }));
+  }
+
   function evaluerGardeFou({ trades = [], regles = {}, limitePerte = null } = {}) {
     const net = Math.round(trades.reduce((s, t) => s + Number(t.resultat) - (Number(t.frais) || 0), 0) * 100) / 100;
-    const nb = trades.length;
-    const pertes = trades.filter((t) => Number(t.resultat) - (Number(t.frais) || 0) < 0).length;
+    // Un signal = 1 trade, même s'il a plusieurs TP ou a été copié sur plusieurs comptes.
+    const signaux = regrouperSignaux(trades);
+    const nb = signaux.length;
+    const pertes = signaux.filter((s) => s.net < 0).length;
     const regle = (v) => (v === null || v === undefined || v === "" || !(Number(v) > 0) ? null : Number(v));
     const maxTrades = regle(regles.maxTrades), pertesArret = regle(regles.pertesArret), seuilGain = regle(regles.seuilGain);
     const limite = regle(limitePerte);
@@ -975,7 +996,7 @@
     calculerPosition, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
     ema, atr, calculerTendance, separerBougies,
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
-    scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou, aUnTradeGagnant, etatChallenge,
+    scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou, regrouperSignaux, aUnTradeGagnant, etatChallenge,
     OBJECTIF_PAR_DEFAUT, debutPeriode, progressionObjectif, prochaineAnnonceDuJour,
     slCourant, evaluerTouches, pnlEstime, alerteTouchee, distanceAlerte, situationCompte, LIBELLE_TF, LIBELLES_SPEC,
   };
