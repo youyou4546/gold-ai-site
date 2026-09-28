@@ -1571,3 +1571,21 @@ h2.titre-section { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; t
   font-size: 13.5px;
   line-height: 1.45;
 }
+
+/* ---------- Notifications d'annonces ---------- */
+.ligne-notifications { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ligne-notifications .bouton { width: auto; flex-shrink: 0; margin: 0; }
+.proposition-notifications {
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: var(--rayon);
+  border: 1px dashed var(--accent);
+  background: rgba(34, 211, 238, 0.08);
+  color: var(--texte);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.proposition-notifications strong { color: var(--accent); }

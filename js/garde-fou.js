@@ -8,12 +8,12 @@
 //    plusieurs comptes). Calcul : js/noyau.js › evaluerGardeFou.
 // 2. Blocage du calculateur quand une règle est atteinte (« Journée terminée »).
 // 3. Alerte dans le calculateur si une annonce USD à fort impact tombe dans
-//    les 15 prochaines minutes.
+//    les 30 prochaines minutes.
 (() => {
   const N = window.GoldAI.noyau;
   const U = window.GoldAI.utils;
   const { esc } = U;
-  const FENETRE_ANNONCE_MS = 15 * 60000;
+  const FENETRE_ANNONCE_MS = 30 * 60000;
 
   let regles = null;     // { maxTrades, pertesArret, seuilGain }
   let limite = null;     // { montant, nomCompte } ou null

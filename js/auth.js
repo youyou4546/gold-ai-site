@@ -70,7 +70,8 @@ window.GoldAI = window.GoldAI || {};
     // Marché est l'onglet par défaut : charge ses données dès l'affichage de
     // l'app, comme si on venait de cliquer dessus (les autres onglets se
     // chargent à la demande, au clic — voir app.js).
-    window.GoldAI.app?.allerA("marche");
+    // Ouverture depuis une notification d'annonce : adresse "…#calendrier".
+    window.GoldAI.app?.allerA(location.hash === "#calendrier" ? "calendrier" : "marche");
   }
 
   // Appelé par journal.js si une opération renvoie SESSION_INVALIDE

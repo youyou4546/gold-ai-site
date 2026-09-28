@@ -10,7 +10,7 @@
 //  - Bibliothèques du CDN (Supabase, Chart.js) : cache d'abord (versions figées).
 //
 // Change ce numéro à chaque mise à jour pour nettoyer les anciens caches.
-const VERSION = "goldai-v20";
+const VERSION = "goldai-v21";
 
 const FICHIERS_A_METTRE_EN_CACHE = [
   "./",
@@ -33,6 +33,7 @@ const FICHIERS_A_METTRE_EN_CACHE = [
   "./js/journal.js",
   "./js/journal-fiche.js",
   "./js/garde-fou.js",
+  "./js/notifications.js",
   "./js/journal-performance.js",
   "./js/parametres.js",
   "./js/profil-comptes.js",
@@ -92,5 +93,39 @@ self.addEventListener("fetch", (evenement) => {
         return reponse;
       })
       .catch(() => caches.match(requete, { ignoreSearch: true }))
+  );
+});
+
+// ---------------------------------------------------------------- Notifications
+// Envoyées par le PC (site/notifier_annonces.py) ~15 min avant une annonce
+// USD à fort impact. Affichées même quand l'app est fermée.
+self.addEventListener("push", (evenement) => {
+  let d = {};
+  try { d = evenement.data ? evenement.data.json() : {}; } catch { d = { texte: evenement.data?.text() }; }
+  evenement.waitUntil(
+    self.registration.showNotification(d.titre || "Trading Tool", {
+      body: d.texte || "",
+      icon: "icons/icon-192.png",
+      badge: "icons/icon-192.png",
+      tag: d.tag || undefined,
+      data: { url: d.url || "./index.html#calendrier" },
+      vibrate: [200, 100, 200],
+    })
+  );
+});
+
+// Toucher la notification ouvre l'app sur la page Annonces.
+self.addEventListener("notificationclick", (evenement) => {
+  evenement.notification.close();
+  const url = new URL(evenement.notification.data?.url || "./index.html#calendrier", self.location.href).href;
+  evenement.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((fenetres) => {
+      const ouverte = fenetres.find((f) => f.url.startsWith(self.registration.scope));
+      if (ouverte) {
+        ouverte.postMessage({ type: "aller", section: "calendrier" });
+        return ouverte.focus();
+      }
+      return self.clients.openWindow(url);
+    })
   );
 });

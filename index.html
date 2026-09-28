@@ -82,6 +82,7 @@
     <section class="section" id="section-calendrier">
       <h2 class="titre-section">Annonces</h2>
 
+      <button type="button" class="proposition-notifications hidden" id="proposition-notifications">🔔 Être prévenu 15 min avant les annonces fortes, même app fermée — <strong>Activer</strong></button>
       <div class="barre-filtres" id="filtres-annonces" role="group" aria-label="Filtres">
         <button type="button" class="puce-filtre" data-filtre="tout" aria-pressed="true">Tout</button>
         <button type="button" class="puce-filtre" data-filtre="urgent" aria-pressed="false">⚡ Urgent</button>
@@ -213,6 +214,16 @@
           <div class="nom-connecte" id="nom-utilisateur-affiche"></div>
           <p class="sous-titre-ecran" style="margin-bottom:20px;">Connecté sur cet appareil</p>
           <button class="bouton danger" id="bouton-deconnexion">Déconnexion</button>
+        </div>
+
+        <div class="carte carte-notifications" id="carte-notifications">
+          <div class="ligne-notifications">
+            <div>
+              <strong>🔔 Notifications d'annonces</strong>
+              <div class="petit texte-attenue" id="etat-notifications">…</div>
+            </div>
+            <button class="bouton bouton-petit hidden" id="bouton-notifications"></button>
+          </div>
         </div>
 
         <div class="grille-tuiles-profil">
@@ -516,6 +527,7 @@
 <script src="js/journal.js"></script>
 <script src="js/journal-fiche.js"></script>
 <script src="js/garde-fou.js"></script>
+<script src="js/notifications.js"></script>
 <script src="js/journal-performance.js"></script>
 <script src="js/parametres.js"></script>
 <script src="js/profil-comptes.js"></script>

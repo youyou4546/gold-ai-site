@@ -20,6 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cible === "calculateur") {
       window.GoldAI?.gardeFou?.afficherAlerteAnnonce();
     }
+    if (cible === "profil" || cible === "calendrier") {
+      window.GoldAI?.notifications?.rafraichir();
+    }
     if (cible === "profil" && window.GoldAI?.profilCompte?.charger) {
       window.GoldAI.profilCompte.charger();
     }
@@ -30,6 +33,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   onglets.forEach((onglet) => {
     onglet.addEventListener("click", () => allerA(onglet.dataset.section));
+  });
+
+  // Toucher une notification d'annonce (app déjà ouverte) → page Annonces.
+  navigator.serviceWorker?.addEventListener("message", (e) => {
+    if (e.data?.type === "aller" && window.GoldAI.auth?.getToken()) allerA(e.data.section);
   });
 
   window.GoldAI = window.GoldAI || {};
