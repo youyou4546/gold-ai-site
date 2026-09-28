@@ -787,6 +787,52 @@
       aucuneRegle: maxTrades === null && pertesArret === null && seuilGain === null && limite === null };
   }
 
+  // =====================================================================
+  // 9. OBJECTIF DE PROFIT (jour / semaine / mois) et PROCHAINE ANNONCE
+  // =====================================================================
+
+  const OBJECTIF_PAR_DEFAUT = { montant: 100, periode: "jour", compteId: "" };
+
+  /** Début de la période ("AAAA-MM-JJ") contenant `jour` : jour même, lundi de la semaine, 1er du mois. */
+  function debutPeriode(jour, periode) {
+    const [a, m, j] = jour.split("-").map(Number);
+    const d = new Date(Date.UTC(a, m - 1, j));
+    if (periode === "semaine") d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+    else if (periode === "mois") d.setUTCDate(1);
+    return d.toISOString().slice(0, 10);
+  }
+
+  /**
+   * Réalisé = somme des résultats nets (frais déduits) des trades de la
+   * période en cours, filtrés sur un compte si `objectif.compteId` est rempli.
+   * `aujourdhui` : "AAAA-MM-JJ" dans le fuseau de l'utilisateur.
+   */
+  function progressionObjectif(trades, objectif, aujourdhui) {
+    const o = { ...OBJECTIF_PAR_DEFAUT, ...(objectif || {}) };
+    const montant = Number(o.montant) > 0 ? Number(o.montant) : OBJECTIF_PAR_DEFAUT.montant;
+    const debut = debutPeriode(aujourdhui, o.periode);
+    const retenus = (trades || []).filter((t) => t.date >= debut && t.date <= aujourdhui && (!o.compteId || t.compteTradingId === o.compteId));
+    const realise = Math.round(retenus.reduce((s, t) => s + Number(t.resultat) - (Number(t.frais) || 0), 0) * 100) / 100;
+    return {
+      montant, periode: o.periode, compteId: o.compteId, debut, realise, nbTrades: retenus.length,
+      pourcentage: Math.max(0, Math.min(100, (realise / montant) * 100)),
+      atteint: realise >= montant,
+    };
+  }
+
+  /**
+   * Prochaine annonce à impact élevé du même jour (fuseau de l'utilisateur),
+   * pas encore publiée. `jourDe(ms)` renvoie "AAAA-MM-JJ" dans ce fuseau.
+   */
+  function prochaineAnnonceDuJour(evenements, maintenantMs, jourDe) {
+    const aujourdhui = jourDe(maintenantMs);
+    return (evenements || [])
+      .filter((e) => e.impact === "high" && e.horodatage_utc)
+      .map((e) => ({ e, ms: Date.parse(e.horodatage_utc) }))
+      .filter(({ ms }) => ms > maintenantMs && jourDe(ms) === aujourdhui)
+      .sort((a, b) => a.ms - b.ms)[0] || null;
+  }
+
   const LIBELLE_TF = { "30min": "30 min", "1h": "1 h", "4h": "4 h", "1week": "1W" };
 
   const api = {
@@ -794,7 +840,8 @@
     calculerPosition, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
     ema, atr, calculerTendance, separerBougies,
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
-    scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou, LIBELLE_TF, LIBELLES_SPEC,
+    scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou,
+    OBJECTIF_PAR_DEFAUT, debutPeriode, progressionObjectif, prochaineAnnonceDuJour, LIBELLE_TF, LIBELLES_SPEC,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

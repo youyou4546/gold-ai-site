@@ -291,3 +291,42 @@ test("garde-fou du jour", () => {
   assert.equal(g.niveau, "ok");
   assert.equal(g.aucuneRegle, true);
 });
+
+test("objectif de profit : périodes, frais, compte", () => {
+  assert.equal(N.debutPeriode("2026-09-30", "jour"), "2026-09-30");
+  assert.equal(N.debutPeriode("2026-09-30", "semaine"), "2026-09-28"); // mercredi → lundi
+  assert.equal(N.debutPeriode("2026-09-28", "semaine"), "2026-09-28"); // lundi
+  assert.equal(N.debutPeriode("2026-10-04", "semaine"), "2026-09-28"); // dimanche → lundi précédent
+  assert.equal(N.debutPeriode("2026-09-30", "mois"), "2026-09-01");
+  const trades = [
+    { date: "2026-09-30", resultat: 80, frais: 20, compteTradingId: "a" },
+    { date: "2026-09-29", resultat: 50, frais: 0, compteTradingId: "b" },
+    { date: "2026-09-10", resultat: 200, frais: 0, compteTradingId: "a" },
+    { date: "2026-08-31", resultat: 999, frais: 0, compteTradingId: "a" },
+  ];
+  let p = N.progressionObjectif(trades, null, "2026-09-30"); // défaut : 100 $ / jour
+  assert.equal(p.realise, 60);
+  assert.equal(p.montant, 100);
+  assert.equal(p.atteint, false);
+  assert.equal(Math.round(p.pourcentage), 60);
+  assert.equal(N.progressionObjectif(trades, { montant: 100, periode: "semaine" }, "2026-09-30").realise, 110);
+  p = N.progressionObjectif(trades, { montant: 250, periode: "mois", compteId: "a" }, "2026-09-30");
+  assert.equal(p.realise, 260);
+  assert.equal(p.atteint, true);
+  assert.equal(p.pourcentage, 100);
+  assert.equal(N.progressionObjectif([{ date: "2026-09-30", resultat: -40 }], null, "2026-09-30").pourcentage, 0);
+});
+
+test("prochaine annonce à impact élevé du jour", () => {
+  const jourDe = (ms) => new Date(ms).toISOString().slice(0, 10); // fuseau UTC pour le test
+  const maintenant = Date.parse("2026-09-30T12:00:00Z");
+  const evs = [
+    { id: "passee", impact: "high", horodatage_utc: "2026-09-30T11:00:00Z" },
+    { id: "moyenne", impact: "medium", horodatage_utc: "2026-09-30T12:30:00Z" },
+    { id: "b", impact: "high", horodatage_utc: "2026-09-30T18:00:00Z" },
+    { id: "a", impact: "high", horodatage_utc: "2026-09-30T14:00:00Z" },
+    { id: "demain", impact: "high", horodatage_utc: "2026-10-01T08:00:00Z" },
+  ];
+  assert.equal(N.prochaineAnnonceDuJour(evs, maintenant, jourDe).e.id, "a");
+  assert.equal(N.prochaineAnnonceDuJour(evs, Date.parse("2026-09-30T19:00:00Z"), jourDe), null);
+});

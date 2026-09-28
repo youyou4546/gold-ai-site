@@ -74,6 +74,14 @@
     <!-- ============ SECTION : SUIVI DU MARCHÉ ============ -->
     <section class="section actif" id="section-marche">
       <h2 class="titre-section">Marché</h2>
+
+      <!-- Bloc Discipline (js/accueil-discipline.js) -->
+      <div class="bloc-discipline" id="bloc-discipline">
+        <div class="tuile-discipline" id="tuile-trades-restants"><span class="libelle-tuile">Trades restants</span><span class="valeur-tuile">…</span></div>
+        <button type="button" class="tuile-discipline tuile-annonce" id="tuile-prochaine-annonce" aria-label="Prochaine annonce importante — ouvrir les annonces"><span class="libelle-tuile">Prochaine annonce</span><span class="valeur-tuile">…</span></button>
+      </div>
+      <div class="carte bloc-objectif" id="bloc-objectif"><p class="etat-vide petit">Objectif…</p></div>
+
       <p class="petit" id="date-marche"></p>
       <div id="liste-actifs-marche"></div>
     </section>
@@ -280,6 +288,30 @@
       <!-- Vue Paramètres -->
       <div id="profil-parametres" class="hidden">
         <button type="button" class="bouton-retour" id="bouton-retour-parametres"><span aria-hidden="true">←</span> Retour</button>
+
+        <div class="carte" id="carte-objectif">
+          <h3 class="titre-bloc">🎯 Objectif de profit</h3>
+          <div class="ligne-champs">
+            <div class="champ">
+              <label for="objectif-montant">Montant ($)</label>
+              <input type="number" id="objectif-montant" inputmode="decimal" min="1" step="any" placeholder="100" />
+            </div>
+            <div class="champ">
+              <label for="objectif-periode">Période</label>
+              <select id="objectif-periode">
+                <option value="jour">Par jour</option>
+                <option value="semaine">Par semaine</option>
+                <option value="mois">Par mois</option>
+              </select>
+            </div>
+          </div>
+          <div class="champ">
+            <label for="objectif-compte">Compte concerné</label>
+            <select id="objectif-compte"><option value="">Tous mes comptes combinés</option></select>
+          </div>
+          <p class="aide" id="aide-objectif-compte"></p>
+          <p class="message-succes" id="message-objectif"></p>
+        </div>
 
         <div class="carte">
           <h3 class="titre-bloc">Paramètres du calculateur</h3>
@@ -528,6 +560,7 @@
 <script src="js/journal-fiche.js"></script>
 <script src="js/garde-fou.js"></script>
 <script src="js/notifications.js"></script>
+<script src="js/accueil-discipline.js"></script>
 <script src="js/journal-performance.js"></script>
 <script src="js/parametres.js"></script>
 <script src="js/profil-comptes.js"></script>

@@ -1589,3 +1589,40 @@ h2.titre-section { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; t
   cursor: pointer;
 }
 .proposition-notifications strong { color: var(--accent); }
+
+/* ---------- Accueil : bloc Discipline + objectif ---------- */
+.bloc-discipline { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-bottom: 10px; }
+.tuile-discipline {
+  display: flex; flex-direction: column; gap: 3px; min-width: 0;
+  padding: 12px 14px;
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  color: var(--texte);
+  font: inherit;
+  text-align: left;
+}
+button.tuile-discipline { cursor: pointer; }
+button.tuile-discipline:active { background: var(--fond-carte-survol); }
+.libelle-tuile { font-size: 11.5px; color: var(--texte-attenue); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.valeur-tuile { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.sous-tuile { font-size: 12px; color: var(--texte-attenue); }
+.nom-annonce-tuile { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vide-annonce { font-size: 13px; color: var(--texte); padding: 6px 0; }
+.badge-impact-mini { font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 6px; background: var(--rouge-fond); color: var(--rouge); }
+.tuile-discipline.orange { border-color: var(--orange); background: rgba(255, 180, 84, 0.12); }
+.tuile-discipline.orange .valeur-tuile { color: var(--orange); }
+.tuile-discipline.rouge { border-color: var(--rouge); background: var(--rouge-fond); }
+.tuile-discipline.rouge .valeur-tuile { color: var(--rouge); }
+
+.bloc-objectif { margin-bottom: 14px; }
+.entete-objectif { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 14px; margin-bottom: 8px; }
+.entete-objectif strong { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.entete-objectif .negatif { color: var(--rouge); }
+.barre-objectif { height: 10px; border-radius: 999px; background: var(--fond); border: 1px solid var(--bordure); overflow: hidden; }
+.remplissage-objectif { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.4s ease; }
+.pied-objectif { font-size: 12px; color: var(--texte-attenue); margin-top: 6px; }
+.bloc-objectif.atteint { border-color: var(--vert); background: var(--vert-fond); }
+.bloc-objectif.atteint .remplissage-objectif { background: var(--vert); }
+.bloc-objectif.atteint .pied-objectif { color: var(--vert); font-weight: 700; }
+@media (max-width: 360px) { .bloc-discipline { grid-template-columns: 1fr; } }

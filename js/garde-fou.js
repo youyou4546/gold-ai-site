@@ -53,6 +53,7 @@
       etat = N.evaluerGardeFou({ trades: parJour[jourCalcule] || [], regles, limitePerte: limite?.montant ?? null });
       afficherBandeau();
       afficherBlocageCalculateur();
+      window.dispatchEvent(new CustomEvent("goldai:garde-fou", { detail: etat })); // bloc Discipline de l'accueil
       return etat;
     })();
     chargement = tache;
@@ -158,5 +159,5 @@
   window.addEventListener("goldai:donnees", () => { if ($("section-calculateur")?.classList.contains("actif")) afficherAlerteAnnonce(); });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.gardeFou = { demarrer, viderCache, recalculer, calculAutorise, afficherAlerteAnnonce, annonceProche };
+  window.GoldAI.gardeFou = { demarrer, viderCache, recalculer, calculAutorise, afficherAlerteAnnonce, annonceProche, etat: () => etat, cleAujourdhui };
 })();
