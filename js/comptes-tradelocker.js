@@ -68,12 +68,14 @@
     bouton.textContent = "Connecter";
     if (r?.erreur) return message(r.erreur);
     $("formulaire-tradelocker").reset();
+    window.GoldAI.journal.oublierComptesRelies?.();
     $("carte-ajout-tradelocker").open = false;
     await charger();
   }
 
   async function supprimer(id) {
     await appeler("supprimer", { id });
+    window.GoldAI.journal.oublierComptesRelies?.();
     await charger();
   }
 

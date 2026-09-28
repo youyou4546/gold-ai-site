@@ -50,15 +50,28 @@
     try { filtreCompte = localStorage.getItem(cleFiltre()) || "tous"; } catch { filtreCompte = "tous"; }
   }
 
+  // Comptes TradeLocker reliés (Profil › Mes comptes TradeLocker), chargés une fois par session.
+  let comptesRelies = null;
+  let chargementRelies = null;
+  function chargerComptesRelies() {
+    if (comptesRelies || chargementRelies) return chargementRelies;
+    chargementRelies = window.GoldAI.auth.client.functions
+      .invoke("tradelocker", { body: { token: token(), action: "comptes" } })
+      .then(({ data }) => { comptesRelies = data?.comptes || []; })
+      .catch(() => { comptesRelies = []; })
+      .finally(() => { chargementRelies = null; });
+    return chargementRelies;
+  }
+
   function comptesDisponibles() {
-    const noms = new Map();
+    const noms = new Map((comptesRelies || []).map((c) => [c.cle, c.nom]));
     let manuels = false;
     (cacheTradesBruts || []).forEach((t) => {
       if (t.compteTl) noms.set(t.compteTl, t.compteTlNom || "Compte TradeLocker");
       else manuels = true;
     });
     const liste = [...noms].map(([cle, nom]) => ({ cle, nom })).sort((a, b) => a.nom.localeCompare(b.nom));
-    if (manuels && liste.length) liste.push({ cle: "manuel", nom: "Trades ajoutés à la main" });
+    if (manuels) liste.push({ cle: "manuel", nom: "Trades ajoutés à la main" });
     return liste;
   }
 
@@ -67,20 +80,25 @@
     return (trades || []).filter((t) => (filtreCompte === "manuel" ? !t.compteTl : t.compteTl === filtreCompte));
   }
 
-  // Menu « Compte » (masqué tant qu'il n'y a qu'une seule source de trades).
+  // Menu « Compte » (toujours affiché) : tous les comptes, chaque compte TradeLocker
+  // relié (même sans trade encore), et les trades ajoutés à la main.
   function afficherSelecteurCompte(idZone) {
     const zone = document.getElementById(idZone);
     if (!zone) return;
-    const comptes = comptesDisponibles();
-    if (filtreCompte !== "tous" && !comptes.some((c) => c.cle === filtreCompte)) filtreCompte = "tous";
-    zone.classList.toggle("hidden", comptes.length < 2);
-    if (comptes.length < 2) { zone.innerHTML = ""; return; }
-    const esc = window.GoldAI.utils.esc;
-    zone.innerHTML = `<label for="${idZone}-choix">Compte</label>
-      <select id="${idZone}-choix">
-        <option value="tous">Tous les comptes</option>
-        ${comptes.map((c) => `<option value="${esc(c.cle)}" ${c.cle === filtreCompte ? "selected" : ""}>${esc(c.nom)}</option>`).join("")}
-      </select>`;
+    const dessiner = () => {
+      const comptes = comptesDisponibles();
+      if (comptesRelies && filtreCompte !== "tous" && !comptes.some((c) => c.cle === filtreCompte)) filtreCompte = "tous";
+      const esc = window.GoldAI.utils.esc;
+      zone.classList.remove("hidden");
+      zone.innerHTML = `<label for="${idZone}-choix">Compte</label>
+        <select id="${idZone}-choix">
+          <option value="tous">Tous les comptes</option>
+          ${comptes.map((c) => `<option value="${esc(c.cle)}" ${c.cle === filtreCompte ? "selected" : ""}>${esc(c.nom)}</option>`).join("")}
+        </select>
+        ${comptesRelies && !comptesRelies.length ? `<p class="texte-attenue petit">Relie tes comptes dans Profil › Mes comptes TradeLocker pour les choisir ici.</p>` : ""}`;
+    };
+    dessiner();
+    if (!comptesRelies) chargerComptesRelies()?.then(dessiner);
   }
 
   function changerFiltreCompte(valeur) {
@@ -159,6 +177,7 @@
     cacheTrades = null;
     cacheTradesBruts = null;
     filtreCompte = "tous";
+    comptesRelies = null;
     document.getElementById("journal-calendrier")?.classList.add("hidden");
     document.getElementById("journal-performance")?.classList.add("hidden");
     document.getElementById("journal-alertes")?.classList.add("hidden");
@@ -435,5 +454,6 @@
 
   window.GoldAI = window.GoldAI || {};
   window.GoldAI.journal = { afficherMoisCourant, viderCache, chargerTousLesTrades, obtenirTradesBruts, memoriserTrade,
-    filtrerParCompte, afficherSelecteurCompte, changerFiltreCompte, lireFiltreMemorise };
+    filtrerParCompte, afficherSelecteurCompte, changerFiltreCompte, lireFiltreMemorise,
+    oublierComptesRelies: () => { comptesRelies = null; } };
 })();

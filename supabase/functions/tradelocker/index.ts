@@ -8,6 +8,7 @@
 //                  (_shared/import-tradelocker.ts), puis pour chaque connexion
 //                  tous les comptes TradeLocker (solde, équité, résultat du jour,
 //                  trades ouverts avec leur P&L).
+//  - "comptes"   : liste légère des comptes reliés (menu « Compte » du Journal).
 //  - "supprimer" : oublie une connexion (et son mot de passe chiffré).
 // LECTURE SEULE : aucune route d'ordre n'est appelée ici.
 // Routes TradeLocker : les mêmes que la bibliothèque officielle « tradelocker » (Python).
@@ -94,6 +95,18 @@ Deno.serve(async (req) => {
       }, { onConflict: "compte_id,environnement,email,serveur" });
       if (error) throw error;
       return repondre({ ok: true });
+    }
+
+    // Liste légère des comptes reliés (menu « Compte » du Calendrier et de la Performance).
+    if (corps.action === "comptes") {
+      const { data } = await db.from("comptes_tradelocker").select("*").eq("compte_id", compteId).order("cree_le");
+      const comptes = [];
+      for (const c of (data || []) as Connexion[]) {
+        try {
+          for (const a of (await comptesDuLogin(c)).comptes) comptes.push({ cle: `${c.environnement}|${a.id}`, nom: `${String(a.name || "Compte")} #${a.accNum}` });
+        } catch (e) { console.error("comptes", c.id, String(e)); }
+      }
+      return repondre({ comptes });
     }
 
     if (corps.action === "supprimer") {
