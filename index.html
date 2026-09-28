@@ -67,9 +67,12 @@
 <div id="app-principale" class="hidden">
 
   <!-- Garde-fou du jour (rempli par js/garde-fou.js), toujours visible en haut -->
-  <div id="garde-fou" class="garde-fou" hidden aria-live="polite"></div>
-  <!-- Objectif de profit (js/accueil-discipline.js), juste dessous, sur toutes les pages -->
-  <div id="bloc-objectif" class="bloc-objectif" hidden></div>
+  <!-- Un seul rectangle en haut de toutes les pages : garde-fou du jour
+       (js/garde-fou.js) + objectif de profit (js/accueil-discipline.js) -->
+  <div class="barre-haut" id="barre-haut">
+    <div id="garde-fou" class="garde-fou" hidden aria-live="polite"></div>
+    <div id="bloc-objectif" class="bloc-objectif" hidden></div>
+  </div>
 
   <main>
 
