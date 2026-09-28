@@ -151,6 +151,8 @@
     clearInterval(minuterie);
     const zone = $("garde-fou");
     if (zone) { zone.hidden = true; zone.innerHTML = ""; }
+    const objectif = $("bloc-objectif"); // barre d'objectif, juste dessous
+    if (objectif) { objectif.hidden = true; objectif.innerHTML = ""; }
   }
 
   window.addEventListener("goldai:trades", () => recalculer());

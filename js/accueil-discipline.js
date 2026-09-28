@@ -5,7 +5,7 @@
 //   (calendrier déjà chargé, fuseau de l'utilisateur), mis à jour chaque
 //   seconde : orange sous 30 min, rouge sous 10 min, passe tout seul à la
 //   suivante. Toucher → section Annonces.
-// - Barre d'objectif de profit (jour / semaine / mois, tous comptes ou un
+// - Barre d'objectif de profit (en haut de TOUTES les pages, sous le garde-fou) (jour / semaine / mois, tous comptes ou un
 //   compte) réglée dans Profil › Général, calculée avec les trades du journal
 //   (noyau.progressionObjectif).
 (() => {
@@ -101,7 +101,8 @@
       nomCompte = c ? c.nom : "compte supprimé";
     }
     const m = (v) => U.montant(v, "USD");
-    zone.className = `carte bloc-objectif${p.atteint ? " atteint" : ""}`;
+    zone.className = `bloc-objectif${p.atteint ? " atteint" : ""}`;
+    zone.hidden = false;
     zone.innerHTML = `
       <div class="entete-objectif">
         <span>🎯 Objectif ${LIBELLE_PERIODE[p.periode] || ""} <span class="texte-attenue petit">· ${esc(nomCompte)}</span></span>
@@ -169,7 +170,9 @@
     ["objectif-montant", "objectif-periode", "objectif-compte"].forEach((id) => $(id)?.addEventListener("change", enregistrerObjectif));
   });
   document.addEventListener("visibilitychange", () => { if (actif()) demarrerChrono(); });
-  window.addEventListener("goldai:garde-fou", afficherTradesRestants);
+  // Le garde-fou se calcule à la connexion puis à chaque trade : l'objectif
+  // (en haut de toutes les pages) suit le même rythme.
+  window.addEventListener("goldai:garde-fou", () => { afficherTradesRestants(); afficherObjectif(); });
   window.addEventListener("goldai:trades", afficherObjectif);
   window.addEventListener("goldai:reglages-calculateur", afficherObjectif);
   window.addEventListener("goldai:comptes", afficherObjectif);

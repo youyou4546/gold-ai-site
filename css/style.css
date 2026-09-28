@@ -1615,13 +1615,23 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .tuile-discipline.rouge { border-color: var(--rouge); background: var(--rouge-fond); }
 .tuile-discipline.rouge .valeur-tuile { color: var(--rouge); }
 
-.bloc-objectif { margin-bottom: 14px; }
-.entete-objectif { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 14px; margin-bottom: 8px; }
+.bloc-objectif[hidden] { display: none; }
+.bloc-objectif {
+  flex-shrink: 0;
+  width: calc(100% - 32px);
+  max-width: 1100px;
+  margin: 6px auto 0;
+  padding: 8px 12px 9px;
+  border-radius: var(--rayon);
+  background: var(--fond-carte);
+  border: 1px solid var(--bordure);
+}
+.entete-objectif { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 13px; margin-bottom: 6px; }
 .entete-objectif strong { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .entete-objectif .negatif { color: var(--rouge); }
-.barre-objectif { height: 10px; border-radius: 999px; background: var(--fond); border: 1px solid var(--bordure); overflow: hidden; }
+.barre-objectif { height: 8px; border-radius: 999px; background: var(--fond); border: 1px solid var(--bordure); overflow: hidden; }
 .remplissage-objectif { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.4s ease; }
-.pied-objectif { font-size: 12px; color: var(--texte-attenue); margin-top: 6px; }
+.pied-objectif { font-size: 11.5px; color: var(--texte-attenue); margin-top: 4px; }
 .bloc-objectif.atteint { border-color: var(--vert); background: var(--vert-fond); }
 .bloc-objectif.atteint .remplissage-objectif { background: var(--vert); }
 .bloc-objectif.atteint .pied-objectif { color: var(--vert); font-weight: 700; }

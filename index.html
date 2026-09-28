@@ -68,6 +68,8 @@
 
   <!-- Garde-fou du jour (rempli par js/garde-fou.js), toujours visible en haut -->
   <div id="garde-fou" class="garde-fou" hidden aria-live="polite"></div>
+  <!-- Objectif de profit (js/accueil-discipline.js), juste dessous, sur toutes les pages -->
+  <div id="bloc-objectif" class="bloc-objectif" hidden></div>
 
   <main>
 
@@ -80,8 +82,6 @@
         <div class="tuile-discipline" id="tuile-trades-restants"><span class="libelle-tuile">Trades restants</span><span class="valeur-tuile">…</span></div>
         <button type="button" class="tuile-discipline tuile-annonce" id="tuile-prochaine-annonce" aria-label="Prochaine annonce importante — ouvrir les annonces"><span class="libelle-tuile">Prochaine annonce</span><span class="valeur-tuile">…</span></button>
       </div>
-      <div class="carte bloc-objectif" id="bloc-objectif"><p class="etat-vide petit">Objectif…</p></div>
-
       <p class="petit" id="date-marche"></p>
       <div id="liste-actifs-marche"></div>
     </section>
