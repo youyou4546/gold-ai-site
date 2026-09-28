@@ -274,6 +274,10 @@
       <!-- Vue Mes comptes TradeLocker : solde, résultat du jour, trades ouverts (js/comptes-tradelocker.js) — remplace l'ancien « Mes comptes » -->
       <div id="profil-tradelocker" class="hidden">
         <button type="button" class="bouton-retour" id="bouton-retour-tradelocker"><span aria-hidden="true">←</span> Retour</button>
+        <details class="carte hidden" id="noms-comptes-tradelocker">
+          <summary><strong>✏️ Noms de mes comptes</strong> <span class="texte-attenue petit">(utilisés seulement dans l'app)</span></summary>
+          <ul class="liste-noms-tl" id="liste-noms-tradelocker"></ul>
+        </details>
         <div id="contenu-tradelocker"></div>
 
         <details class="carte" id="carte-ajout-tradelocker">
