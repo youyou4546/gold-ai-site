@@ -702,6 +702,45 @@
       nbSignaux: signaux.length, alternatif, invalidation };
   }
 
+  // =====================================================================
+  // 7. BIAIS D'UNE ANNONCE POUR L'OR (badge Haussier / Baissier / Neutre)
+  // =====================================================================
+  //
+  // - Résultat publié : comparé à la prévision (base "confirmée").
+  // - Sinon : prévision comparée au précédent (base "attendue" — le flux
+  //   gratuit Forex Factory ne donne pas le résultat).
+  // - Direction lue dans le glossaire (si_superieur / si_inferieur), appliquée
+  //   seulement aux annonces en dollar : pour les autres devises l'effet sur
+  //   l'or est indirect → neutre.
+
+  function biaisAnnonceOr(evenement, explication) {
+    const neutre = (ligne, base = null) => ({ biais: "neutre", ligne, base });
+    if (!explication) return neutre("Pas de fiche : effet sur l'or non établi");
+    if (!explication.or_affecte) return neutre("Pas d'effet direct connu sur l'or");
+    if (evenement.devise !== "USD") return neutre("Hors dollar : effet indirect sur l'or");
+
+    const v = (evenement.valeurs || [])[0] || {};
+    const resultat = (evenement.valeurs || []).find((x) => x.resultat)?.resultat || null;
+    let ecart = null, base = null;
+    if (resultat) { ecart = ecartResultatPrevision(resultat, v.prevision); base = "resultat"; }
+    if (!ecart) { ecart = ecartResultatPrevision(v.prevision, v.precedent); base = ecart ? "prevision" : null; }
+    if (!ecart) return neutre("Pas de chiffres à comparer pour l'instant");
+    if (ecart.ecart === 0) {
+      return neutre(base === "resultat" ? "Conforme aux attentes → peu d'effet" : "Prévu stable → peu d'effet attendu", base);
+    }
+
+    const scenario = ecart.ecart > 0 ? explication.si_superieur : explication.si_inferieur;
+    const debut = base === "resultat"
+      ? (ecart.ecart > 0 ? "Plus fort que prévu" : "Plus faible que prévu")
+      : (ecart.ecart > 0 ? "Prévu en hausse" : "Prévu en baisse");
+    return {
+      biais: scenario.direction === "hausse" ? "haussier" : "baissier",
+      ligne: `${debut} → ${scenario.court || (scenario.direction === "hausse" ? "or soutenu" : "or sous pression")}`,
+      base,
+      scenario,
+    };
+  }
+
   const LIBELLE_TF = { "30min": "30 min", "1h": "1 h", "4h": "4 h", "1week": "1W" };
 
   const api = {
@@ -709,7 +748,7 @@
     calculerPosition, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
     ema, atr, calculerTendance, separerBougies,
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
-    scorePriorite, analyserImpact, LIBELLE_TF, LIBELLES_SPEC,
+    scorePriorite, analyserImpact, biaisAnnonceOr, LIBELLE_TF, LIBELLES_SPEC,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

@@ -32,7 +32,23 @@
     sauvegarder_mes_parametres: (p) => { ecrire("banc_params", p); return null; },
     obtenir_parametres_calculateur: () => lire("banc_calc", null),
     sauvegarder_parametres_calculateur: (p) => { ecrire("banc_calc", p.p_parametres); return null; },
-    lister_mes_comptes_trading: () => [],
+    lister_mes_comptes_trading: () => [{ id: "c1", nom: "FTMO 100k", taille: 100000, solde_actuel: 100000, statut: "challenge", dll_pourcentage: 5, max_dd_pourcentage: 10 }],
+    enregistrer_mon_trade: (p) => {
+      if (localStorage.banc_patch_absent === "1") return absent();
+      const liste = lire("banc_trades", []);
+      const t = { id: p.p_trade_id || crypto.randomUUID(), date_trade: p.p_date, resultat: p.p_resultat, note: p.p_note, compte_trading_id: p.p_compte_trading_id,
+        instrument: p.p_instrument || null, frais: p.p_frais ?? null, prix_entree: p.p_prix_entree, prix_sortie: p.p_prix_sortie, rr: p.p_rr };
+      ecrire("banc_trades", [...liste.filter((x) => x.id !== t.id), t]);
+      return t.id;
+    },
+    lister_images_trade: (p) => lire("banc_images", []).filter((i) => i.trade_id === p.p_trade_id),
+    ajouter_image_trade: (p) => { const i = { id: crypto.randomUUID(), trade_id: p.p_trade_id, image_data: p.p_image_data }; ecrire("banc_images", [...lire("banc_images", []), i]); return i.id; },
+    supprimer_image_trade: (p) => { ecrire("banc_images", lire("banc_images", []).filter((i) => i.id !== p.p_image_id)); return true; },
+    compter_images_mes_trades: () => {
+      if (localStorage.banc_patch_absent === "1") return absent();
+      const n = {}; lire("banc_images", []).forEach((i) => { n[i.trade_id] = (n[i.trade_id] || 0) + 1; });
+      return Object.entries(n).map(([trade_id, nombre]) => ({ trade_id, nombre }));
+    },
     lire_donnees: () => absent(),
     obtenir_cle_cotations: () => localStorage.banc_cle_td || null,
     enregistrer_analyse: (p) => { const l = lire("banc_analyses", []); l.unshift({ ...p, cree_le: new Date().toISOString(), actif: p.p_actif, horizon: p.p_horizon, direction: p.p_direction, confiance: p.p_confiance, prix_reference: p.p_prix_reference }); ecrire("banc_analyses", l); return "id"; },

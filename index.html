@@ -66,31 +66,13 @@
 <!-- ============ APPLICATION PRINCIPALE (visible une fois connecté) ============ -->
 <div id="app-principale" class="hidden">
 
-  <header class="entete">
-    <h1>Trading Tool</h1>
-    <p class="sous-titre" id="sous-titre-dynamique">by Theyous</p>
-  </header>
-
   <main>
 
     <!-- ============ SECTION : SUIVI DU MARCHÉ ============ -->
     <section class="section actif" id="section-marche">
-      <h2 class="titre-section">Suivi du marché</h2>
-      <p style="font-size:12px; color:var(--texte-attenue); margin-top:-6px;" id="date-marche"></p>
+      <h2 class="titre-section">Marché</h2>
+      <p class="petit" id="date-marche"></p>
       <div id="liste-actifs-marche"></div>
-    </section>
-
-    <!-- ============ SECTION : CHAT PARTAGÉ ============ -->
-    <section class="section" id="section-chat">
-      <h2 class="titre-section">Chat</h2>
-      <p style="font-size:12px; color:var(--texte-attenue); margin-top:-6px;">Visible par tous ceux qui ont l'app.</p>
-
-      <div class="zone-messages-chat" id="zone-messages-chat"></div>
-
-      <div class="barre-envoi-chat">
-        <input type="text" id="champ-message-chat" placeholder="Écris un message…" maxlength="2000" autocomplete="off" />
-        <button class="bouton-envoyer-chat" id="bouton-envoyer-chat" aria-label="Envoyer">➤</button>
-      </div>
     </section>
 
     <!-- ============ SECTION : ANNONCES (actualités urgentes + calendrier + impact probable) ============ -->
@@ -104,23 +86,24 @@
         <button type="button" class="puce-filtre" data-filtre="xau" aria-pressed="false">XAUUSD</button>
         <button type="button" class="puce-filtre" data-filtre="usd" aria-pressed="false">USD</button>
       </div>
-      <div class="ligne-champs filtres-selects">
-        <div class="champ">
-          <label for="filtre-pays">Pays</label>
-          <select id="filtre-pays"><option value="">Tous les pays</option></select>
+      <details class="details-discrets"><summary>Plus de filtres et sources</summary>
+        <div class="ligne-champs filtres-selects">
+          <div class="champ">
+            <label for="filtre-pays">Pays</label>
+            <select id="filtre-pays"><option value="">Tous les pays</option></select>
+          </div>
+          <div class="champ">
+            <label for="filtre-periode">Période</label>
+            <select id="filtre-periode">
+              <option value="jour">Aujourd'hui</option>
+              <option value="24h">± 24 h</option>
+              <option value="semaine" selected>Cette semaine</option>
+            </select>
+          </div>
         </div>
-        <div class="champ">
-          <label for="filtre-periode">Période</label>
-          <select id="filtre-periode">
-            <option value="jour">Aujourd'hui</option>
-            <option value="24h">± 24 h</option>
-            <option value="semaine" selected>Cette semaine</option>
-          </select>
-        </div>
-      </div>
-      <label class="case-a-cocher"><input type="checkbox" id="filtre-tous" /> Afficher tous les événements (faible impact, toutes devises, commentaires de marché)</label>
-
-      <details class="details-discrets"><summary>Sources et dernière actualisation</summary><div id="etat-sources-annonces"></div></details>
+        <label class="case-a-cocher"><input type="checkbox" id="filtre-tous" /> Afficher tous les événements (faible impact, toutes devises, commentaires de marché)</label>
+        <div id="etat-sources-annonces"></div>
+      </details>
 
       <div class="grille-annonces">
         <aside class="carte encadre-impact" id="encadre-impact" aria-live="polite"><p class="etat-vide">Analyse en cours…</p></aside>
@@ -363,62 +346,74 @@
 
   </main>
 
-  <!-- Modale : explication d'une annonce économique -->
-  <div class="fond-modale" id="modale-annonce">
-    <div class="modale">
-      <h3 id="modale-titre-annonce"></h3>
-      <p style="font-size:12px; color:var(--texte-attenue); margin:0 0 12px;" id="modale-meta-annonce"></p>
-
-      <div class="ligne-info">
-        <div class="etiquette">Ce que ça mesure</div>
-        <div class="contenu" id="modale-mesure"></div>
-      </div>
-
-      <div class="ligne-info" id="bloc-impact-or">
-        <div class="etiquette">Impact généralement observé sur l'or</div>
-        <div class="contenu" id="modale-impact-or"></div>
-      </div>
-
-      <div class="bloc-avertissement" id="modale-avertissement"></div>
-
-      <button class="bouton secondaire bouton-fermer-modale" id="bouton-fermer-modale">Fermer</button>
-    </div>
-  </div>
-
-  <!-- Modale : ajouter/voir les trades d'un jour -->
+  <!-- Modale : trades d'un jour (liste + bouton d'ajout) -->
   <div class="fond-modale" id="modale-jour">
     <div class="modale">
       <h3 id="modale-titre-jour"></h3>
-
       <div class="liste-trades-jour" id="liste-trades-jour"></div>
+      <button class="bouton" id="bouton-nouveau-trade">+ Ajouter un trade</button>
+      <button class="bouton secondaire bouton-fermer-modale" id="bouton-fermer-modale-jour" style="margin-top:10px;">Fermer</button>
+    </div>
+  </div>
 
-      <div class="carte" style="margin-top:4px;">
+  <!-- Modale : fiche détaillée d'un trade (ajout ou modification) -->
+  <div class="fond-modale" id="modale-fiche-trade">
+    <div class="modale modale-fiche">
+      <h3 id="fiche-titre">Nouveau trade</h3>
+      <p class="petit texte-attenue" id="fiche-date"></p>
+
+      <div class="champ">
+        <label for="fiche-compte">Compte utilisé</label>
+        <select id="fiche-compte"></select>
+      </div>
+
+      <div class="ligne-champs">
         <div class="champ">
-          <label for="resultat-nouveau-trade">Résultat ($) — négatif si perte</label>
-          <input type="number" id="resultat-nouveau-trade" inputmode="decimal" step="0.01" placeholder="ex: 340 ou -120" />
-        </div>
-        <div class="ligne-champs">
-          <div class="champ">
-            <label for="instrument-nouveau-trade">Instrument (optionnel)</label>
-            <input type="text" id="instrument-nouveau-trade" placeholder="ex: XAUUSD" autocapitalize="characters" />
-          </div>
-          <div class="champ">
-            <label for="frais-nouveau-trade">Frais ($, optionnel)</label>
-            <input type="number" id="frais-nouveau-trade" inputmode="decimal" step="0.01" min="0" placeholder="ex: 7" />
-          </div>
+          <label for="fiche-instrument">Instrument</label>
+          <input type="text" id="fiche-instrument" placeholder="ex: XAUUSD" autocapitalize="characters" />
         </div>
         <div class="champ">
-          <label for="note-nouveau-trade">Note (optionnel)</label>
-          <input type="text" id="note-nouveau-trade" placeholder="ex: ORB NY, sorti tôt sur TP1" />
-        </div>
-        <div class="champ" style="margin-bottom:0; display:none;">
-          <label for="select-compte-trade">Compte</label>
-          <select id="select-compte-trade"></select>
+          <label for="fiche-rr">RR obtenu</label>
+          <input type="number" id="fiche-rr" inputmode="decimal" step="0.01" placeholder="ex: 2.5 ou -1" />
         </div>
       </div>
 
-      <button class="bouton" id="bouton-ajouter-trade">Ajouter le trade</button>
-      <button class="bouton secondaire bouton-fermer-modale" id="bouton-fermer-modale-jour" style="margin-top:10px;">Fermer</button>
+      <div class="ligne-champs">
+        <div class="champ">
+          <label for="fiche-entree">Prix d'entrée</label>
+          <input type="number" id="fiche-entree" inputmode="decimal" step="any" placeholder="ex: 4335.20" />
+        </div>
+        <div class="champ">
+          <label for="fiche-sortie">Prix de sortie</label>
+          <input type="number" id="fiche-sortie" inputmode="decimal" step="any" placeholder="ex: 4320.50" />
+        </div>
+      </div>
+
+      <div class="ligne-champs">
+        <div class="champ">
+          <label for="fiche-resultat">Profit / perte ($)</label>
+          <input type="number" id="fiche-resultat" inputmode="decimal" step="0.01" placeholder="ex: 340 ou -120" />
+        </div>
+        <div class="champ">
+          <label for="fiche-frais">Frais ($, optionnel)</label>
+          <input type="number" id="fiche-frais" inputmode="decimal" step="0.01" min="0" placeholder="ex: 7" />
+        </div>
+      </div>
+
+      <label class="label-groupe">Captures du graphique</label>
+      <div class="galerie-trade" id="fiche-galerie"></div>
+      <input type="file" id="fiche-fichiers" accept="image/*" multiple class="hidden" />
+      <button type="button" class="zone-upload" id="fiche-bouton-images">📷 Ajouter une ou plusieurs images</button>
+
+      <div class="champ">
+        <label for="fiche-notes">Notes</label>
+        <textarea id="fiche-notes" rows="8" placeholder="Pourquoi j'ai pris ce trade, ce que j'ai ressenti, ce que j'ai bien ou mal fait…"></textarea>
+      </div>
+
+      <p class="avertissement-erreur" id="fiche-erreur"></p>
+
+      <button class="bouton" id="fiche-enregistrer">Enregistrer le trade</button>
+      <button class="bouton secondaire" id="fiche-fermer" style="margin-top:10px;">Fermer</button>
     </div>
   </div>
 
@@ -478,10 +473,6 @@
       <span class="icone-onglet">📈</span>
       <span>Marché</span>
     </button>
-    <button class="onglet" data-section="chat">
-      <span class="icone-onglet">💬</span>
-      <span>Chat</span>
-    </button>
     <button class="onglet" data-section="calendrier">
       <span class="icone-onglet">📰</span>
       <span>Annonces</span>
@@ -516,7 +507,6 @@
 <script src="js/donnees.js"></script>
 <script src="js/cotations.js"></script>
 <script src="js/marche.js"></script>
-<script src="js/chat.js"></script>
 <script src="js/annonces.js"></script>
 <script src="js/impact.js"></script>
 <script src="js/parametres-calculateur.js"></script>
@@ -524,6 +514,7 @@
 <script src="js/analyse-graphique.js"></script>
 <script src="js/comptes-trading.js"></script>
 <script src="js/journal.js"></script>
+<script src="js/journal-fiche.js"></script>
 <script src="js/journal-performance.js"></script>
 <script src="js/parametres.js"></script>
 <script src="js/profil-comptes.js"></script>

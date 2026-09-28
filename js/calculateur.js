@@ -163,6 +163,11 @@
         return;
       }
       lectureCourante = N.lireSignal(texte);
+      // Le champ est vidé tout de suite, prêt pour le trade suivant (le
+      // signal lu reste en mémoire pour le résultat et les corrections).
+      const champSignal = document.getElementById("champ-signal");
+      champSignal.value = "";
+      champSignal.blur();
       signalCourant = { instrument: lectureCourante.instrument, sens: lectureCourante.sens, entree: lectureCourante.entree, sl: lectureCourante.sl, tps: lectureCourante.tps, tpOuverts: lectureCourante.tpOuverts };
       repartitionForcee = null;
       // Le signal interprété reste construit (le calcul le relit) mais n'est

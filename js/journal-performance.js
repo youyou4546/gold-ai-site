@@ -52,7 +52,12 @@
     const gainMoyen = gagnants.length ? gagnants.reduce((s, x) => s + x, 0) / gagnants.length : null;
     const perteMoyenne = perdants.length ? Math.abs(perdants.reduce((s, x) => s + x, 0) / perdants.length) : null;
     const fraisTotaux = trades.reduce((s, t) => s + (t.frais || 0), 0);
+    const avecRr = trades.filter((t) => t.rr !== null && t.rr !== undefined && Number.isFinite(t.rr));
     return {
+      rrMoyen: avecRr.length ? avecRr.reduce((s, t) => s + t.rr, 0) / avecRr.length : null,
+      nbAvecRr: avecRr.length,
+      meilleur: nets.length ? Math.max(...nets) : null,
+      pire: nets.length ? Math.min(...nets) : null,
       nombre: trades.length, gagnants: gagnants.length, perdants: perdants.length, equilibre,
       tauxReussite: decisifs ? (gagnants.length / decisifs) * 100 : null,
       gainMoyen, perteMoyenne,
@@ -138,6 +143,8 @@
         ${carte("Taux de réussite", s.tauxReussite === null ? "—" : `${U().nombre(s.tauxReussite, 1)} %`, s.tauxReussite === null ? "aucun trade gagnant ou perdant" : `${s.gagnants} gagnant${s.gagnants > 1 ? "s" : ""} ÷ ${s.gagnants + s.perdants} (équilibre exclu)`)}
         ${carte("Trades clôturés", String(s.nombre), `${s.equilibre} à l'équilibre`)}
         ${carte("Gain moyen / perte moyenne", s.ratio === null ? "—" : s.ratio.toFixed(2), s.ratio === null ? (s.perdants === 0 ? "aucune perte sur la période" : "aucun gain sur la période") : `${m(s.gainMoyen)} / ${m(s.perteMoyenne)}`)}
+        ${carte("RR moyen obtenu", s.rrMoyen === null ? "—" : `<span class="${s.rrMoyen > 0 ? "positif" : s.rrMoyen < 0 ? "negatif" : ""}">${s.rrMoyen.toFixed(2)}</span>`, s.rrMoyen === null ? "renseigne le RR dans la fiche du trade" : `sur ${s.nbAvecRr} trade${s.nbAvecRr > 1 ? "s" : ""} avec RR`)}
+        ${carte("Meilleur / pire trade", `<span class="${s.meilleur > 0 ? "positif" : s.meilleur < 0 ? "negatif" : ""}">${m(s.meilleur, { signe: true })}</span>`, `pire : ${m(s.pire, { signe: true })}`)}
       </div>
 
       <div class="grille-graphiques">

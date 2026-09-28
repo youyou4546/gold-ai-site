@@ -3,107 +3,257 @@
   "annonces": [
     {
       "id": "cpi",
-      "mots_cles": ["cpi"],
+      "mots_cles": [
+        "cpi"
+      ],
       "nom": "CPI (indice des prix à la consommation)",
       "mesure": "L'évolution des prix payés par les consommateurs dans le pays de la devise concernée — le principal indicateur d'inflation. Publié pour beaucoup de pays (USD, EUR, GBP...), pas seulement les États-Unis.",
       "or_affecte": true,
       "si_superieur": {
         "direction": "baisse",
-        "raisonnement": "Inflation plus forte que prévu → la banque centrale de cette devise a plus de raisons de rester restrictive (taux hauts) → généralement baissier pour l'or si c'est le dollar, effet plus indirect pour les autres devises"
+        "raisonnement": "Inflation plus forte que prévu → la banque centrale de cette devise a plus de raisons de rester restrictive (taux hauts) → généralement baissier pour l'or si c'est le dollar, effet plus indirect pour les autres devises",
+        "court": "Fed reste ferme"
       },
       "si_inferieur": {
         "direction": "hausse",
-        "raisonnement": "Inflation plus faible que prévu → la banque centrale de cette devise peut envisager de baisser ses taux → généralement haussier pour l'or si c'est le dollar, effet plus indirect pour les autres devises"
+        "raisonnement": "Inflation plus faible que prévu → la banque centrale de cette devise peut envisager de baisser ses taux → généralement haussier pour l'or si c'est le dollar, effet plus indirect pour les autres devises",
+        "court": "Fed peut baisser ses taux"
       }
     },
     {
       "id": "nfp",
-      "mots_cles": ["non-farm", "non farm", "nfp", "employment change"],
+      "mots_cles": [
+        "non-farm",
+        "non farm",
+        "nfp",
+        "employment change"
+      ],
       "nom": "NFP (créations d'emplois non agricoles)",
       "mesure": "Le nombre d'emplois créés aux États-Unis sur le mois écoulé (hors secteur agricole) — un des indicateurs les plus suivis de la santé économique.",
       "or_affecte": true,
       "si_superieur": {
         "direction": "baisse",
-        "raisonnement": "Plus de créations d'emplois que prévu → économie jugée solide, la Fed peut rester restrictive → généralement baissier pour l'or"
+        "raisonnement": "Plus de créations d'emplois que prévu → économie jugée solide, la Fed peut rester restrictive → généralement baissier pour l'or",
+        "court": "Économie solide → Fed ferme"
       },
       "si_inferieur": {
         "direction": "hausse",
-        "raisonnement": "Moins de créations d'emplois que prévu → économie qui ralentit, la Fed peut assouplir sa politique → généralement haussier pour l'or"
+        "raisonnement": "Moins de créations d'emplois que prévu → économie qui ralentit, la Fed peut assouplir sa politique → généralement haussier pour l'or",
+        "court": "Économie ralentit → Fed assouplit"
       }
     },
     {
       "id": "taux_fed",
-      "mots_cles": ["federal funds rate", "fomc", "fed interest rate"],
+      "mots_cles": [
+        "federal funds rate",
+        "fomc",
+        "fed interest rate"
+      ],
       "nom": "Taux directeur de la Fed (décision FOMC)",
       "mesure": "Le niveau des taux d'intérêt fixé par la Réserve fédérale américaine — influence directement le coût de l'argent dans toute l'économie.",
       "or_affecte": true,
       "si_superieur": {
         "direction": "baisse",
-        "raisonnement": "Décision ou ton plus restrictif (hawkish) que prévu → dollar et rendements plus attractifs → généralement baissier pour l'or"
+        "raisonnement": "Décision ou ton plus restrictif (hawkish) que prévu → dollar et rendements plus attractifs → généralement baissier pour l'or",
+        "court": "Ton plus dur → dollar fort"
       },
       "si_inferieur": {
         "direction": "hausse",
-        "raisonnement": "Décision ou ton plus accommodant (dovish) que prévu → dollar et rendements moins attractifs → généralement haussier pour l'or"
+        "raisonnement": "Décision ou ton plus accommodant (dovish) que prévu → dollar et rendements moins attractifs → généralement haussier pour l'or",
+        "court": "Ton plus souple → dollar faible"
       }
     },
     {
       "id": "chomage",
-      "mots_cles": ["unemployment rate"],
+      "mots_cles": [
+        "unemployment rate"
+      ],
       "nom": "Taux de chômage",
       "mesure": "Le pourcentage de la population active qui est sans emploi et en recherche active de travail, dans le pays de la devise concernée.",
       "or_affecte": true,
       "si_superieur": {
         "direction": "hausse",
-        "raisonnement": "Chômage plus élevé que prévu → économie qui s'affaiblit, la banque centrale de cette devise peut assouplir sa politique → généralement haussier pour l'or si c'est le dollar, effet plus indirect pour les autres devises"
+        "raisonnement": "Chômage plus élevé que prévu → économie qui s'affaiblit, la banque centrale de cette devise peut assouplir sa politique → généralement haussier pour l'or si c'est le dollar, effet plus indirect pour les autres devises",
+        "court": "Économie faiblit → Fed assouplit"
       },
       "si_inferieur": {
         "direction": "baisse",
-        "raisonnement": "Chômage plus bas que prévu → marché du travail solide, la banque centrale de cette devise peut rester restrictive → généralement baissier pour l'or si c'est le dollar, effet plus indirect pour les autres devises"
+        "raisonnement": "Chômage plus bas que prévu → marché du travail solide, la banque centrale de cette devise peut rester restrictive → généralement baissier pour l'or si c'est le dollar, effet plus indirect pour les autres devises",
+        "court": "Emploi solide → Fed ferme"
       }
     },
     {
       "id": "pib",
-      "mots_cles": ["gdp"],
+      "mots_cles": [
+        "gdp"
+      ],
       "nom": "PIB (produit intérieur brut)",
       "mesure": "La croissance totale de l'économie du pays de la devise concernée sur un trimestre.",
       "or_affecte": true,
       "si_superieur": {
         "direction": "baisse",
-        "raisonnement": "Croissance plus forte que prévu → économie jugée solide, la banque centrale de cette devise peut rester restrictive → généralement baissier pour l'or si c'est le dollar, effet plus indirect pour les autres devises"
+        "raisonnement": "Croissance plus forte que prévu → économie jugée solide, la banque centrale de cette devise peut rester restrictive → généralement baissier pour l'or si c'est le dollar, effet plus indirect pour les autres devises",
+        "court": "Croissance solide → Fed ferme"
       },
       "si_inferieur": {
         "direction": "hausse",
-        "raisonnement": "Croissance plus faible que prévu → économie qui ralentit, la banque centrale de cette devise peut assouplir sa politique → généralement haussier pour l'or si c'est le dollar, effet plus indirect pour les autres devises"
+        "raisonnement": "Croissance plus faible que prévu → économie qui ralentit, la banque centrale de cette devise peut assouplir sa politique → généralement haussier pour l'or si c'est le dollar, effet plus indirect pour les autres devises",
+        "court": "Croissance faible → Fed assouplit"
       }
     },
     {
       "id": "ventes_detail",
-      "mots_cles": ["retail sales"],
+      "mots_cles": [
+        "retail sales"
+      ],
       "nom": "Ventes au détail (Retail Sales)",
       "mesure": "L'évolution du montant dépensé par les consommateurs dans les commerces sur le mois, dans le pays de la devise concernée — reflète la vigueur de la consommation.",
       "or_affecte": true,
       "si_superieur": {
         "direction": "baisse",
-        "raisonnement": "Ventes plus fortes que prévu → consommation jugée solide, la banque centrale de cette devise peut rester restrictive → généralement baissier pour l'or si c'est le dollar, effet plus indirect pour les autres devises"
+        "raisonnement": "Ventes plus fortes que prévu → consommation jugée solide, la banque centrale de cette devise peut rester restrictive → généralement baissier pour l'or si c'est le dollar, effet plus indirect pour les autres devises",
+        "court": "Consommation solide → Fed ferme"
       },
       "si_inferieur": {
         "direction": "hausse",
-        "raisonnement": "Ventes plus faibles que prévu → consommation qui ralentit, la banque centrale de cette devise peut assouplir sa politique → généralement haussier pour l'or si c'est le dollar, effet plus indirect pour les autres devises"
+        "raisonnement": "Ventes plus faibles que prévu → consommation qui ralentit, la banque centrale de cette devise peut assouplir sa politique → généralement haussier pour l'or si c'est le dollar, effet plus indirect pour les autres devises",
+        "court": "Consommation faible → Fed assouplit"
       }
     },
     {
       "id": "pmi",
-      "mots_cles": ["pmi"],
+      "mots_cles": [
+        "pmi"
+      ],
       "nom": "PMI (indice des directeurs d'achat)",
       "mesure": "Une enquête auprès des entreprises (industrie ou services) qui indique si l'activité économique est en expansion (au-dessus de 50) ou en contraction (en dessous de 50).",
       "or_affecte": true,
       "si_superieur": {
         "direction": "baisse",
-        "raisonnement": "Activité économique plus forte que prévu → la banque centrale de cette devise peut rester restrictive → généralement baissier pour l'or si c'est le dollar, effet plus indirect pour les autres devises"
+        "raisonnement": "Activité économique plus forte que prévu → la banque centrale de cette devise peut rester restrictive → généralement baissier pour l'or si c'est le dollar, effet plus indirect pour les autres devises",
+        "court": "Activité solide → Fed ferme"
       },
       "si_inferieur": {
         "direction": "hausse",
-        "raisonnement": "Activité économique plus faible que prévu → la banque centrale de cette devise peut assouplir sa politique → généralement haussier pour l'or si c'est le dollar, effet plus indirect pour les autres devises"
+        "raisonnement": "Activité économique plus faible que prévu → la banque centrale de cette devise peut assouplir sa politique → généralement haussier pour l'or si c'est le dollar, effet plus indirect pour les autres devises",
+        "court": "Activité faible → Fed assouplit"
+      }
+    },
+    {
+      "id": "pce",
+      "mots_cles": [
+        "pce"
+      ],
+      "nom": "PCE (inflation préférée de la Fed)",
+      "mesure": "L'évolution des prix des dépenses de consommation aux États-Unis — l'indicateur d'inflation que la Fed suit en priorité.",
+      "or_affecte": true,
+      "si_superieur": {
+        "direction": "baisse",
+        "raisonnement": "Inflation PCE plus forte que prévu → la Fed a plus de raisons de garder des taux hauts → généralement baissier pour l'or",
+        "court": "Fed reste ferme"
+      },
+      "si_inferieur": {
+        "direction": "hausse",
+        "raisonnement": "Inflation PCE plus faible que prévu → la Fed peut envisager de baisser ses taux → généralement haussier pour l'or",
+        "court": "Fed peut baisser ses taux"
+      }
+    },
+    {
+      "id": "ppi",
+      "mots_cles": [
+        "ppi"
+      ],
+      "nom": "PPI (prix à la production)",
+      "mesure": "L'évolution des prix payés par les entreprises pour produire — un signal avancé de l'inflation.",
+      "or_affecte": true,
+      "si_superieur": {
+        "direction": "baisse",
+        "raisonnement": "Prix à la production plus forts que prévu → risque d'inflation, Fed plus ferme → généralement baissier pour l'or",
+        "court": "Inflation en amont → Fed ferme"
+      },
+      "si_inferieur": {
+        "direction": "hausse",
+        "raisonnement": "Prix à la production plus faibles que prévu → moins de pression d'inflation → généralement haussier pour l'or",
+        "court": "Moins d'inflation → Fed souple"
+      }
+    },
+    {
+      "id": "inscriptions_chomage",
+      "mots_cles": [
+        "unemployment claims",
+        "jobless claims"
+      ],
+      "nom": "Inscriptions hebdomadaires au chômage",
+      "mesure": "Le nombre de nouvelles demandes d'allocations chômage aux États-Unis sur la semaine.",
+      "or_affecte": true,
+      "si_superieur": {
+        "direction": "hausse",
+        "raisonnement": "Plus d'inscriptions que prévu → marché du travail qui se dégrade, la Fed peut assouplir → généralement haussier pour l'or",
+        "court": "Emploi se dégrade → Fed souple"
+      },
+      "si_inferieur": {
+        "direction": "baisse",
+        "raisonnement": "Moins d'inscriptions que prévu → marché du travail solide, la Fed peut rester ferme → généralement baissier pour l'or",
+        "court": "Emploi solide → Fed ferme"
+      }
+    },
+    {
+      "id": "jolts",
+      "mots_cles": [
+        "jolts",
+        "job openings"
+      ],
+      "nom": "JOLTS (offres d'emploi)",
+      "mesure": "Le nombre de postes à pourvoir aux États-Unis — mesure la tension sur le marché du travail.",
+      "or_affecte": true,
+      "si_superieur": {
+        "direction": "baisse",
+        "raisonnement": "Plus d'offres d'emploi que prévu → marché du travail tendu, Fed plus ferme → généralement baissier pour l'or",
+        "court": "Emploi tendu → Fed ferme"
+      },
+      "si_inferieur": {
+        "direction": "hausse",
+        "raisonnement": "Moins d'offres d'emploi que prévu → marché du travail qui se détend → généralement haussier pour l'or",
+        "court": "Emploi se détend → Fed souple"
+      }
+    },
+    {
+      "id": "salaires",
+      "mots_cles": [
+        "average hourly earnings"
+      ],
+      "nom": "Salaire horaire moyen",
+      "mesure": "L'évolution des salaires aux États-Unis — des salaires qui montent vite nourrissent l'inflation.",
+      "or_affecte": true,
+      "si_superieur": {
+        "direction": "baisse",
+        "raisonnement": "Salaires plus forts que prévu → pression sur l'inflation, Fed plus ferme → généralement baissier pour l'or",
+        "court": "Salaires chauds → Fed ferme"
+      },
+      "si_inferieur": {
+        "direction": "hausse",
+        "raisonnement": "Salaires plus faibles que prévu → moins de pression sur l'inflation → généralement haussier pour l'or",
+        "court": "Salaires calmes → Fed souple"
+      }
+    },
+    {
+      "id": "confiance_conso",
+      "mots_cles": [
+        "consumer confidence",
+        "consumer sentiment"
+      ],
+      "nom": "Confiance des consommateurs",
+      "mesure": "Le moral des ménages américains, mesuré par sondage — indique s'ils vont dépenser.",
+      "or_affecte": true,
+      "si_superieur": {
+        "direction": "baisse",
+        "raisonnement": "Confiance plus forte que prévu → consommation attendue solide → légèrement baissier pour l'or",
+        "court": "Ménages confiants → dollar soutenu"
+      },
+      "si_inferieur": {
+        "direction": "hausse",
+        "raisonnement": "Confiance plus faible que prévu → consommation attendue en recul → légèrement haussier pour l'or",
+        "court": "Ménages inquiets → or recherché"
       }
     }
   ]

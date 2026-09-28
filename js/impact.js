@@ -92,10 +92,7 @@
     return { analyse, cotation, tendances, prochaine, recente, actualites, maintenant };
   }
 
-  const ICONES_DIRECTION = { hausse: "▲", baisse: "▼", neutre: "■", incertaine: "?", "analyse insuffisante": "…" };
-
   function rendu({ analyse, cotation, tendances, prochaine, recente, actualites, maintenant }) {
-    const classeDir = { hausse: "positif", baisse: "negatif" }[analyse.direction] || "";
     const lignesTf = ["30min", "1h", "4h", "1week"].map((tf) => {
       const t = tendances[tf] || {};
       const etat = t.perimee ? "données anciennes" : (t.etat || "insuffisant");
@@ -131,22 +128,28 @@
     }
 
     const liste = (arr) => (arr.length ? `<ul>${arr.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : '<p class="texte-attenue petit">aucun</p>');
+    const badge = { hausse: ["haussier", "Haussier or ↑"], baisse: ["baissier", "Baissier or ↓"] }[analyse.direction]
+      || ["neutre", analyse.direction === "analyse insuffisante" ? "Données insuffisantes" : analyse.direction === "incertaine" ? "Incertain" : "Neutre"];
+    const puceTf = (tf) => {
+      const t = tendances[tf] || {};
+      const etat = t.perimee ? "ancien" : (t.etat || "insuffisant");
+      const [cl, ic] = { haussier: ["positif", "▲"], baissier: ["negatif", "▼"], neutre: ["", "■"] }[etat] || ["texte-attenue", "?"];
+      return `<span class="puce-tf ${cl}">${N.LIBELLE_TF[tf]} <span aria-hidden="true">${ic}</span></span>`;
+    };
 
+    // Vue courte : un badge, les 4 tendances en flèches, une ligne. Tout le
+    // raisonnement est replié dans « Voir le détail ».
     return `
       <div class="entete-impact">
-        <h2 class="titre-bloc-annonces">🧭 Impact probable</h2>
-        <span class="texte-attenue petit">Actif : <strong>XAU/USD (or spot)</strong></span>
+        <h2 class="titre-bloc-annonces">🧭 Tendance de l'or</h2>
+        <span class="badge-or ${badge[0]}">${esc(badge[1])}</span>
       </div>
-      <div class="ligne-direction">
-        <div class="direction ${classeDir}"><span aria-hidden="true">${ICONES_DIRECTION[analyse.direction] || "?"}</span> ${esc(analyse.direction === "analyse insuffisante" ? "Analyse insuffisante" : `Direction probable : ${analyse.direction}`)}</div>
-        <div class="meta-direction">
-          <span>Horizon : <strong>${esc(analyse.horizon)}</strong></span>
-          <span>Confiance : <strong>${esc(analyse.confiance)}</strong></span>
-          ${analyse.concordance !== null ? `<span title="Somme des signaux ÷ nombre de signaux disponibles">Concordance : <strong>${analyse.somme > 0 ? "+" : ""}${analyse.somme}/${analyse.nbSignaux}</strong> (pas une probabilité)</span>` : ""}
-        </div>
-      </div>
+      <div class="rangee-tf">${["30min", "1h", "4h", "1week"].map(puceTf).join("")}</div>
+      <p class="ligne-annonce">Confiance ${esc(analyse.confiance)} · horizon ${esc(analyse.horizon)}${prochaine ? ` · annonce ${esc(prochaine.titre)} ${U.compteARebours(prochaine.horodatage_utc, maintenant) || ""}` : ""}</p>
+      <details class="details-discrets" id="details-impact"><summary>Voir le détail</summary>
       ${analyse.raisonInsuffisance ? `<div class="alerte-donnees">${esc(analyse.raisonInsuffisance)}</div>` : ""}
       <ul class="lignes-tendances">${lignesTf}</ul>
+      ${analyse.concordance !== null ? `<p class="petit">Concordance : <strong>${analyse.somme > 0 ? "+" : ""}${analyse.somme}/${analyse.nbSignaux}</strong> signaux (pas une probabilité)</p>` : ""}
       <div class="grille-arguments">
         <div><h4>Éléments favorables à la hausse</h4>${liste(analyse.favorables)}</div>
         <div><h4>Éléments contraires (baisse)</h4>${liste(analyse.contraires)}</div>
@@ -155,7 +158,7 @@
       ${analyse.alternatif ? `<p class="petit"><strong>Scénario alternatif :</strong> ${esc(analyse.alternatif)}</p>` : ""}
       ${analyse.invalidation ? `<p class="petit"><strong>Invalidation :</strong> ${esc(analyse.invalidation)}</p>` : ""}
       ${blocAnnonce}
-      <p class="texte-attenue petit">Dernière analyse : ${U.jourHeure(analyse.analyseLe)} · prix de référence ${cotation.prix !== null ? cotation.prix.toFixed(2) : "—"} (${esc(cotation.fraicheur)}). « Impact probable » = scénario, pas une garantie de mouvement ni un conseil. Aucune probabilité chiffrée n'est affichée : la méthode n'a pas encore été calibrée sur l'historique.</p>
+      <p class="texte-attenue petit">Dernière analyse : ${U.jourHeure(analyse.analyseLe)} · prix de référence ${cotation.prix !== null ? cotation.prix.toFixed(2) : "—"} (${esc(cotation.fraicheur)}). « Tendance probable » = scénario, pas une garantie de mouvement ni un conseil.</p>
       <details class="details-discrets"><summary>Méthode utilisée</summary>
         <ul class="petit">
           <li>Tendances : EMA20, pente de l'EMA sur 5 bougies et structure sur 10 bougies, mesurées en ATR14, sur bougies <strong>clôturées</strong> uniquement (la bougie en cours est ignorée). Somme ≥ +2 haussier, ≤ −2 baissier.</li>
@@ -164,7 +167,8 @@
           <li>Confiance élevée seulement si concordance ≥ 0,6 avec ≥ 5 signaux, prix en direct et pas d'annonce majeure dans les 2 h ; plafonnée à faible avant une annonce majeure ou marché fermé.</li>
         </ul>
       </details>
-      <details class="details-discrets" id="details-historique"><summary>Historique des analyses enregistrées</summary><div id="historique-analyses"><p class="texte-attenue petit">Ouvre pour charger.</p></div></details>`;
+      <details class="details-discrets" id="details-historique"><summary>Historique des analyses enregistrées</summary><div id="historique-analyses"><p class="texte-attenue petit">Ouvre pour charger.</p></div></details>
+      </details>`;
   }
 
   async function enregistrer(res) {
@@ -234,8 +238,10 @@
     dernierRenduMs = Date.now();
     await chargerGlossaire();
     const ouvert = document.getElementById("details-historique")?.open;
+    const detailOuvert = document.getElementById("details-impact")?.open;
     const res = calculer();
     zone.innerHTML = rendu(res);
+    if (detailOuvert) document.getElementById("details-impact").open = true;
     const details = document.getElementById("details-historique");
     if (ouvert) { details.open = true; afficherHistorique(); }
     details.addEventListener("toggle", () => { if (details.open) afficherHistorique(); });

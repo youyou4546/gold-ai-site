@@ -10,7 +10,7 @@
 //  - Bibliothèques du CDN (Supabase, Chart.js) : cache d'abord (versions figées).
 //
 // Change ce numéro à chaque mise à jour pour nettoyer les anciens caches.
-const VERSION = "goldai-v16";
+const VERSION = "goldai-v17";
 
 const FICHIERS_A_METTRE_EN_CACHE = [
   "./",
@@ -24,7 +24,6 @@ const FICHIERS_A_METTRE_EN_CACHE = [
   "./js/cotations.js",
   "./js/app.js",
   "./js/marche.js",
-  "./js/chat.js",
   "./js/annonces.js",
   "./js/impact.js",
   "./js/parametres-calculateur.js",
@@ -32,6 +31,7 @@ const FICHIERS_A_METTRE_EN_CACHE = [
   "./js/analyse-graphique.js",
   "./js/comptes-trading.js",
   "./js/journal.js",
+  "./js/journal-fiche.js",
   "./js/journal-performance.js",
   "./js/parametres.js",
   "./js/profil-comptes.js",

@@ -17,20 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cible === "calendrier" && window.GoldAI?.calendrier?.charger) {
       window.GoldAI.calendrier.charger();
     }
-    if (cible === "calculateur") {
-      document.getElementById("champ-signal")?.focus({ preventScroll: true });
-    }
     if (cible === "profil" && window.GoldAI?.profilCompte?.charger) {
       window.GoldAI.profilCompte.charger();
     }
 
-    // Le chat se rafraîchit en continu tant qu'il est affiché, et s'arrête
-    // dès qu'on change d'onglet (pas la peine d'interroger le serveur pour rien).
-    if (cible === "chat") {
-      window.GoldAI?.chat?.demarrerRafraichissement();
-    } else {
-      window.GoldAI?.chat?.arreterRafraichissement();
-    }
+    // Section Chat mise de côté (voir mis-de-cote/chat/LISEZMOI.md) : pour la
+    // remettre, rajouter ici le démarrage/arrêt de son rafraîchissement.
   }
 
   onglets.forEach((onglet) => {

@@ -242,3 +242,22 @@ test("SL du runner : ne recule jamais et n'utilise pas un TP pas encore touché"
   const achat = { sens: "BUY", entree: 100, sl: 95, tps: [{ numero: 1, prix: 105 }, { numero: 2, prix: 110 }] };
   assert.deepEqual(N.planSlRunner(achat, null).map((p) => p.sl), [100, 105]);
 });
+
+test("biais d'une annonce pour l'or (badge)", () => {
+  const cpi = { or_affecte: true, si_superieur: { direction: "baisse", court: "Fed reste ferme" }, si_inferieur: { direction: "hausse", court: "Fed peut baisser ses taux" } };
+  const ev = (valeurs, devise = "USD") => ({ devise, valeurs: [valeurs] });
+  // Résultat publié plus fort que prévu → baissier, ligne "Plus fort que prévu".
+  let b = N.biaisAnnonceOr(ev({ prevision: "0.3%", precedent: "0.2%", resultat: "0.5%" }), cpi);
+  assert.equal(b.biais, "baissier");
+  assert.equal(b.base, "resultat");
+  assert.equal(b.ligne, "Plus fort que prévu → Fed reste ferme");
+  // Pas de résultat : prévision vs précédent.
+  b = N.biaisAnnonceOr(ev({ prevision: "0.1%", precedent: "0.2%", resultat: null }), cpi);
+  assert.equal(b.biais, "haussier");
+  assert.equal(b.base, "prevision");
+  // Égalité → neutre ; hors dollar → neutre ; pas de fiche → neutre ; unités différentes → neutre.
+  assert.equal(N.biaisAnnonceOr(ev({ prevision: "0.3%", precedent: "0.3%" }), cpi).biais, "neutre");
+  assert.equal(N.biaisAnnonceOr(ev({ prevision: "0.4%", precedent: "0.3%" }, "EUR"), cpi).biais, "neutre");
+  assert.equal(N.biaisAnnonceOr(ev({ prevision: "0.4%", precedent: "0.3%" }), null).biais, "neutre");
+  assert.equal(N.biaisAnnonceOr(ev({ prevision: "98K", precedent: "0.3%" }), cpi).biais, "neutre");
+});

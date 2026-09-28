@@ -72,7 +72,18 @@
       compteTradingId: trade.compte_trading_id || null,
       instrument: trade.instrument || null,
       frais: trade.frais === null || trade.frais === undefined ? null : Number(trade.frais),
+      prixEntree: trade.prix_entree === null || trade.prix_entree === undefined ? null : Number(trade.prix_entree),
+      prixSortie: trade.prix_sortie === null || trade.prix_sortie === undefined ? null : Number(trade.prix_sortie),
+      rr: trade.rr === null || trade.rr === undefined ? null : Number(trade.rr),
+      nbImages: 0,
     }));
+
+    // Nombre d'images par trade (📷 dans la liste). Sans le patch SQL : aucune image.
+    const images = await client().rpc("compter_images_mes_trades", { p_token: token() });
+    if (!images.error) {
+      const parTrade = new Map((images.data || []).map((x) => [x.trade_id, x.nombre]));
+      cacheTradesBruts.forEach((t) => { t.nbImages = parTrade.get(t.id) || 0; });
+    }
 
     const parJour = {};
     cacheTradesBruts.forEach((trade) => {
@@ -178,29 +189,8 @@
     document.getElementById("modale-titre-jour").textContent =
       dateLisible.charAt(0).toUpperCase() + dateLisible.slice(1);
 
-    document.getElementById("resultat-nouveau-trade").value = "";
-    document.getElementById("note-nouveau-trade").value = "";
-    await peuplerSelectCompteTrade();
-
     await rafraichirListeTradesDuJour();
     document.getElementById("modale-jour").classList.add("visible");
-  }
-
-  // Remplit le menu "Compte" du formulaire d'ajout de trade avec les comptes
-  // de trading créés dans Profil > Mes comptes (masqué s'il n'y en a aucun).
-  async function peuplerSelectCompteTrade() {
-    const champ = document.getElementById("select-compte-trade");
-    if (!champ || !window.GoldAI.comptesTrading) return;
-
-    const comptes = await window.GoldAI.comptesTrading.chargerComptes();
-    champ.innerHTML = `<option value="">Aucun compte</option>`;
-    comptes.forEach((c) => {
-      const option = document.createElement("option");
-      option.value = c.id;
-      option.textContent = c.nom;
-      champ.appendChild(option);
-    });
-    champ.parentElement.style.display = comptes.length > 0 ? "block" : "none";
   }
 
   async function rafraichirListeTradesDuJour() {
@@ -215,16 +205,24 @@
 
     const { esc } = window.GoldAI.utils;
     conteneur.innerHTML = "";
+    const comptes = await window.GoldAI.comptesTrading.chargerComptes();
     tradesJour.forEach((trade) => {
       const item = document.createElement("div");
       item.className = "trade-item";
-      const details = [trade.instrument, trade.frais ? `frais ${formaterDollars(-trade.frais)}` : ""].filter(Boolean).join(" · ");
+      const compte = comptes.find((c) => c.id === trade.compteTradingId);
+      const details = [
+        trade.instrument,
+        compte?.nom,
+        trade.rr !== null && trade.rr !== undefined ? `RR ${trade.rr}` : "",
+        trade.frais ? `frais ${formaterDollars(-trade.frais)}` : "",
+        trade.nbImages ? `📷 ${trade.nbImages}` : "",
+      ].filter(Boolean).join(" · ");
       item.innerHTML = `
-        <div class="infos-trade">
-          <div class="resultat-trade ${trade.resultat >= 0 ? "positif" : "negatif"}">${formaterDollars(trade.resultat)}</div>
-          ${details ? `<div class="note-trade">${esc(details)}</div>` : ""}
-          ${trade.note ? `<div class="note-trade">${esc(trade.note)}</div>` : ""}
-        </div>
+        <button type="button" class="infos-trade ouvrir-fiche" aria-label="Ouvrir la fiche de ce trade">
+          <span class="resultat-trade ${trade.resultat >= 0 ? "positif" : "negatif"}">${formaterDollars(trade.resultat)}</span>
+          ${details ? `<span class="note-trade">${esc(details)}</span>` : ""}
+          ${trade.note ? `<span class="note-trade apercu-note">${esc(trade.note)}</span>` : ""}
+        </button>
         <button type="button" class="supprimer-trade" aria-label="Supprimer ce trade">✕</button>
         <div class="confirmation-suppression hidden" role="alertdialog" aria-label="Confirmer la suppression">
           <span>Supprimer ce trade définitivement ?</span>
@@ -236,6 +234,7 @@
         </div>
       `;
       const zoneConfirm = item.querySelector(".confirmation-suppression");
+      item.querySelector(".ouvrir-fiche").addEventListener("click", () => window.GoldAI.ficheTrade.ouvrir(trade));
       // stopPropagation : le clic sur ✕ ne doit rien déclencher d'autre (ouverture, fermeture de la fenêtre…).
       item.querySelector(".supprimer-trade").addEventListener("click", (e) => {
         e.preventDefault();
@@ -265,47 +264,20 @@
     });
   }
 
-  async function ajouterTrade() {
-    const champResultat = document.getElementById("resultat-nouveau-trade");
-    const champNote = document.getElementById("note-nouveau-trade");
-    const champCompte = document.getElementById("select-compte-trade");
+  // Appelé par la fiche (js/journal-fiche.js) après un enregistrement réussi :
+  // met à jour le trade en mémoire (nouveau ou modifié), puis la liste du
+  // jour, le calendrier et Performance.
+  async function memoriserTrade(trade) {
+    await chargerTousLesTrades();
+    cacheTradesBruts = (cacheTradesBruts || []).filter((t) => t.id !== trade.id);
+    cacheTradesBruts.push(trade);
+    Object.keys(cacheTrades).forEach((jour) => {
+      cacheTrades[jour] = cacheTrades[jour].filter((t) => t.id !== trade.id);
+      if (cacheTrades[jour].length === 0) delete cacheTrades[jour];
+    });
+    (cacheTrades[trade.date] = cacheTrades[trade.date] || []).push(trade);
 
-    const resultat = parseFloat(champResultat.value);
-    if (isNaN(resultat)) {
-      alert("Renseigne un résultat en $ (négatif si c'est une perte).");
-      return;
-    }
-
-    const note = champNote.value.trim();
-    const compteTradingId = champCompte?.value || null;
-    const instrument = document.getElementById("instrument-nouveau-trade").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "") || null;
-    const fraisBrut = document.getElementById("frais-nouveau-trade").value.trim();
-    const frais = fraisBrut === "" ? null : Math.abs(parseFloat(fraisBrut));
-    if (fraisBrut !== "" && isNaN(frais)) {
-      alert("Frais : indique un nombre (ex : 7) ou laisse vide.");
-      return;
-    }
-    const base = { p_token: token(), p_date: dateJourSelectionne, p_resultat: resultat, p_note: note || null, p_compte_trading_id: compteTradingId };
-    let { data: idTrade, error } = await client().rpc("ajouter_mon_trade", { ...base, p_instrument: instrument, p_frais: frais });
-    let instrumentGarde = instrument, fraisGardes = frais;
-    if (error && (error.code === "PGRST202" || /could not find the function/i.test(error.message || ""))) {
-      // Patch Supabase pas encore installé : enregistre sans instrument ni frais (signalé).
-      ({ data: idTrade, error } = await client().rpc("ajouter_mon_trade", base));
-      if (!error && (instrument || frais !== null)) alert("Trade enregistré, mais sans instrument ni frais : le patch Supabase n'est pas encore installé.");
-      instrumentGarde = null; fraisGardes = null;
-    }
-    if (gererErreur(error)) return;
-
-    const tousLesTrades = await chargerTousLesTrades();
-    const nouveauTrade = { id: idTrade, date: dateJourSelectionne, resultat, note, compteTradingId, instrument: instrumentGarde, frais: fraisGardes };
-    if (!tousLesTrades[dateJourSelectionne]) tousLesTrades[dateJourSelectionne] = [];
-    tousLesTrades[dateJourSelectionne].push(nouveauTrade);
-    if (cacheTradesBruts) cacheTradesBruts.push(nouveauTrade);
-
-    champResultat.value = "";
-    champNote.value = "";
-    document.getElementById("frais-nouveau-trade").value = "";
-    await rafraichirListeTradesDuJour();
+    if (dateJourSelectionne) await rafraichirListeTradesDuJour();
     await afficherMoisCourant();
     window.dispatchEvent(new CustomEvent("goldai:trades"));
   }
@@ -379,7 +351,7 @@
       afficherMoisCourant();
     });
 
-    document.getElementById("bouton-ajouter-trade").addEventListener("click", ajouterTrade);
+    document.getElementById("bouton-nouveau-trade").addEventListener("click", () => window.GoldAI.ficheTrade.ouvrir(null, dateJourSelectionne));
     document.getElementById("bouton-fermer-modale-jour").addEventListener("click", fermerModaleJour);
     document.getElementById("modale-jour").addEventListener("click", (evenement) => {
       if (evenement.target.id === "modale-jour") fermerModaleJour();
@@ -401,5 +373,5 @@
   });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.journal = { afficherMoisCourant, viderCache, chargerTousLesTrades, obtenirTradesBruts };
+  window.GoldAI.journal = { afficherMoisCourant, viderCache, chargerTousLesTrades, obtenirTradesBruts, memoriserTrade };
 })();
