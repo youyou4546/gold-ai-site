@@ -1123,8 +1123,8 @@
 
     // ------------------------------------------------ Conseils
     const conseils = [];
-    const pct = (x) => `${Math.round(x)} %`;
-    const usd = (x) => `${x < 0 ? "−" : ""}${Math.abs(Math.round(x)).toLocaleString("fr-FR")} $`;
+    const pct = (x) => `${Math.round(x)} %`; // espace insécable : « 75 % » ne se coupe pas en fin de ligne
+    const usd = (x) => `${x < 0 ? "−" : ""}${Math.abs(Math.round(x)).toLocaleString("fr-FR")} $`;
     const creneau = (h) => `entre ${h}h et ${h + 1}h`;
     if (global.nb < 10) conseils.push({ niveau: "info", texte: `Seulement ${global.nb} trade${global.nb > 1 ? "s" : ""} analysé${global.nb > 1 ? "s" : ""} : les conseils deviendront fiables avec plus de trades.` });
 

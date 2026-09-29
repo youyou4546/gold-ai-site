@@ -541,9 +541,9 @@ test("analyse de mes trades : chiffres, TP atteints, créneaux et conseils", () 
   assert.equal(r.gainMoyen, 135);
   assert.equal(r.perteMoyenne, 97.5);
   const textes = r.conseils.map((c) => c.texte).join("\n");
-  assert.match(textes, /entre 11h et 12h perdent 80 %/);
+  assert.match(textes, /entre 11h et 12h perdent 80\s%/);
   assert.match(textes, /meilleur créneau : entre 9h et 10h/);
-  assert.match(textes, /Tes ventes gagnent 20 % du temps contre 100 %/);
+  assert.match(textes, /Tes ventes gagnent 20\s% du temps contre 100\s%/);
   // Journal vide : pas d'erreur
   const vide = N.analyserTrades([], {});
   assert.equal(vide.nb, 0);

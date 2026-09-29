@@ -1809,21 +1809,47 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .bloc-ess p { margin: 6px 0 0; }
 .lien-objectif { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; }
 
-/* Analyse › Analyse de mes trades (js/analyse-trades.js) */
-.sous-titre-analyse { margin: 18px 0 8px; font-size: 14px; }
-.ligne-analyse { display: grid; grid-template-columns: 78px 1fr auto; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid var(--bordure); font-size: 13px; }
-.lib-analyse { color: var(--texte); }
-.barre-analyse { height: 8px; background: var(--bordure); border-radius: 999px; overflow: hidden; }
-.barre-analyse span { display: block; height: 100%; border-radius: 999px; }
-.barre-analyse .gain { background: var(--vert); }
-.barre-analyse .perte { background: var(--rouge); }
-.val-analyse { text-align: right; line-height: 1.25; min-width: 96px; }
+/* Journal › Analyse de mes trades (js/analyse-trades.js) */
+.sous-titre-analyse { margin: 20px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--texte-attenue); }
+.kpi-analyse { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+.kpi { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 14px 8px; border: 1px solid var(--bordure); border-radius: var(--rayon); text-align: center; }
+.lib-kpi { font-size: 12px; color: var(--texte-attenue); }
+.sous-kpi { font-size: 11.5px; color: var(--texte-attenue); }
+.grand-kpi { font-size: 26px; line-height: 1.1; }
+.anneau-kpi { --p: 0; width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center;
+  background: conic-gradient(var(--vert) calc(var(--p) * 1%), var(--bordure) 0); position: relative; }
+.anneau-kpi::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: var(--fond-carte); }
+.anneau-kpi strong { position: relative; font-size: 17px; }
+.anneau-kpi.petit-anneau { width: 58px; height: 58px; }
+.anneau-kpi.petit-anneau::before { inset: 6px; }
+.anneau-kpi.petit-anneau strong { font-size: 13px; }
+.moyennes-analyse { margin-top: 12px; padding: 12px; border: 1px solid var(--bordure); border-radius: var(--rayon); }
+.entete-moyennes { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--texte-attenue); }
+.entete-moyennes strong { font-size: 15px; margin-left: 4px; }
+.barre-moyennes { display: flex; gap: 2px; height: 10px; margin: 8px 0 4px; }
+.barre-moyennes span { border-radius: 4px; }
+.barre-moyennes .gain { background: var(--vert); }
+.barre-moyennes .perte { background: var(--rouge); }
+.moyennes-analyse p { margin: 6px 0 0; }
 .conseils-analyse { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
-.conseils-analyse li { padding: 10px 12px; border-radius: var(--rayon); border: 1px solid var(--bordure); font-size: 13.5px; line-height: 1.45; }
+.conseils-analyse li { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: var(--rayon); border: 1px solid var(--bordure); font-size: 13.5px; line-height: 1.45; }
 .conseils-analyse li.attention { border-color: var(--orange); background: var(--orange-fond); }
 .conseils-analyse li.ok { border-color: var(--vert); background: var(--vert-fond); }
-.valeur-stat.positif { color: var(--vert); }
-.valeur-stat.negatif { color: var(--rouge); }
+.icone-conseil { flex: 0 0 auto; }
+.grille-cases-analyse { display: grid; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 6px; }
+.case-analyse { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; border-radius: 10px; border: 1px solid var(--bordure); text-align: center; }
+.case-analyse.vide { opacity: .55; }
+.lib-case { font-size: 11.5px; color: var(--texte-attenue); text-transform: capitalize; }
+.val-case { font-size: 13.5px; color: var(--texte); white-space: nowrap; }
+.sous-case { font-size: 10.5px; color: var(--texte-attenue); white-space: nowrap; }
+.sens-analyse { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bloc-sens { display: flex; flex-direction: column; gap: 5px; padding: 12px; border: 1px solid var(--bordure); border-radius: var(--rayon); }
+.bloc-sens.vide { opacity: .55; }
+.bloc-sens strong { font-size: 18px; }
+.barre-sens { height: 6px; background: var(--bordure); border-radius: 999px; overflow: hidden; }
+.barre-sens span { display: block; height: 100%; background: var(--vert); border-radius: 999px; }
+.tps-analyse { display: flex; justify-content: space-around; gap: 8px; flex-wrap: wrap; }
+.tp-analyse { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 
 /* Analyse › Analyse de graphique par l'IA (js/analyse-ia.js) */
 .compteur-ia { font-size: 13px; margin: 8px 0 10px; }

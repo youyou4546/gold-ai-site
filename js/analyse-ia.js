@@ -49,8 +49,7 @@
     if (!etat) { zone.textContent = "Compteurs indisponibles pour l'instant."; return; }
     const r = restantes();
     zone.className = `compteur-ia ${r === 0 ? "epuise" : r <= 1 ? "bientot" : ""}`;
-    zone.innerHTML = `Toi : <strong>${etat.moi} / ${etat.limite_moi}</strong> aujourd'hui · Tous les utilisateurs : <strong>${etat.total} / ${etat.limite_total}</strong>
-      <span class="texte-attenue petit">· environ 0,02 $ US par analyse · remis à zéro à minuit</span>`;
+    zone.innerHTML = `<strong>${etat.moi} / ${etat.limite_moi}</strong> analyses aujourd'hui`;
     majBouton();
   }
 
@@ -84,7 +83,6 @@
       ${scen("🔴 Scénario de vente", a.scenario_vente, "vente")}
       ${a.invalidation ? `<p><strong>❌ Invalidation :</strong> ${esc(a.invalidation)}</p>` : ""}
       ${a.prudence ? `<p class="texte-attenue petit">⚠️ ${esc(a.prudence)}</p>` : ""}
-      ${cout !== null && cout !== undefined ? `<p class="texte-attenue petit">Coût de cette analyse : ${U.nombre(Number(cout), 3)} $ US · analyse automatique, pas un conseil financier.</p>` : ""}
     </div>`;
   }
 

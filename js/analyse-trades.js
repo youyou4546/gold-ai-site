@@ -23,7 +23,7 @@
 
   const ouverte = () => $("section-journal")?.classList.contains("actif") && !$("journal-analyse")?.classList.contains("hidden");
   const argent = (v, signe = false) => U.montant(v, "USD", { signe });
-  const pct = (x) => `${Math.round(x)} %`;
+  const pct = (x) => `${Math.round(x)} %`;
 
   async function chargerPositions(forcer = false) {
     if (positions && !forcer) return positions;
@@ -53,18 +53,32 @@
     return trades;
   }
 
-  // Une ligne « barre » : libellé, nombre de trades, % gagnants, total (barre verte / rouge).
-  function lignes(groupes, libelle, maxAbs) {
-    return groupes.map((g) => `
-      <div class="ligne-analyse">
-        <span class="lib-analyse">${esc(libelle(g))}</span>
-        <span class="barre-analyse">${g.nb ? `<span class="${g.net >= 0 ? "gain" : "perte"}" style="width:${maxAbs ? Math.max(3, (Math.abs(g.net) / maxAbs) * 100) : 0}%"></span>` : ""}</span>
-        <span class="val-analyse">${g.nb ? `<strong class="${g.net >= 0 ? "positif" : "negatif"}">${argent(g.net, true)}</strong><br><span class="texte-attenue petit">${g.nb} trade${g.nb > 1 ? "s" : ""} · ${pct(g.taux)} gagnants</span>` : `<span class="texte-attenue petit">aucun trade</span>`}</span>
-      </div>`).join("");
+  // ------------------------------------------------ Rendu
+  // Couleur d'une case selon son résultat : vert (gain) / rouge (perte), plus
+  // intense quand le montant est grand ; gris neutre sans trade.
+  function teinte(net, nb, maxAbs) {
+    if (!nb) return "";
+    const force = maxAbs ? Math.round(14 + (Math.abs(net) / maxAbs) * 40) : 14;
+    return `style="background:color-mix(in srgb, var(${net >= 0 ? "--vert" : "--rouge"}) ${force}%, var(--fond-carte))"`;
   }
 
-  function tuile(label, valeur, sous = "", classe = "") {
-    return `<div class="carte-stat"><div class="label-stat">${label}</div><div class="valeur-stat ${classe}">${valeur}</div>${sous ? `<div class="sous-valeur-stat">${sous}</div>` : ""}</div>`;
+  // Montant court pour les petites cases : « +178 $ », « −1,6 k$ ».
+  const compact = (x) => (Math.abs(x) >= 1000
+    ? `${x < 0 ? "−" : "+"}${(Math.abs(x) / 1000).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} k$`
+    : court(x));
+  const court = (x) => `${x < 0 ? "−" : x > 0 ? "+" : ""}${Math.abs(Math.round(x)).toLocaleString("fr-FR")} $`;
+
+  // Grille de cases (jours ou heures) : libellé, résultat, % gagnants.
+  function grille(groupes, libelle, uneLigne = false) {
+    const maxAbs = Math.max(0, ...groupes.map((g) => Math.abs(g.net)));
+    const style = uneLigne ? ` style="grid-template-columns:repeat(${groupes.length}, 1fr)"` : "";
+    return `<div class="grille-cases-analyse"${style}>${groupes.map((g) => `
+      <div class="case-analyse ${g.nb ? "" : "vide"}" ${teinte(g.net, g.nb, maxAbs)}
+        title="${esc(libelle(g))} : ${g.nb} trade${g.nb > 1 ? "s" : ""}, ${pct(g.taux)} gagnants, ${esc(argent(g.net, true))}">
+        <span class="lib-case">${esc(libelle(g))}</span>
+        <strong class="val-case">${g.nb ? compact(g.net) : "—"}</strong>
+        <span class="sous-case">${g.nb ? `${pct(g.taux)} gagn.` : "aucun"}</span>
+      </div>`).join("")}</div>`;
   }
 
   function dessiner(r) {
@@ -73,42 +87,60 @@
       zone.innerHTML = `<p class="etat-vide">Aucun trade dans le journal pour ce compte et cette période.</p>`;
       return;
     }
-    const maxJour = Math.max(0, ...r.parJour.map((g) => Math.abs(g.net)));
-    const maxHeure = Math.max(0, ...r.parHeure.map((g) => Math.abs(g.net)));
-    const sens = [["Achats", r.parSens.buy], ["Ventes", r.parSens.sell]].filter(([, g]) => g.nb);
     const icone = { attention: "⚠️", ok: "✅", info: "💡" };
+    const ordre = { attention: 0, ok: 1, info: 2 }; // les alertes d'abord
+    const conseils = [...r.conseils].sort((a, b) => (ordre[a.niveau] ?? 3) - (ordre[b.niveau] ?? 3));
+    const gm = r.gainMoyen, pm = r.perteMoyenne, somme = gm + pm;
+    const sens = [["Achats", r.parSens.buy], ["Ventes", r.parSens.sell]];
+    const jours = r.parJour.map((g) => ({ ...g, court: g.nom.slice(0, 3) }));
+
     zone.innerHTML = `
-      <div class="grille-stats-perf">
-        ${tuile("Trades gagnants", pct(r.taux), `${r.gagnants} sur ${r.nb}`)}
-        ${tuile("Total", argent(r.total, true), "", r.total >= 0 ? "positif" : "negatif")}
-        ${tuile("Gain moyen", argent(r.gainMoyen), r.meilleur !== null ? `meilleur ${argent(r.meilleur, true)}` : "", "positif")}
-        ${tuile("Perte moyenne", argent(r.perteMoyenne), r.pire !== null ? `pire ${argent(r.pire, true)}` : "", "negatif")}
+      <div class="kpi-analyse">
+        <div class="kpi">
+          <span class="lib-kpi">Réussite</span>
+          <span class="anneau-kpi" style="--p:${Math.round(r.taux)}"><strong>${pct(r.taux)}</strong></span>
+          <span class="sous-kpi">${r.gagnants} gagnant${r.gagnants > 1 ? "s" : ""} sur ${r.nb}</span>
+        </div>
+        <div class="kpi">
+          <span class="lib-kpi">Résultat</span>
+          <strong class="grand-kpi ${r.total >= 0 ? "positif" : "negatif"}">${court(r.total)}</strong>
+          <span class="sous-kpi">${r.nb} trade${r.nb > 1 ? "s" : ""}</span>
+        </div>
       </div>
-      ${r.ratioGainPerte !== null ? `<p class="texte-attenue petit">Gain moyen ÷ perte moyenne : <strong>${U.nombre(r.ratioGainPerte, 2)}</strong>${r.profitFactor !== null ? ` · total des gains ÷ total des pertes : <strong>${U.nombre(r.profitFactor, 2)}</strong> (au-dessus de 1 = rentable)` : ""}</p>` : ""}
 
-      <h4 class="sous-titre-analyse">Conseils</h4>
-      ${r.conseils.length ? `<ul class="conseils-analyse">${r.conseils.map((c) => `<li class="${c.niveau}">${icone[c.niveau] || "•"} ${esc(c.texte)}</li>`).join("")}</ul>`
-        : `<p class="texte-attenue petit">Rien de marquant pour l'instant : pas de créneau, de jour ou de sens nettement meilleur ou pire (au moins 4 trades par groupe).</p>`}
+      ${gm || pm ? `<div class="moyennes-analyse">
+        <div class="entete-moyennes"><span>Gain moyen <strong class="positif">${court(gm)}</strong></span><span>Perte moyenne <strong class="negatif">${court(-pm)}</strong></span></div>
+        <div class="barre-moyennes" role="img" aria-label="Gain moyen ${court(gm)}, perte moyenne ${court(-pm)}">
+          <span class="gain" style="flex:${somme ? gm / somme : 0.5}"></span><span class="perte" style="flex:${somme ? pm / somme : 0.5}"></span>
+        </div>
+      </div>` : ""}
 
-      <h4 class="sous-titre-analyse">Par jour de la semaine</h4>
-      ${lignes(r.parJour, (g) => g.nom.charAt(0).toUpperCase() + g.nom.slice(1), maxJour)}
+      <h4 class="sous-titre-analyse">À retenir</h4>
+      ${conseils.length ? `<ul class="conseils-analyse">${conseils.map((c) => `<li class="${c.niveau}"><span class="icone-conseil" aria-hidden="true">${icone[c.niveau] || "•"}</span><span>${esc(c.texte)}</span></li>`).join("")}</ul>`
+        : `<p class="texte-attenue petit">Rien de marquant pour l'instant.</p>`}
 
-      <h4 class="sous-titre-analyse">Par heure d'ouverture <span class="texte-attenue petit">(${esc(U.fuseau())})</span></h4>
-      ${r.parHeure.length ? lignes(r.parHeure, (g) => `${g.heure}h – ${g.heure + 1}h`, maxHeure) : `<p class="texte-attenue petit">Aucune heure connue (seuls les trades importés de TradeLocker ont une heure d'ouverture).</p>`}
-      ${r.sansHeure ? `<p class="texte-attenue petit">${r.sansHeure} trade${r.sansHeure > 1 ? "s" : ""} saisi${r.sansHeure > 1 ? "s" : ""} à la main, sans heure : pas compté${r.sansHeure > 1 ? "s" : ""} ici.</p>` : ""}
+      <h4 class="sous-titre-analyse">Jours de la semaine</h4>
+      ${grille(jours, (g) => g.court.charAt(0).toUpperCase() + g.court.slice(1), true)}
+
+      <h4 class="sous-titre-analyse">Heures d'ouverture</h4>
+      ${r.parHeure.length ? grille(r.parHeure, (g) => `${g.heure}h`) : `<p class="texte-attenue petit">Seuls les trades importés de TradeLocker ont une heure.</p>`}
 
       <h4 class="sous-titre-analyse">Achats / ventes</h4>
-      ${sens.length ? `<div class="grille-stats-perf">${sens.map(([nom, g]) => tuile(nom, argent(g.net, true), `${g.nb} trade${g.nb > 1 ? "s" : ""} · ${pct(g.taux)} gagnants`, g.net >= 0 ? "positif" : "negatif")).join("")}</div>`
-        : `<p class="texte-attenue petit">Sens inconnu (trades saisis à la main).</p>`}
+      <div class="sens-analyse">${sens.map(([nom, g]) => `
+        <div class="bloc-sens ${g.nb ? "" : "vide"}">
+          <span class="lib-kpi">${nom}</span>
+          <strong class="${g.net >= 0 ? "positif" : "negatif"}">${g.nb ? court(g.net) : "—"}</strong>
+          <div class="barre-sens" role="img" aria-label="${pct(g.taux)} gagnants"><span style="width:${g.taux}%"></span></div>
+          <span class="sous-kpi">${g.nb ? `${pct(g.taux)} gagnants · ${g.nb} trade${g.nb > 1 ? "s" : ""}` : "aucun trade"}</span>
+        </div>`).join("")}</div>
 
-      <h4 class="sous-titre-analyse">TP atteints</h4>
-      ${r.tps.length ? r.tps.map((tp) => `
-        <div class="ligne-analyse">
-          <span class="lib-analyse">TP${tp.numero}</span>
-          <span class="barre-analyse"><span class="gain" style="width:${tp.pct}%"></span></span>
-          <span class="val-analyse"><strong>${pct(tp.pct)}</strong><br><span class="texte-attenue petit">${tp.atteints} sur ${tp.total}</span></span>
-        </div>`).join("") + `<p class="texte-attenue petit">Trades importés de TradeLocker seulement : chaque position (TP1, TP2, TP3…) fermée en gain compte comme TP atteint.</p>`
-        : `<p class="texte-attenue petit">Pas encore de trade importé de TradeLocker sur cette période.</p>`}`;
+      ${r.tps.length ? `<h4 class="sous-titre-analyse">TP atteints</h4>
+      <div class="tps-analyse">${r.tps.map((tp) => `
+        <div class="tp-analyse">
+          <span class="anneau-kpi petit-anneau" style="--p:${Math.round(tp.pct)}"><strong>${pct(tp.pct)}</strong></span>
+          <span class="lib-kpi">TP${tp.numero}</span>
+          <span class="sous-kpi">${tp.atteints} / ${tp.total}</span>
+        </div>`).join("")}</div>` : ""}`;
   }
 
   let enCours = null;
