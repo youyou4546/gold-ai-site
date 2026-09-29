@@ -48,9 +48,9 @@ test("cas de test : 0,75 lot, 0,30/0,23/0,22, gains 180/345/506, total 1031, per
   assert.equal(Math.round(r.perteTotaleSl), 300);
   assert.ok(r.risqueEffectif <= r.risqueDemande + 1e-9);
   assert.deepEqual(r.portions.map((p) => Math.round(p.gainCumuleSiCloturee)), [180, 525, 1031]);
-  // TP ouvert : aucune portion inventée
+  // TP runner sans portion libre : aucune portion inventée, avertissement
   assert.equal(r.portions.length, 3);
-  assert.ok(r.avertissements.some((a) => a.includes("TP ouvert")));
+  assert.ok(r.avertissements.some((a) => a.includes("TP runner")));
 });
 
 test("variantes de formulation (anglais, minuscules, virgule décimale)", () => {
@@ -481,4 +481,27 @@ test("ESS : exemples officiels Top One Trader", () => {
   assert.equal(e.nbJours, 2);
   // Pas de bénéfice : non calculable
   assert.equal(N.calculerEss([{ date: "2026-09-01", resultat: -50 }], 20).calculable, false);
+});
+
+test("TP sans chiffre = TP runner, qui reçoit toujours son lot", () => {
+  const signal = (...lignes) => N.lireSignal(["XAUUSD SELL 4335", "SL 4345", ...lignes].join("\n"));
+  // Différentes écritures d'un TP sans chiffre
+  for (const ligne of ["TP4", "TP4 :", "TP4 : ?", "TP 4 🚀", "- TP4 open", "TP runner", "Take profit 4 : --"]) {
+    assert.equal(signal("TP1 4329", ligne).tpOuverts, 1, ligne);
+  }
+  // Une consigne dans la ligne du SL n'est pas un runner
+  assert.equal(N.lireSignal(["XAUUSD SELL 4335", "SL 4345 (BE après TP1)", "TP1 4329"].join("\n")).tpOuverts, 0);
+  // 2 TP chiffrés + runner, répartition 40/30/30 → le runner a sa portion de 30 %
+  let r = N.calculerPosition(signal("TP1 4329", "TP2 4320", "TP3"), REGLAGES_TEST, null);
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.deepEqual(r.portions.map((p) => p.objectif), ["TP1", "TP2", "TP runner"]);
+  assert.ok(r.portions[2].lot > 0);
+  assert.equal(r.sommeLotsPortions, r.lotTotal);
+  // Répartition réglée 50/25/15/10 : TP1, TP2, TP3 + runner → le runner a les 10 %
+  r = N.calculerPosition(signal("TP1 4329", "TP2 4320", "TP3 4310", "TP4"), { ...REGLAGES_TEST, repartition: [50, 25, 15, 10] }, null);
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.deepEqual(r.portions.map((p) => p.objectif), ["TP1", "TP2", "TP3", "TP runner"]);
+  assert.equal(r.portions[3].pctConfigure, 10);
+  assert.ok(r.portions[3].lot > 0);
+  assert.equal(r.contientTpOuvert, true);
 });

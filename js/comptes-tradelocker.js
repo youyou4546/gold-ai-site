@@ -55,14 +55,14 @@
   // Compte maître : un seul à la fois (le choisir sur un compte le retire de l'ancien).
   // Enregistré par utilisateur avec les paramètres du calculateur.
   async function definirMaitre(cle) {
-    const r = await window.GoldAI.reglagesCalculateur.charger();
+    const r = await window.GoldAI.reglagesCalculateur.charger({ forcer: true });
     compteMaitre = cle;
     await window.GoldAI.reglagesCalculateur.sauvegarder({ ...r, compteMaitre: cle }); // → la barre d'objectif se met à jour
     afficherNoms();
   }
 
   async function enregistrerStatut(cle, champs) {
-    const r = await window.GoldAI.reglagesCalculateur.charger();
+    const r = await window.GoldAI.reglagesCalculateur.charger({ forcer: true });
     const tous = { ...(r.statutsComptes || {}) };
     tous[cle] = { ...(tous[cle] || {}), ...champs };
     statuts = tous;
@@ -71,7 +71,7 @@
   }
 
   async function enregistrerSurnom(cle, nom) {
-    const r = await window.GoldAI.reglagesCalculateur.charger();
+    const r = await window.GoldAI.reglagesCalculateur.charger({ forcer: true });
     const tous = { ...(r.surnomsComptes || {}) };
     if (nom) tous[cle] = nom.slice(0, 40); else delete tous[cle]; // vide = nom d'origine
     await window.GoldAI.reglagesCalculateur.sauvegarder({ ...r, surnomsComptes: tous });

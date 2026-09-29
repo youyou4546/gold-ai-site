@@ -51,7 +51,7 @@
         </div>
         <div class="ligne-actions">
           <button type="button" class="bouton secondaire bouton-petit" id="sig-ajouter-tp">+ TP</button>
-          <label class="case-a-cocher"><input type="checkbox" id="sig-tp-ouvert" ${s.tpOuverts ? "checked" : ""}/> Le signal a un « TP ouvert » (sans prix)</label>
+          <label class="case-a-cocher"><input type="checkbox" id="sig-tp-ouvert" ${s.tpOuverts ? "checked" : ""}/> Le signal a un TP runner (TP sans chiffre)</label>
         </div>
         ${lecture.lignesIgnorees.length ? `<details class="details-discrets"><summary>${lecture.lignesIgnorees.length} ligne(s) ignorée(s) (commentaires)</summary><ul>${lecture.lignesIgnorees.map((l) => `<li>${esc(l)}</li>`).join("")}</ul></details>` : ""}
       </div>`;
@@ -85,7 +85,7 @@
     if (!plan.length) return "";
     return `
       <div class="carte">
-        <h3 class="titre-bloc">SL du runner (TP ouvert)</h3>
+        <h3 class="titre-bloc">SL du TP runner</h3>
         <ul class="liste-plan-sl">${plan.map((p) => `
           <li><strong>${esc(p.apres)} touché</strong> → SL à <strong>${prixAffiche(p.sl)}</strong> <span class="texte-attenue">${esc(p.libelle)}</span></li>`).join("")}
         </ul>
@@ -100,7 +100,7 @@
         <td>${p.prix === null ? "<span class=\"texte-attenue\">sans prix</span>" : prixAffiche(p.prix)}</td>
         <td>${nombre(p.pctConfigure, 0)} %${Math.abs(p.pctReel - p.pctConfigure) >= 0.5 ? `<br><span class="texte-attenue">réel ${nombre(p.pctReel, 1)} %</span>` : ""}</td>
         <td><strong>${nombre(p.lot, 2)}</strong></td>
-        <td class="positif">${p.gainAuTp === null ? "<span class=\"texte-attenue\">non calculable</span>" : `▲ ${montant(p.gainAuTp, d)}`}</td>
+        <td class="positif">${p.type === "ouvert" ? "<span class=\"texte-attenue\">laisse courir</span>" : p.gainAuTp === null ? "<span class=\"texte-attenue\">non calculable</span>" : `▲ ${montant(p.gainAuTp, d)}`}</td>
       </tr>`).join("");
 
     return `

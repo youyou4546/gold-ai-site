@@ -93,7 +93,9 @@
           numeroAuto = numero || numeroAuto + 1;
           resultat.tps.push({ numero: numeroAuto, prix: prix[0] });
           if (prix.length > 1) resultat.ambiguites.push({ champ: `tp${numeroAuto}`, message: `TP${numeroAuto} : plusieurs nombres sur la ligne « ${ligne} » — le premier (${prix[0]}) est retenu, vérifie-le.` });
-        } else if (MOTIF_TP_OUVERT.test(reste) || reste.trim() === "") {
+        } else if ((/^[^A-Za-z0-9]*$/.test(ligne.slice(0, tp.index)) && /^(?:tp|take)/i.test(tp[0].trim())) || MOTIF_TP_OUVERT.test(reste) || reste.trim() === "") {
+          // Ligne qui commence par un TP sans chiffre (« TP4 », « TP4 : ? », « TP4 🚀 », « TP ouvert »…) = TP RUNNER.
+          // (« Objectif … » / « Target … » sans chiffre : seulement si « ouvert / runner… » ou vide.)
           resultat.tpOuverts += 1;
         }
         return;
@@ -255,23 +257,26 @@
     // Portions : chaque portion est un ordre séparé → soumise au lot min / max.
     const nbTps = signal.tps.length;
     const nbPortions = repartition.length;
+    // TP runner (TP sans chiffre) : il prend la portion de la répartition (Général)
+    // qui suit les TP chiffrés — ex. TP1, TP2, TP3 + runner avec 50/25/15/10 → runner 10 %.
+    const nbTpsRetenus = Math.min(nbTps, nbPortions);
     const portionsDef = [];
     for (let i = 0; i < nbPortions; i++) {
-      if (i < nbTps) portionsDef.push({ type: "tp", numero: signal.tps[i].numero, prix: signal.tps[i].prix, pct: repartition[i] });
-      else if (i === nbTps && signal.tpOuverts > 0) portionsDef.push({ type: "ouvert", numero: null, prix: null, pct: repartition[i] });
+      if (i < nbTpsRetenus) portionsDef.push({ type: "tp", numero: signal.tps[i].numero, prix: signal.tps[i].prix, pct: repartition[i] });
+      else if (i === nbTpsRetenus && signal.tpOuverts > 0) portionsDef.push({ type: "ouvert", numero: null, prix: null, pct: repartition[i] });
       else portionsDef.push({ type: "sans_objectif", numero: null, prix: null, pct: repartition[i] });
     }
     const sansObjectif = portionsDef.filter((p) => p.type === "sans_objectif").length;
     if (sansObjectif > 0) {
       return {
         ok: false, avertissements, aConfigurer: [],
-        erreurs: [`La répartition configurée prévoit ${nbPortions} portions mais le signal ne donne que ${nbTps} TP chiffré(s)${signal.tpOuverts ? " + 1 TP ouvert" : ""}. Choisis comment répartir (bouton ci-dessous) ou ajuste la répartition dans Général.`],
+        erreurs: [`La répartition configurée prévoit ${nbPortions} portions mais le signal ne donne que ${nbTps} TP chiffré(s)${signal.tpOuverts ? " + 1 TP runner" : ""}. Choisis comment répartir (bouton ci-dessous) ou ajuste la répartition dans Général.`],
         choixRepartition: true,
       };
     }
-    if (nbTps > nbPortions) avertissements.push(`Le signal contient ${nbTps} TP chiffrés mais ta répartition n'en prévoit que ${nbPortions} : ${signal.tps.slice(nbPortions).map((t) => `TP${t.numero}`).join(", ")} ignoré(s).`);
+    if (nbTps > nbTpsRetenus) avertissements.push(`Le signal contient ${nbTps} TP chiffrés mais ta répartition n'en prévoit que ${nbPortions} : ${signal.tps.slice(nbTpsRetenus).map((t) => `TP${t.numero}`).join(", ")} ignoré(s).`);
     if (signal.tpOuverts > 0 && !portionsDef.some((p) => p.type === "ouvert")) {
-      avertissements.push("« TP ouvert » (sans prix) : aucune portion ne lui est attribuée, car ta répartition est entièrement utilisée par les TP chiffrés. Aucun prix ni gain n'est inventé pour lui.");
+      avertissements.push(`TP runner (TP sans chiffre) : pas de lot pour lui, car ta répartition n'a que ${nbPortions} portion(s), toutes prises par les TP chiffrés. Ajoute une portion dans Profil › Général › Répartition pour lui donner son lot.`);
     }
 
     const unitesMin = Math.round(spec.lotMin / pas);
@@ -323,7 +328,7 @@
         cumul += gain;
       }
       return {
-        objectif: p.type === "tp" ? `TP${p.numero}` : "TP ouvert",
+        objectif: p.type === "tp" ? `TP${p.numero}` : "TP runner",
         type: p.type,
         prix: p.prix,
         pctConfigure: p.pct,

@@ -161,8 +161,10 @@
         <span id="total-repartition" class="total-rep"></span>
       </div>
 
-      <label class="label-groupe">SL du runner (TP ouvert)</label>
-      <p class="aide">Où remonter le SL de la portion « TP ouvert » après chaque TP touché. Par défaut, il reste un cran derrière le dernier TP touché.</p>
+      <p class="aide">Un TP sans chiffre dans le signal = <strong>TP runner</strong> : il prend la portion qui suit les TP chiffrés (ex. TP1, TP2, TP3 + runner → 4 portions).</p>
+
+      <label class="label-groupe">SL du TP runner</label>
+      <p class="aide">Où remonter le SL du TP runner après chaque TP touché. Par défaut, il reste un cran derrière le dernier TP touché.</p>
       <div class="grille-sl-runner">${(r.slRunner?.length ? r.slRunner : window.GoldAI.noyau.reglesSlRunnerParDefaut()).map(ligneSlRunner).join("")}</div>
 
       <label class="label-groupe">Instruments</label>
@@ -239,6 +241,46 @@
     return { r, erreurs };
   }
 
+  // Enregistre le formulaire. Les autres réglages (objectif, comptes, ESS…) sont
+  // relus juste avant sur le serveur : un changement fait ailleurs (autre appareil)
+  // n'est jamais écrasé par une vieille copie.
+  let minuterieAuto = null;
+  let enregistrement = Promise.resolve();
+  function planifierAuto() {
+    clearTimeout(minuterieAuto);
+    minuterieAuto = setTimeout(() => enregistrerFormulaire(true), 700);
+  }
+
+  function enregistrerFormulaire(auto) {
+    enregistrement = enregistrement.then(async () => {
+      const zoneErreur = document.getElementById("erreur-parametres-calculateur");
+      const zoneMsg = document.getElementById("message-parametres-calculateur");
+      const bouton = document.getElementById("bouton-sauvegarder-calculateur");
+      if (!zoneErreur) return;
+      zoneErreur.classList.remove("visible");
+      const verif = lireFormulaire();
+      if (verif.erreurs.length) {
+        zoneErreur.innerHTML = (auto ? ["Pas encore enregistré :"] : []).concat(verif.erreurs).map(esc).join("<br>");
+        zoneErreur.classList.add("visible");
+        return;
+      }
+      bouton.disabled = true;
+      try {
+        await charger({ forcer: true });     // dernière version du serveur…
+        const { r } = lireFormulaire();      // …+ les champs de ce formulaire
+        const res = await sauvegarder(r);
+        zoneMsg.textContent = res.local ? res.message : auto ? "✓ Enregistré automatiquement" : res.message;
+      } catch {
+        zoneMsg.textContent = "Enregistrement impossible pour l'instant : vérifie ta connexion.";
+      } finally {
+        bouton.disabled = false;
+      }
+      zoneMsg.classList.add("succes-visible");
+      setTimeout(() => zoneMsg.classList.remove("succes-visible"), 4000);
+    });
+    return enregistrement;
+  }
+
   async function ouvrir() {
     const zone = document.getElementById("zone-parametres-calculateur");
     zone.innerHTML = `<p class="etat-vide">Chargement…</p>`;
@@ -275,23 +317,15 @@
       } else if (t.hasAttribute("data-suppr-instrument")) {
         t.closest(".carte-instrument").remove();
       } else if (t.id === "bouton-sauvegarder-calculateur") {
-        const zoneErreur = document.getElementById("erreur-parametres-calculateur");
-        const zoneMsg = document.getElementById("message-parametres-calculateur");
-        zoneErreur.classList.remove("visible");
-        const { r, erreurs } = lireFormulaire();
-        if (erreurs.length) {
-          zoneErreur.innerHTML = erreurs.map(esc).join("<br>");
-          zoneErreur.classList.add("visible");
-          return;
-        }
-        t.disabled = true;
-        const res = await sauvegarder(r);
-        t.disabled = false;
-        zoneMsg.textContent = res.message;
-        zoneMsg.classList.add("succes-visible");
-        setTimeout(() => zoneMsg.classList.remove("succes-visible"), 4000);
+        clearTimeout(minuterieAuto);
+        enregistrerFormulaire(false);
       }
+      // Portion ajoutée / retirée : enregistrée automatiquement aussi.
+      if (t.id === "ajouter-rep" || t.dataset.supprRep !== undefined || t.hasAttribute("data-suppr-instrument")) planifierAuto();
     });
+    // Enregistrement automatique à chaque changement (plus besoin du bouton du bas,
+    // qu'on pouvait oublier : la répartition des TP changée n'était alors pas gardée).
+    zone.addEventListener("change", planifierAuto);
   });
 
   function viderCache() { cache = null; stockage = null; }

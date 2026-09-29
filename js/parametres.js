@@ -50,7 +50,7 @@
   }
 
   async function enregistrerArretPremierGain() {
-    const r = await window.GoldAI.reglagesCalculateur.charger();
+    const r = await window.GoldAI.reglagesCalculateur.charger({ forcer: true });
     const res = await window.GoldAI.reglagesCalculateur.sauvegarder({
       ...r, arretPremierGain: document.getElementById("param-arret-premier-gain").checked,
     });

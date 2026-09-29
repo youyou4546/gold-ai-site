@@ -25,7 +25,7 @@
   }
 
   async function sauverRegles() {
-    const r = await window.GoldAI.reglagesCalculateur.charger();
+    const r = await window.GoldAI.reglagesCalculateur.charger({ forcer: true });
     await window.GoldAI.reglagesCalculateur.sauvegarder({ ...r, reglesComptes: regles });
   }
 

@@ -123,7 +123,7 @@
     const seuil = Number($("seuil-ess").value);
     const message = $("message-ess");
     if (!(seuil > 0 && seuil <= 100)) { message.textContent = "Indique un pourcentage entre 1 et 100."; message.classList.add("succes-visible"); return; }
-    const r = await window.GoldAI.reglagesCalculateur.charger();
+    const r = await window.GoldAI.reglagesCalculateur.charger({ forcer: true }); // version la plus récente : ne pas écraser un réglage changé ailleurs
     const res = await window.GoldAI.reglagesCalculateur.sauvegarder({ ...r, seuilEss: seuil });
     message.textContent = res.local ? res.message : "✓ Seuil ESS enregistré";
     message.classList.add("succes-visible");
@@ -134,7 +134,7 @@
     const montant = Number($("objectif-montant").value);
     const message = $("message-objectif");
     if (!(montant > 0)) { message.textContent = "Indique un montant supérieur à 0."; message.classList.add("succes-visible"); return; }
-    const r = await window.GoldAI.reglagesCalculateur.charger();
+    const r = await window.GoldAI.reglagesCalculateur.charger({ forcer: true });
     const res = await window.GoldAI.reglagesCalculateur.sauvegarder({
       ...r, objectif: { montant, periode: $("objectif-periode").value, compteId: "" }, // le compte suivi = le compte maître (Mes comptes)
     });
