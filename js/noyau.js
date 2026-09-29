@@ -767,7 +767,16 @@
       const g = groupes.find((x) => x.instrument === (t.instrument || "") && x.sens === (t.sens || "") && debut - x.debut <= ecartMs);
       if (g) g.trades.push(t); else groupes.push({ instrument: t.instrument || "", sens: t.sens || "", debut, trades: [t] });
     }
-    trades.filter((t) => !t.ouvertLe).forEach((t) => groupes.push({ trades: [t] }));
+    // Trade saisi à la main (sans heure) mais rattaché à un compte : c'est la
+    // copie d'un signal déjà présent sur un AUTRE compte le même jour s'il y en a
+    // un où ce compte manque encore (ex. import supprimé puis ressaisi à la main).
+    // Sans compte : un signal à lui seul.
+    const code = (x) => String(x || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 6);
+    trades.filter((t) => !t.ouvertLe).forEach((t) => {
+      const g = t.compteTl && groupes.find((x) => (!code(x.instrument) || !code(t.instrument) || code(x.instrument) === code(t.instrument))
+        && x.trades.every((y) => y.compteTl && y.compteTl !== t.compteTl && (!y.date || !t.date || y.date === t.date)));
+      if (g) g.trades.push(t); else groupes.push({ instrument: t.instrument || "", trades: [t] });
+    });
     return groupes.map((g) => ({ trades: g.trades, net: Math.round(g.trades.reduce((s, t) => s + net(t), 0) * 100) / 100 }));
   }
 
@@ -859,7 +868,7 @@
   // 9. OBJECTIF DE PROFIT (jour / semaine / mois) et PROCHAINE ANNONCE
   // =====================================================================
 
-  const OBJECTIF_PAR_DEFAUT = { montant: 100, periode: "jour", compteId: "" };
+  const OBJECTIF_PAR_DEFAUT = { montant: 150, periode: "jour", compteId: "" };
 
   /** Début de la période ("AAAA-MM-JJ") contenant `jour` : jour même, lundi de la semaine, 1er du mois. */
   function debutPeriode(jour, periode) {
@@ -872,14 +881,16 @@
 
   /**
    * Réalisé = somme des résultats nets (frais déduits) des trades de la
-   * période en cours, filtrés sur un compte si `objectif.compteId` est rempli.
+   * période en cours, filtrés sur un compte si `objectif.compteId` est rempli,
+   * ou sur un compte TradeLocker (le compte maître) si `objectif.compteTl` l'est.
    * `aujourdhui` : "AAAA-MM-JJ" dans le fuseau de l'utilisateur.
    */
   function progressionObjectif(trades, objectif, aujourdhui) {
     const o = { ...OBJECTIF_PAR_DEFAUT, ...(objectif || {}) };
     const montant = Number(o.montant) > 0 ? Number(o.montant) : OBJECTIF_PAR_DEFAUT.montant;
     const debut = debutPeriode(aujourdhui, o.periode);
-    const retenus = (trades || []).filter((t) => t.date >= debut && t.date <= aujourdhui && (!o.compteId || t.compteTradingId === o.compteId));
+    const retenus = (trades || []).filter((t) => t.date >= debut && t.date <= aujourdhui
+      && (!o.compteId || t.compteTradingId === o.compteId) && (!o.compteTl || t.compteTl === o.compteTl));
     const realise = Math.round(retenus.reduce((s, t) => s + Number(t.resultat) - (Number(t.frais) || 0), 0) * 100) / 100;
     return {
       montant, periode: o.periode, compteId: o.compteId, debut, realise, nbTrades: retenus.length,
@@ -989,6 +1000,37 @@
     };
   }
 
+  // =====================================================================
+  // 10. ESS (Equity Stability Score) — Top One Trader, comptes financés
+  // =====================================================================
+
+  /**
+   * ESS = (plus grand jour gagnant + plus grande journée de perte en valeur
+   * absolue) ÷ bénéfice net total × 100. Les trades sont d'abord regroupés par
+   * journée (profit net du jour, frais déduits). `seuilPct` : ex. 20.
+   * - requis : bénéfice net total minimum pour être au seuil, sans battre les
+   *   records de journée actuels = (gain max + perte max) ÷ seuil décimal ;
+   * - marge (sous le seuil) : bénéfice total au-delà de ce minimum ;
+   * - manque (au-dessus) : bénéfice total à ajouter pour redescendre au seuil.
+   * Non calculable si le bénéfice net total est ≤ 0.
+   */
+  function calculerEss(trades, seuilPct = 20) {
+    const r2 = (x) => Math.round(x * 100) / 100;
+    const parJour = {};
+    (trades || []).forEach((t) => { parJour[t.date] = (parJour[t.date] || 0) + Number(t.resultat) - (Number(t.frais) || 0); });
+    const nets = Object.values(parJour).map(r2);
+    const total = r2(nets.reduce((s, x) => s + x, 0));
+    const maxGain = Math.max(0, ...nets);
+    const maxPerte = Math.abs(Math.min(0, ...nets));
+    const seuil = Number(seuilPct) > 0 ? Number(seuilPct) : 20;
+    const requis = r2((maxGain + maxPerte) / (seuil / 100));
+    const res = { total, maxGain, maxPerte, seuil, requis, nbJours: nets.length, calculable: total > 0 };
+    if (!res.calculable) return { ...res, ess: null, eligible: false, marge: 0, manque: r2(requis - total) };
+    const ess = ((maxGain + maxPerte) / total) * 100;
+    const eligible = Math.round(ess * 100) / 100 <= seuil;
+    return { ...res, ess, eligible, marge: eligible ? r2(total - requis) : 0, manque: eligible ? 0 : r2(requis - total) };
+  }
+
   const LIBELLE_TF = { "30min": "30 min", "1h": "1 h", "4h": "4 h", "1week": "1W" };
 
   const api = {
@@ -998,7 +1040,7 @@
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
     scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou, regrouperSignaux, aUnTradeGagnant, etatChallenge,
     OBJECTIF_PAR_DEFAUT, debutPeriode, progressionObjectif, prochaineAnnonceDuJour,
-    slCourant, evaluerTouches, pnlEstime, alerteTouchee, distanceAlerte, situationCompte, LIBELLE_TF, LIBELLES_SPEC,
+    slCourant, evaluerTouches, pnlEstime, alerteTouchee, distanceAlerte, situationCompte, calculerEss, LIBELLE_TF, LIBELLES_SPEC,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

@@ -304,11 +304,11 @@ test("objectif de profit : périodes, frais, compte", () => {
     { date: "2026-09-10", resultat: 200, frais: 0, compteTradingId: "a" },
     { date: "2026-08-31", resultat: 999, frais: 0, compteTradingId: "a" },
   ];
-  let p = N.progressionObjectif(trades, null, "2026-09-30"); // défaut : 100 $ / jour
+  let p = N.progressionObjectif(trades, null, "2026-09-30"); // défaut : 150 $ / jour
   assert.equal(p.realise, 60);
-  assert.equal(p.montant, 100);
+  assert.equal(p.montant, 150);
   assert.equal(p.atteint, false);
-  assert.equal(Math.round(p.pourcentage), 60);
+  assert.equal(Math.round(p.pourcentage), 40);
   assert.equal(N.progressionObjectif(trades, { montant: 100, periode: "semaine" }, "2026-09-30").realise, 110);
   p = N.progressionObjectif(trades, { montant: 250, periode: "mois", compteId: "a" }, "2026-09-30");
   assert.equal(p.realise, 260);
@@ -429,4 +429,56 @@ test("garde-fou : un signal copié sur 2 comptes compte pour 1 trade", () => {
   assert.equal(g.nb, 3);
   assert.equal(g.pertes, 1);                                    // la perte copiée sur 2 comptes = 1 perte
   assert.equal(g.niveau, "bloque");                             // 3 sur 3
+});
+
+test("garde-fou : trade ressaisi à la main sur l'autre compte = même signal (29/09 : 1 trade, pas 2)", () => {
+  const imp = { date: "2026-09-29", resultat: 23.75, instrument: "XAUUSD", sens: "buy", compteTl: "demo|2501722", ouvertLe: "2026-09-29T07:16:37Z" };
+  const main = { date: "2026-09-29", resultat: 179, instrument: "XAUUSD", compteTl: "demo|2501723" };
+  assert.equal(N.regrouperSignaux([imp, main]).length, 1);
+  assert.equal(N.evaluerGardeFou({ trades: [imp, main], regles: { maxTrades: 2 } }).nb, 1);
+  // Sur le MÊME compte : deux trades distincts.
+  assert.equal(N.regrouperSignaux([imp, { ...main, compteTl: "demo|2501722" }]).length, 2);
+  // Sans compte : un trade à part.
+  assert.equal(N.regrouperSignaux([imp, { ...main, compteTl: null }]).length, 2);
+});
+
+test("objectif sur le compte maître seulement", () => {
+  const trades = [
+    { date: "2026-09-29", resultat: 23.75, compteTl: "demo|1" },
+    { date: "2026-09-29", resultat: 179, compteTl: "demo|2" },
+  ];
+  const p = N.progressionObjectif(trades, { montant: 150, periode: "jour", compteTl: "demo|2" }, "2026-09-29");
+  assert.equal(p.realise, 179);
+  assert.equal(p.atteint, true);
+  assert.equal(N.progressionObjectif(trades, { montant: 150, periode: "jour", compteTl: "demo|1" }, "2026-09-29").atteint, false);
+});
+
+test("ESS : exemples officiels Top One Trader", () => {
+  const jours = (liste) => liste.map((r, i) => ({ date: `2026-09-${String(i + 1).padStart(2, "0")}`, resultat: r }));
+  // 400 / -350 / total 3750 → 20 % pile → qualifié
+  let e = N.calculerEss(jours([400, -350, 390, 380, 370, 360, 350, 340, 330, 320, 310, 300, 250]), 20);
+  assert.equal(e.total, 3750);
+  assert.equal(e.maxGain, 400);
+  assert.equal(e.maxPerte, 350);
+  assert.equal(Math.round(e.ess * 100) / 100, 20);
+  assert.equal(e.eligible, true);
+  assert.equal(e.marge, 0);
+  // 1200 / -800 / total 11000 → 18,18 %
+  e = N.calculerEss(jours([1200, -800, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 700]), 20);
+  assert.equal(e.total, 11000);
+  assert.equal(Math.round(e.ess * 100) / 100, 18.18);
+  assert.equal(e.eligible, true);
+  assert.equal(e.requis, 10000);
+  assert.equal(e.marge, 1000);
+  // Au-dessus : 1000 / -500 / total 5000 → 30 %, il faut 7500 → manque 2500
+  e = N.calculerEss(jours([1000, -500, 900, 900, 900, 900, 900]), 20);
+  assert.equal(e.ess, 30);
+  assert.equal(e.eligible, false);
+  assert.equal(e.manque, 2500);
+  // Plusieurs trades le même jour = une journée
+  e = N.calculerEss([{ date: "2026-09-01", resultat: 300 }, { date: "2026-09-01", resultat: -100, frais: 10 }, { date: "2026-09-02", resultat: 810 }], 20);
+  assert.equal(e.maxGain, 810);
+  assert.equal(e.nbJours, 2);
+  // Pas de bénéfice : non calculable
+  assert.equal(N.calculerEss([{ date: "2026-09-01", resultat: -50 }], 20).calculable, false);
 });

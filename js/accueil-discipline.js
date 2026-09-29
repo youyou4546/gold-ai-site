@@ -1,13 +1,14 @@
 // Gold AI — Calculateur : bloc Discipline (après un calcul) + barre d'objectif.
 //
-// - « Trades restants » : repris du garde-fou du jour (js/garde-fou.js).
 // - Compte à rebours vers la prochaine annonce à impact élevé DU JOUR
 //   (calendrier déjà chargé, fuseau de l'utilisateur), mis à jour chaque
 //   seconde : orange sous 30 min, rouge sous 10 min, passe tout seul à la
 //   suivante. Toucher → section Annonces.
-// - Barre d'objectif de profit (en haut de TOUTES les pages, sous le garde-fou) (jour / semaine / mois, tous comptes ou un
-//   compte) réglée dans Profil › Général, calculée avec les trades du journal
-//   (noyau.progressionObjectif).
+// - Barre d'objectif de profit (en haut de TOUTES les pages) (jour / semaine /
+//   mois) réglée dans Profil › Général, calculée avec les trades du journal liés
+//   au COMPTE MAÎTRE choisi dans Profil › Mes comptes TradeLocker
+//   (noyau.progressionObjectif). Sans compte maître : lien pour en choisir un.
+// - Réglage du seuil ESS (Profil › Général), utilisé par Mes comptes.
 (() => {
   const N = window.GoldAI.noyau;
   const U = window.GoldAI.utils;
@@ -21,26 +22,6 @@
   // Le bloc n'apparaît que dans le Calculateur, une fois un trade calculé.
   const surAccueil = () => $("section-calculateur")?.classList.contains("actif") && !$("bloc-discipline")?.classList.contains("hidden") && window.GoldAI.auth?.getToken();
   const actif = () => surAccueil() && !document.hidden; // pas de tic-tac écran éteint / app en arrière-plan
-
-  // ---------------------------------------------------------------- Trades restants
-
-  function afficherTradesRestants() {
-    const zone = $("tuile-trades-restants");
-    if (!zone) return;
-    const g = window.GoldAI.gardeFou?.etat();
-    let valeur = "—", sous = "aucune limite définie", classe = "";
-    if (g?.maxTrades) {
-      const reste = Math.max(0, g.maxTrades - g.nb);
-      valeur = `${reste} / ${g.maxTrades}`;
-      sous = reste === 0 ? "plus de trade aujourd'hui" : `${g.nb} déjà pris aujourd'hui`;
-      classe = g.niveau === "bloque" || reste === 0 ? "rouge" : reste === 1 || g.niveau === "attention" ? "orange" : "";
-    } else if (g) {
-      sous = `${g.nb} pris aujourd'hui · sans limite`;
-    }
-    if (g?.niveau === "bloque") sous = "journée terminée";
-    zone.className = `tuile-discipline ${classe}`;
-    zone.innerHTML = `<span class="libelle-tuile">Trades restants</span><span class="valeur-tuile">${valeur}</span><span class="sous-tuile">${esc(sous)}</span>`;
-  }
 
   // ---------------------------------------------------------------- Compte à rebours
 
@@ -92,13 +73,26 @@
     const zone = $("bloc-objectif");
     if (!zone || !window.GoldAI.auth?.getToken()) return;
     const reglages = await window.GoldAI.reglagesCalculateur.charger();
+    // Pas encore de compte maître : invitation à en choisir un à la place de la barre.
+    if (!reglages.compteMaitre) {
+      window.GoldAI.dernierObjectif = null;
+      zone.className = "bloc-objectif";
+      zone.hidden = false;
+      zone.innerHTML = `<div class="entete-objectif"><span>🎯 <button type="button" class="lien-objectif" id="lien-choisir-maitre">Choisis un compte maître dans Mes comptes</button></span></div>`;
+      $("lien-choisir-maitre").addEventListener("click", () => {
+        window.GoldAI.app.allerA("profil");
+        window.GoldAI.comptesTradelocker.ouvrir();
+      });
+      return;
+    }
     const parJour = await window.GoldAI.journal.chargerTousLesTrades();
     const trades = Object.values(parJour).flat();
     const aujourdhui = window.GoldAI.gardeFou?.cleAujourdhui?.() || U.cleJour(Date.now());
-    // Toujours tous les trades (un ancien choix de compte est ignoré).
-    const p = N.progressionObjectif(trades, { ...(reglages.objectif || {}), compteId: "" }, aujourdhui);
+    // Seulement les trades du journal liés au compte maître (Profil › Mes comptes TradeLocker).
+    const p = N.progressionObjectif(trades, { ...(reglages.objectif || {}), compteId: "", compteTl: reglages.compteMaitre }, aujourdhui);
     window.GoldAI.dernierObjectif = p; // repris par le briefing vocal (js/briefing.js)
-    const nomCompte = "";
+    const nomCompte = reglages.surnomsComptes?.[reglages.compteMaitre]
+      || trades.find((t) => t.compteTl === reglages.compteMaitre)?.compteTlNom || "compte maître";
     const m = (v) => U.montant(v, "USD");
     zone.className = `bloc-objectif${p.atteint ? " atteint" : ""}`;
     zone.hidden = false;
@@ -121,6 +115,19 @@
     const o = { ...N.OBJECTIF_PAR_DEFAUT, ...(r.objectif || {}) };
     $("objectif-montant").value = o.montant;
     $("objectif-periode").value = o.periode;
+    $("seuil-ess").value = Number(r.seuilEss) > 0 ? r.seuilEss : 20;
+  }
+
+  // Seuil ESS maximum (%), 20 par défaut : sert au suivi ESS des comptes financés.
+  async function enregistrerSeuilEss() {
+    const seuil = Number($("seuil-ess").value);
+    const message = $("message-ess");
+    if (!(seuil > 0 && seuil <= 100)) { message.textContent = "Indique un pourcentage entre 1 et 100."; message.classList.add("succes-visible"); return; }
+    const r = await window.GoldAI.reglagesCalculateur.charger();
+    const res = await window.GoldAI.reglagesCalculateur.sauvegarder({ ...r, seuilEss: seuil });
+    message.textContent = res.local ? res.message : "✓ Seuil ESS enregistré";
+    message.classList.add("succes-visible");
+    setTimeout(() => message.classList.remove("succes-visible"), 2500);
   }
 
   async function enregistrerObjectif() {
@@ -129,7 +136,7 @@
     if (!(montant > 0)) { message.textContent = "Indique un montant supérieur à 0."; message.classList.add("succes-visible"); return; }
     const r = await window.GoldAI.reglagesCalculateur.charger();
     const res = await window.GoldAI.reglagesCalculateur.sauvegarder({
-      ...r, objectif: { montant, periode: $("objectif-periode").value, compteId: "" }, // toujours tous les trades
+      ...r, objectif: { montant, periode: $("objectif-periode").value, compteId: "" }, // le compte suivi = le compte maître (Mes comptes)
     });
     message.textContent = res.local ? res.message : "✓ Objectif enregistré";
     message.classList.add("succes-visible");
@@ -141,7 +148,6 @@
   function afficher() {
     if (!$("bloc-discipline")) return;
     $("bloc-discipline").classList.remove("hidden");
-    afficherTradesRestants();
     demarrerChrono();
     afficherObjectif();
   }
@@ -150,11 +156,12 @@
     $("tuile-prochaine-annonce")?.addEventListener("click", () => window.GoldAI.app.allerA("calendrier"));
     $("bouton-ouvrir-parametres")?.addEventListener("click", remplirReglageObjectif);
     ["objectif-montant", "objectif-periode"].forEach((id) => $(id)?.addEventListener("change", enregistrerObjectif));
+    $("seuil-ess")?.addEventListener("change", enregistrerSeuilEss);
   });
   document.addEventListener("visibilitychange", () => { if (actif()) demarrerChrono(); });
   // Le garde-fou se calcule à la connexion puis à chaque trade : l'objectif
   // (en haut de toutes les pages) suit le même rythme.
-  window.addEventListener("goldai:garde-fou", () => { afficherTradesRestants(); afficherObjectif(); });
+  window.addEventListener("goldai:garde-fou", afficherObjectif);
   window.addEventListener("goldai:trades", afficherObjectif);
   window.addEventListener("goldai:reglages-calculateur", afficherObjectif);
   window.addEventListener("goldai:comptes", afficherObjectif);

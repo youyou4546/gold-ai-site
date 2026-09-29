@@ -1,8 +1,9 @@
 // Gold AI — Garde-fou du jour + alerte d'annonce proche.
 //
-// 1. Bandeau en haut de l'app : trades du jour, résultat net, marge avant la
-//    limite de perte journalière. Couleur : normal / orange (attention) /
-//    rouge (règle atteinte). Règles : Profil › Général (max trades, pertes
+// 1. Règles du jour calculées en arrière-plan (trades du jour comptés en
+//    SIGNAUX : 1 trade = 1, peu importe ses TP ou ses copies sur d'autres
+//    comptes). Le bandeau du haut ne s'affiche que pour avertir (orange) ou
+//    quand une règle est atteinte (rouge) ; plus de compteur affiché. Règles : Profil › Général (max trades, pertes
 //    qui arrêtent la journée, gain qui arrête la journée) + limite de perte
 //    journalière des comptes de Profil › Mes comptes (la plus stricte si
 //    plusieurs comptes). Calcul : js/noyau.js › evaluerGardeFou.
@@ -64,12 +65,13 @@
     try { return await tache; } finally { if (chargement === tache) chargement = null; }
   }
 
-  // Même calcul que la barre d'objectif (js/accueil-discipline.js), tous comptes.
+  // Même calcul que la barre d'objectif (js/accueil-discipline.js) : compte maître seulement.
   async function majObjectifAtteint(parJour) {
     try {
       const reglages = await window.GoldAI.reglagesCalculateur.charger();
+      if (!reglages.compteMaitre) { objectifAtteint = false; return; }
       const trades = Object.values(parJour || await window.GoldAI.journal.chargerTousLesTrades()).flat();
-      objectifAtteint = N.progressionObjectif(trades, { ...(reglages.objectif || {}), compteId: "" }, cleAujourdhui()).atteint;
+      objectifAtteint = N.progressionObjectif(trades, { ...(reglages.objectif || {}), compteId: "", compteTl: reglages.compteMaitre }, cleAujourdhui()).atteint;
     } catch { objectifAtteint = false; }
   }
 
@@ -81,26 +83,19 @@
   function afficherBandeau() {
     const zone = $("garde-fou");
     if (!zone || !etat) return;
-    // Le résultat en $ n'est pas répété ici : il est affiché juste dessous, dans l'objectif.
-    // Objectif atteint : le compteur de trades (« 2 trades sur 3 ») et son
-    // avertissement « plus qu'un seul trade » disparaissent.
-    const morceaux = objectifAtteint ? [] : [`${etat.nb} trade${etat.nb > 1 ? "s" : ""}${etat.maxTrades ? ` sur ${etat.maxTrades}` : ""}`];
-    if (etat.resteAvantLimite !== null) morceaux.push(`reste ${dollars(etat.resteAvantLimite)} avant ta limite`);
-    if (!morceaux.length) morceaux.push("objectif atteint ✅");
+    // En haut, seule la barre d'objectif reste affichée en temps normal : plus de
+    // compteur « X trades sur N » ni de « reste … avant ta limite ». Les règles
+    // continuent de tourner : le rectangle réapparaît seulement pour AVERTIR
+    // (orange) ou quand une règle BLOQUE la journée (rouge).
     const alertes = objectifAtteint ? etat.alertes.filter((a) => !(a.cle === "trades" && a.niveau !== "bloque")) : etat.alertes;
-    const principale = alertes[0];
-    const niveau = alertes[0]?.niveau || "ok"; // alertes triées : la plus grave en premier
+    const principale = alertes[0]; // alertes triées : la plus grave en premier
+    if (!principale) { zone.hidden = true; zone.innerHTML = ""; return; }
+    const niveau = principale.niveau;
     zone.className = `garde-fou ${niveau}`;
     zone.innerHTML = `
-      <div class="ligne-garde-fou"><span class="icone-garde-fou" aria-hidden="true">${{ ok: "🛡️", attention: "⚠️", bloque: "⛔" }[niveau]}</span>
-        <span><strong>Aujourd'hui :</strong> ${morceaux.join(" · ")}</span></div>
-      ${principale ? `<div class="raison-garde-fou">${esc(texteAlerte(principale))}${niveau === "bloque" ? " — journée terminée" : ""}</div>` : ""}
-      ${etat.aucuneRegle ? `<button type="button" class="raison-garde-fou lien-garde-fou" id="garde-fou-regles">Définis tes règles dans Profil › Général pour activer le garde-fou</button>` : ""}`;
+      <div class="ligne-garde-fou"><span class="icone-garde-fou" aria-hidden="true">${{ attention: "⚠️", bloque: "⛔" }[niveau]}</span>
+        <span>${esc(texteAlerte(principale))}${niveau === "bloque" ? " — journée terminée" : ""}</span></div>`;
     zone.hidden = false;
-    $("garde-fou-regles")?.addEventListener("click", () => {
-      window.GoldAI.app.allerA("profil");
-      $("bouton-ouvrir-parametres")?.click();
-    });
   }
 
   // ---------------------------------------------------------------- Calculateur

@@ -1789,3 +1789,22 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .alerte-marges p { margin: 0 0 6px; font-size: 14px; line-height: 1.45; }
 .alerte-marges.rouge { border-color: var(--rouge); background: var(--rouge-fond); }
 .alerte-marges.orange { border-color: var(--orange); background: var(--orange-fond); }
+
+/* Mes comptes : compte maître, statut, ESS (js/comptes-tradelocker.js) */
+.compte-tl-ligne .nom-compte-tl { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.actions-compte-tl { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge-maitre { font-size: 10.5px; font-weight: 700; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; background: rgba(34, 211, 238, 0.15); color: var(--accent); white-space: nowrap; }
+.reglage-statut-tl { flex: 1 1 100%; display: flex; gap: 10px; flex-wrap: wrap; font-size: 12.5px; color: var(--texte-attenue); }
+.reglage-statut-tl label { display: flex; align-items: center; gap: 6px; }
+.reglage-statut-tl select, .reglage-statut-tl input { width: auto; padding: 4px 8px; font-size: 12.5px; }
+.bloc-ess { flex: 1 1 100%; border: 1px solid var(--bordure); border-radius: var(--rayon); padding: 10px 12px; }
+.bloc-ess.ok { border-color: var(--vert); background: var(--vert-fond); }
+.bloc-ess.ko { border-color: var(--rouge); background: var(--rouge-fond); }
+.entete-ess { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.entete-ess strong { font-size: 20px; }
+.bloc-ess.ok .entete-ess strong { color: var(--vert); }
+.bloc-ess.ko .entete-ess strong { color: var(--rouge); }
+.details-ess { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 12px; color: var(--texte-attenue); margin: 6px 0; }
+.details-ess strong { color: var(--texte); }
+.bloc-ess p { margin: 6px 0 0; }
+.lien-objectif { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; }

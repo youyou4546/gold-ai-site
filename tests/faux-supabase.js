@@ -37,7 +37,8 @@
       if (localStorage.banc_patch_absent === "1") return absent();
       const liste = lire("banc_trades", []);
       const t = { id: p.p_trade_id || crypto.randomUUID(), date_trade: p.p_date, resultat: p.p_resultat, note: p.p_note, compte_trading_id: p.p_compte_trading_id,
-        instrument: p.p_instrument || null, frais: p.p_frais ?? null, prix_entree: p.p_prix_entree, prix_sortie: p.p_prix_sortie, rr: p.p_rr };
+        instrument: p.p_instrument || null, frais: p.p_frais ?? null, prix_entree: p.p_prix_entree, prix_sortie: p.p_prix_sortie, rr: p.p_rr,
+        compte_tl: p.p_compte_tl || null, compte_tl_nom: p.p_compte_tl ? p.p_compte_tl_nom : null };
       ecrire("banc_trades", [...liste.filter((x) => x.id !== t.id), t]);
       return t.id;
     },

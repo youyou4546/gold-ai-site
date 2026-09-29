@@ -19,6 +19,9 @@
   let minuterie = null;
   let enCours = false;
   let surnoms = {};        // { "live|123": "Compte principal" } — noms choisis dans l'app seulement
+  let compteMaitre = "";   // clé du compte « maître » (suivi par la barre d'objectif)
+  let statuts = {};        // { "live|123": { statut: "finance" | "evaluation", depuis: "AAAA-MM-JJ" } }
+  let seuilEss = 20;
   let enEdition = null;    // clé du compte en train d'être renommé (pas de rafraîchissement pendant ce temps)
 
   const ouverte = () => !$("profil-tradelocker")?.classList.contains("hidden");
@@ -44,6 +47,27 @@
   async function chargerSurnoms() {
     const r = await window.GoldAI.reglagesCalculateur.charger();
     surnoms = { ...(r.surnomsComptes || {}) };
+    compteMaitre = r.compteMaitre || "";
+    statuts = { ...(r.statutsComptes || {}) };
+    seuilEss = Number(r.seuilEss) > 0 ? Number(r.seuilEss) : 20;
+  }
+
+  // Compte maître : un seul à la fois (le choisir sur un compte le retire de l'ancien).
+  // Enregistré par utilisateur avec les paramètres du calculateur.
+  async function definirMaitre(cle) {
+    const r = await window.GoldAI.reglagesCalculateur.charger();
+    compteMaitre = cle;
+    await window.GoldAI.reglagesCalculateur.sauvegarder({ ...r, compteMaitre: cle }); // → la barre d'objectif se met à jour
+    afficherNoms();
+  }
+
+  async function enregistrerStatut(cle, champs) {
+    const r = await window.GoldAI.reglagesCalculateur.charger();
+    const tous = { ...(r.statutsComptes || {}) };
+    tous[cle] = { ...(tous[cle] || {}), ...champs };
+    statuts = tous;
+    await window.GoldAI.reglagesCalculateur.sauvegarder({ ...r, statutsComptes: tous });
+    afficherNoms();
   }
 
   async function enregistrerSurnom(cle, nom) {
@@ -67,6 +91,45 @@
     afficherNoms();
   }
 
+  // ESS (Equity Stability Score) d'un compte financé, calculé avec les trades
+  // du journal liés à ce compte (depuis la date de passage en Financé si indiquée).
+  function blocEss(cle) {
+    const st = statuts[cle] || {};
+    const trades = (window.GoldAI.journal.obtenirTradesBruts() || [])
+      .filter((t) => t.compteTl === cle && (!st.depuis || t.date >= st.depuis));
+    const e = window.GoldAI.noyau.calculerEss(trades, seuilEss);
+    const m = (v, signe = false) => U.montant(v, "USD", { signe });
+    const pct = (v) => `${(Math.round(v * 100) / 100).toLocaleString("fr-FR")} %`;
+    const seuil = pct(e.seuil);
+    const general = "Équilibre tes jours gagnants et perdants, évite les trades surdimensionnés, et vise une croissance régulière plutôt que des pics.";
+    const rappel = `<p class="texte-attenue petit">ℹ️ Score calculé avec les trades entrés dans le journal, pas une donnée officielle NOVA : il peut différer s'il manque des trades. Même avec un ESS conforme, les autres règles de paiement doivent aussi être respectées (montant minimum de retrait, pas de brèche du compte, etc.).</p>`;
+    if (!e.nbJours) {
+      return `<div class="bloc-ess"><div class="entete-ess"><span>ESS</span><strong>—</strong></div>
+        <p class="petit">Aucun trade de ce compte dans le journal${st.depuis ? " depuis le passage en Financé" : ""}.</p>${rappel}</div>`;
+    }
+    const details = `<div class="details-ess">
+        <span>Plus grand jour gagnant <strong>${m(e.maxGain, true)}</strong></span>
+        <span>Plus grande journée de perte <strong>${m(-e.maxPerte)}</strong></span>
+        <span>Bénéfice net total <strong>${m(e.total, true)}</strong></span>
+        <span>${e.nbJours} jour${e.nbJours > 1 ? "s" : ""} de trading</span>
+      </div>`;
+    if (!e.calculable) {
+      return `<div class="bloc-ess ko"><div class="entete-ess"><span>ESS</span><strong>non calculable</strong></div>${details}
+        <p class="petit">Ton bénéfice net total n'est pas positif : l'ESS ne peut pas encore être calculé. Il te faut au moins ${m(e.requis)} de bénéfice net total pour être sous ${seuil}, sans battre ta plus grande journée gagnante ou perdante actuelle.</p>
+        <p class="texte-attenue petit">💡 ${general}</p>${rappel}</div>`;
+    }
+    const conseil = e.eligible
+      ? `Tu es en dessous de ${seuil}, éligible selon ce critère. Marge avant de le dépasser : ${m(e.marge)} de bénéfice net total en plus, sans battre ta plus grande journée gagnante ou perdante actuelle.`
+      : `Il te faut au moins ${m(e.manque)} de bénéfice net total en plus pour redescendre sous ${seuil}, sans battre ta plus grande journée gagnante ou perdante actuelle.`;
+    return `<div class="bloc-ess ${e.eligible ? "ok" : "ko"}">
+      <div class="entete-ess"><span>ESS <span class="texte-attenue petit">· seuil ${seuil}</span></span><strong>${pct(e.ess)}</strong></div>
+      ${details}
+      <p class="petit">${esc(conseil)}</p>
+      <p class="texte-attenue petit">💡 ${general}</p>
+      ${rappel}
+    </div>`;
+  }
+
   function afficherNoms() {
     const bloc = $("noms-comptes-tradelocker");
     if (!bloc) return;
@@ -83,9 +146,26 @@
           <span class="texte-attenue petit">Laisse vide pour revenir à « ${esc(c.nom)} ».</span>
         </li>`;
       }
-      return `<li>
-        <span><strong>${esc(surnom || c.nom)}</strong></span>
-        <button type="button" class="bouton secondaire bouton-petit" data-renommer="${esc(c.cle)}">✏️ Renommer</button>
+      const maitre = compteMaitre === c.cle;
+      const st = statuts[c.cle] || {};
+      const finance = st.statut === "finance";
+      return `<li class="compte-tl-ligne">
+        <span class="nom-compte-tl"><strong>${esc(surnom || c.nom)}</strong>
+          ${maitre ? `<span class="badge-maitre">⭐ Maître</span>` : ""}
+          <span class="badge-statut-compte ${finance ? "finance" : "challenge"}">${finance ? "Financé" : "Évaluation"}</span></span>
+        <span class="actions-compte-tl">
+          ${maitre ? "" : `<button type="button" class="bouton secondaire bouton-petit" data-maitre="${esc(c.cle)}">⭐ Compte maître</button>`}
+          <button type="button" class="bouton secondaire bouton-petit" data-renommer="${esc(c.cle)}">✏️ Renommer</button>
+        </span>
+        <div class="reglage-statut-tl">
+          <label>Statut
+            <select data-statut="${esc(c.cle)}">
+              <option value="evaluation" ${finance ? "" : "selected"}>Évaluation / challenge</option>
+              <option value="finance" ${finance ? "selected" : ""}>Financé</option>
+            </select></label>
+          ${finance ? `<label>Financé depuis le <input type="date" data-depuis="${esc(c.cle)}" value="${esc(st.depuis || "")}"></label>` : ""}
+        </div>
+        ${finance ? blocEss(c.cle) : ""}
       </li>`;
     }).join("");
     $("liste-noms-tradelocker").querySelector("[data-renommer-form] input")?.focus();
@@ -213,6 +293,8 @@
     message("");
     enEdition = null;
     chargerSurnoms().then(() => { afficher(); afficherNoms(); });
+    // Trades du journal : nécessaires au calcul de l'ESS des comptes financés.
+    window.GoldAI.journal.chargerTousLesTrades().then(afficherNoms);
     chargerNoms();
     afficher();
     charger();
@@ -237,8 +319,14 @@
     $("formulaire-tradelocker")?.addEventListener("submit", ajouter);
     $("liste-noms-tradelocker")?.addEventListener("click", (e) => {
       const t = e.target;
-      if (t.dataset.renommer) { enEdition = t.dataset.renommer; afficherNoms(); }
+      if (t.dataset.maitre) definirMaitre(t.dataset.maitre);
+      else if (t.dataset.renommer) { enEdition = t.dataset.renommer; afficherNoms(); }
       else if (t.hasAttribute("data-annuler-renommer")) { enEdition = null; afficherNoms(); }
+    });
+    $("liste-noms-tradelocker")?.addEventListener("change", (e) => {
+      const t = e.target;
+      if (t.dataset.statut) enregistrerStatut(t.dataset.statut, { statut: t.value });
+      else if (t.dataset.depuis !== undefined) enregistrerStatut(t.dataset.depuis, { depuis: t.value || null });
     });
     $("liste-noms-tradelocker")?.addEventListener("submit", (e) => {
       const form = e.target.closest("[data-renommer-form]");
@@ -259,6 +347,10 @@
     });
   });
   document.addEventListener("visibilitychange", () => { if (!document.hidden && ouverte()) charger(); });
+  // Nouveau trade (ajouté, modifié, supprimé ou importé) : l'ESS est recalculé.
+  window.addEventListener("goldai:trades", () => { if (ouverte() && !enEdition) afficherNoms(); });
+  // Seuil ESS changé dans Profil › Général.
+  window.addEventListener("goldai:reglages-calculateur", () => { if (ouverte() && !enEdition) chargerSurnoms().then(afficherNoms); });
 
   window.GoldAI = window.GoldAI || {};
   window.GoldAI.comptesTradelocker = { ouvrir, viderCache };

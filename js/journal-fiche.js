@@ -68,6 +68,37 @@
   }
 
   let apresEnregistrement = null; // action à faire une fois le trade enregistré (ex. arrêter le suivi)
+  let comptesFiche = [];          // [{ cle, nom, nomOrigine }] : comptes TradeLocker reliés
+
+  // Menu « Compte » : le trade est enregistré DANS un compte existant de
+  // Profil › Mes comptes TradeLocker (pas dans une section « à part »).
+  // Nouveau trade : le compte affiché dans le calendrier, sinon le compte maître.
+  async function remplirComptes(trade, prerempli) {
+    const menu = $("fiche-compte");
+    const { esc } = window.GoldAI.utils;
+    menu.innerHTML = `<option value="">Chargement des comptes…</option>`;
+    menu.disabled = true;
+    const [liste, reglages] = await Promise.all([
+      window.GoldAI.journal.comptesPourFiche().catch(() => []),
+      window.GoldAI.reglagesCalculateur.charger().catch(() => ({})),
+    ]);
+    if (tradeOuvert !== (trade || null)) return; // fiche changée entre-temps
+    comptesFiche = [...liste];
+    if (trade?.compteTl && !comptesFiche.some((c) => c.cle === trade.compteTl)) {
+      comptesFiche.push({ cle: trade.compteTl, nom: trade.compteTlNom || trade.compteTl, nomOrigine: trade.compteTlNom });
+    }
+    let choix = "";
+    if (trade) choix = trade.compteTl || "";
+    else {
+      const filtre = window.GoldAI.journal.filtreActuel();
+      const candidats = [prerempli?.compteTl, filtre !== "tous" && filtre !== "manuel" ? filtre : null, reglages.compteMaitre, comptesFiche[0]?.cle];
+      choix = candidats.find((c) => c && comptesFiche.some((x) => x.cle === c)) || "";
+    }
+    menu.innerHTML = comptesFiche.map((c) => `<option value="${esc(c.cle)}">${esc(c.nom)}</option>`).join("")
+      + `<option value="">Aucun compte (trade à part)</option>`;
+    menu.value = choix;
+    menu.disabled = false;
+  }
 
   // `prerempli` (nouveau trade seulement) : { prixEntree, prixSortie, resultat, note }
   // venant du calculateur ou du trade en cours.
@@ -93,6 +124,7 @@
     $("fiche-notes").value = source.note || "";
 
     afficherGalerie();
+    remplirComptes(trade, prerempli); // sans attendre : la fiche s'ouvre tout de suite
     $("modale-fiche-trade").classList.add("visible");
     $("modale-fiche-trade").querySelector(".modale").scrollTop = 0;
 
@@ -126,8 +158,13 @@
     const champs = { entree: nombreOuNull("fiche-entree"), sortie: nombreOuNull("fiche-sortie"), frais: nombreOuNull("fiche-frais") };
     if (Object.values(champs).some(Number.isNaN)) { afficherErreur("Un des champs chiffrés contient autre chose qu'un nombre."); return; }
     const frais = champs.frais === null ? null : Math.abs(champs.frais);
+    if ($("fiche-compte").disabled) { afficherErreur("Attends la fin du chargement des comptes."); return; }
+    const compte = comptesFiche.find((c) => c.cle === $("fiche-compte").value) || null;
 
     const trade = {
+      ...(tradeOuvert || {}), // garde l'heure d'ouverture / le sens d'un trade importé
+      compteTl: compte?.cle || null,
+      compteTlNom: compte?.nomOrigine || compte?.nom || null,
       id: tradeOuvert?.id || null,
       date: dateFiche,
       resultat,
@@ -148,6 +185,7 @@
         p_token: token(), p_trade_id: trade.id, p_date: trade.date, p_resultat: trade.resultat, p_note: trade.note || null,
         p_compte_trading_id: trade.compteTradingId, p_instrument: trade.instrument, p_frais: trade.frais,
         p_prix_entree: trade.prixEntree, p_prix_sortie: trade.prixSortie, p_rr: trade.rr,
+        p_compte_tl: trade.compteTl || "", p_compte_tl_nom: trade.compteTlNom, // "" = aucun compte
       });
 
       let patchAbsent = false;

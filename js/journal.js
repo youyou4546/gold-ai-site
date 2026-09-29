@@ -46,8 +46,19 @@
   // Le garde-fou et l'objectif, eux, comptent toujours TOUS les trades.
   let filtreCompte = "tous";
   const cleFiltre = () => `goldai_filtre_compte_${window.GoldAI.auth.getNom() || "anonyme"}`;
+  // Sans choix mémorisé sur cet appareil : le compte maître (Mes comptes), pour
+  // que le calendrier montre les mêmes trades que la barre d'objectif.
   function lireFiltreMemorise() {
-    try { filtreCompte = localStorage.getItem(cleFiltre()) || "tous"; } catch { filtreCompte = "tous"; }
+    let memorise = null;
+    try { memorise = localStorage.getItem(cleFiltre()); } catch { /* ignoré */ }
+    filtreCompte = memorise || "tous";
+    if (!memorise) {
+      window.GoldAI.reglagesCalculateur.charger().then((r) => {
+        if (!r.compteMaitre || filtreCompte !== "tous") return;
+        filtreCompte = r.compteMaitre; // pas mémorisé : suit le compte maître s'il change
+        window.dispatchEvent(new CustomEvent("goldai:filtre-compte"));
+      }).catch(() => {});
+    }
   }
 
   // Comptes TradeLocker reliés (Profil › Mes comptes TradeLocker), chargés une fois par session.
@@ -66,6 +77,13 @@
   let surnoms = {};
   async function chargerSurnoms() {
     try { surnoms = (await window.GoldAI.reglagesCalculateur.charger()).surnomsComptes || {}; } catch { surnoms = {}; }
+  }
+
+  // Pour la fiche de trade (menu « Compte ») : les comptes TradeLocker reliés,
+  // avec le nom choisi dans l'app et le nom d'origine (enregistré avec le trade).
+  async function comptesPourFiche() {
+    await Promise.all([chargerSurnoms(), comptesRelies ? null : chargerComptesRelies()]);
+    return (comptesRelies || []).map((c) => ({ cle: c.cle, nom: surnoms[c.cle] || c.nom, nomOrigine: c.nom }));
   }
 
   function comptesDisponibles() {
@@ -233,10 +251,11 @@
       caseJour.className = "case-jour";
       if (somme > 0) caseJour.classList.add("jour-gain");
       if (somme < 0) caseJour.classList.add("jour-perte");
+      const maintenant = new Date(); // relu à chaque affichage : l'app peut rester ouverte après minuit
       if (
-        jour === aujourdhui.getDate() &&
-        moisAffiche === aujourdhui.getMonth() &&
-        anneeAffichee === aujourdhui.getFullYear()
+        jour === maintenant.getDate() &&
+        moisAffiche === maintenant.getMonth() &&
+        anneeAffichee === maintenant.getFullYear()
       ) {
         caseJour.classList.add("aujourdhui");
       }
@@ -477,7 +496,7 @@
 
   window.GoldAI = window.GoldAI || {};
   window.GoldAI.journal = { afficherMoisCourant, viderCache, chargerTousLesTrades, obtenirTradesBruts, memoriserTrade,
-    filtrerParCompte, afficherSelecteurCompte, changerFiltreCompte, lireFiltreMemorise,
+    filtrerParCompte, afficherSelecteurCompte, changerFiltreCompte, lireFiltreMemorise, comptesPourFiche,
     oublierComptesRelies: () => { comptesRelies = null; },
     filtreActuel: () => filtreCompte,
     // Comptes reliés avec leur solde (rechargés à la demande : le solde change).

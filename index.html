@@ -295,10 +295,11 @@
       <!-- Vue Mes comptes TradeLocker : solde, résultat du jour, trades ouverts (js/comptes-tradelocker.js) — remplace l'ancien « Mes comptes » -->
       <div id="profil-tradelocker" class="hidden">
         <button type="button" class="bouton-retour" id="bouton-retour-tradelocker"><span aria-hidden="true">←</span> Retour</button>
-        <details class="carte hidden" id="noms-comptes-tradelocker">
-          <summary><strong>✏️ Noms de mes comptes</strong> <span class="texte-attenue petit">(utilisés seulement dans l'app)</span></summary>
+        <div class="carte hidden" id="noms-comptes-tradelocker">
+          <h3 class="titre-bloc">💼 Mes comptes</h3>
+          <p class="texte-attenue petit">Noms utilisés seulement dans l'app. Le compte <strong>Maître</strong> est celui que suit la barre d'objectif en haut.</p>
           <ul class="liste-noms-tl" id="liste-noms-tradelocker"></ul>
-        </details>
+        </div>
         <div id="contenu-tradelocker"></div>
 
         <details class="carte" id="carte-ajout-tradelocker">
@@ -372,7 +373,7 @@
           <div class="ligne-champs">
             <div class="champ">
               <label for="objectif-montant">Montant ($)</label>
-              <input type="number" id="objectif-montant" min="1" step="any" placeholder="100" />
+              <input type="number" id="objectif-montant" min="1" step="any" placeholder="150" />
             </div>
             <div class="champ">
               <label for="objectif-periode">Période</label>
@@ -383,7 +384,18 @@
               </select>
             </div>
           </div>
+          <p class="texte-attenue petit">Suit uniquement les trades du journal liés à ton <strong>compte maître</strong> (Profil › Mes comptes TradeLocker).</p>
           <p class="message-succes" id="message-objectif"></p>
+        </div>
+
+        <div class="carte" id="carte-ess">
+          <h3 class="titre-bloc">📊 ESS (Equity Stability Score)</h3>
+          <div class="champ">
+            <label for="seuil-ess">Seuil ESS maximum (%)</label>
+            <input type="number" id="seuil-ess" min="1" max="100" step="any" inputmode="decimal" placeholder="20" />
+          </div>
+          <p class="texte-attenue petit">Règle Top One Trader des comptes <strong>financés</strong> uniquement : elle ne s'applique pas en phase d'évaluation / challenge. Seuls les comptes au statut « Financé » (Profil › Mes comptes TradeLocker) sont suivis.</p>
+          <p class="message-succes" id="message-ess"></p>
         </div>
 
         <div class="carte">
@@ -477,6 +489,11 @@
     <div class="modale modale-fiche">
       <h3 id="fiche-titre">Nouveau trade</h3>
       <p class="petit texte-attenue" id="fiche-date"></p>
+
+      <div class="champ">
+        <label for="fiche-compte">Compte</label>
+        <select id="fiche-compte"></select>
+      </div>
 
       <div class="ligne-champs">
         <div class="champ">

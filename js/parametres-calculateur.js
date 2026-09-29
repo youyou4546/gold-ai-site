@@ -210,6 +210,9 @@
       arretPremierGain: cache?.arretPremierGain, // réglé à part (Règles de trading), conservé tel quel
       surnomsComptes: cache?.surnomsComptes,     // noms donnés aux comptes TradeLocker (Profil), conservés tels quels
       reglesComptes: cache?.reglesComptes,       // règles de challenge par compte (Performance), conservées telles quelles
+      compteMaitre: cache?.compteMaitre,         // compte maître (Profil › Mes comptes TradeLocker), conservé tel quel
+      statutsComptes: cache?.statutsComptes,     // statut Évaluation / Financé par compte (même endroit), conservé tel quel
+      seuilEss: cache?.seuilEss,                 // seuil ESS (Profil › Général), conservé tel quel
     };
     if (r.risqueMode === "pourcentage" && !(r.solde > 0)) erreurs.push("Indique le solde du compte (nécessaire pour un risque en %).");
     if (!(r.risqueValeur > 0)) erreurs.push("Indique la valeur du risque.");
