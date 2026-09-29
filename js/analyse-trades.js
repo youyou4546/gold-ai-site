@@ -1,4 +1,5 @@
-// Gold AI — Analyse › Analyse de mes trades (gratuit, calculé dans l'app).
+// Gold AI — Journal › Analyse de mes trades (tuile de l'accueil du Journal ;
+// gratuit, calculé dans l'app).
 //
 // À partir du journal (compte choisi dans le menu « Compte », partagé avec le
 // Calendrier et la Performance ; par défaut le compte maître) :
@@ -20,7 +21,7 @@
 
   let positions = null; // { idTrade: [résultats par position] }, chargé une fois par session
 
-  const ouverte = () => $("section-analyse")?.classList.contains("actif");
+  const ouverte = () => $("section-journal")?.classList.contains("actif") && !$("journal-analyse")?.classList.contains("hidden");
   const argent = (v, signe = false) => U.montant(v, "USD", { signe });
   const pct = (x) => `${Math.round(x)} %`;
 
@@ -127,6 +128,16 @@
   document.addEventListener("DOMContentLoaded", () => {
     $("choix-compte-analyse")?.addEventListener("change", (e) => J().changerFiltreCompte(e.target.value));
     $("periode-analyse")?.addEventListener("change", afficher);
+    $("bouton-ouvrir-analyse-trades")?.addEventListener("click", () => {
+      $("journal-accueil").classList.add("hidden");
+      $("journal-analyse").classList.remove("hidden");
+      $("contenu-analyse-trades").innerHTML = `<p class="etat-vide">Chargement…</p>`;
+      afficher();
+    });
+    $("bouton-retour-analyse-trades")?.addEventListener("click", () => {
+      $("journal-analyse").classList.add("hidden");
+      $("journal-accueil").classList.remove("hidden");
+    });
   });
   window.addEventListener("goldai:filtre-compte", () => { if (ouverte()) afficher(); });
   // Nouveau trade (ajouté, importé, supprimé) : positions relues puis analyse refaite.

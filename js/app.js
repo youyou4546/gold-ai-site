@@ -26,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
       window.GoldAI.calendrier.charger();
     }
     if (cible === "analyse") {
-      window.GoldAI?.analyseTrades?.afficher();
       window.GoldAI?.analyseIa?.rafraichir();
     }
     if (cible === "calculateur") {
