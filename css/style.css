@@ -1824,3 +1824,21 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .conseils-analyse li.ok { border-color: var(--vert); background: var(--vert-fond); }
 .valeur-stat.positif { color: var(--vert); }
 .valeur-stat.negatif { color: var(--rouge); }
+
+/* Analyse › Analyse de graphique par l'IA (js/analyse-ia.js) */
+.compteur-ia { font-size: 13px; margin: 8px 0 10px; }
+.compteur-ia.bientot strong { color: var(--orange); }
+.compteur-ia.epuise strong { color: var(--rouge); }
+.apercu-ia { display: block; width: 100%; max-height: 260px; object-fit: contain; border-radius: var(--rayon); border: 1px solid var(--bordure); margin: 10px 0; }
+.resultat-ia { margin-top: 14px; font-size: 14px; line-height: 1.5; }
+.resultat-ia p { margin: 6px 0; }
+.entete-ia { font-weight: 700; }
+.resume-ia { padding: 10px 12px; border-radius: var(--rayon); background: var(--fond-carte-survol); }
+.zones-ia ul { margin: 6px 0; padding-left: 0; list-style: none; display: grid; gap: 4px; }
+.type-zone { font-size: 10.5px; font-weight: 700; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: var(--bordure); }
+.type-zone.haut { background: var(--rouge-fond); color: var(--rouge); }
+.type-zone.bas { background: var(--vert-fond); color: var(--vert); }
+.scenario-ia { border: 1px solid var(--bordure); border-radius: var(--rayon); padding: 8px 12px; margin: 8px 0; }
+.scenario-ia.achat { border-color: var(--vert); }
+.scenario-ia.vente { border-color: var(--rouge); }
+.element-historique-ia { border-top: 1px solid var(--bordure); padding: 8px 0; font-size: 13px; }

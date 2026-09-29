@@ -139,12 +139,26 @@
         <div id="contenu-analyse-trades"><p class="etat-vide">Chargement…</p></div>
       </div>
 
-      <!-- Analyse de capture de graphique par l'IA : payante, pas encore activée -->
-      <div class="placeholder">
-        <div class="icone-placeholder">📊</div>
-        <h3>Analyse de graphique par l'IA — bientôt</h3>
-        <p>Envoie une capture de ton graphique pour recevoir tendance, zones clés, scénario et invalidation. Payant à l'usage : activé seulement après validation du prix.</p>
-        <div class="zone-upload-desactivee">📷 Envoi de capture désactivé pour l'instant</div>
+      <!-- Analyse de capture de graphique par l'IA (js/analyse-ia.js) : Claude Sonnet 5.5, payant,
+           5 par personne et 10 au total par jour (fonction Supabase analyse-graphique) -->
+      <div class="carte" id="carte-analyse-ia">
+        <h3 class="titre-bloc">🤖 Analyse de graphique par l'IA</h3>
+        <p class="texte-attenue petit">Envoie une capture de ton graphique (TradingView, TradeLocker) : tendance, zones clés, scénario d'achat et de vente, invalidation.</p>
+        <p class="compteur-ia" id="compteur-ia">Chargement des compteurs…</p>
+        <input type="file" id="ia-fichier" accept="image/*" class="hidden" />
+        <button type="button" class="zone-upload" id="ia-choisir">📷 Choisir une capture</button>
+        <img id="ia-apercu" class="apercu-ia hidden" alt="Capture à analyser" />
+        <div class="champ">
+          <label for="ia-question">Ta question (facultatif)</label>
+          <textarea id="ia-question" rows="2" maxlength="500" placeholder="ex. unité 15 min, je pense acheter : qu'en penses-tu ?"></textarea>
+        </div>
+        <button type="button" class="bouton" id="ia-analyser" disabled>Analyser ce graphique</button>
+        <p class="avertissement-erreur" id="ia-erreur"></p>
+        <div id="ia-resultat"></div>
+        <details class="details-discrets" id="ia-historique">
+          <summary>Mes dernières analyses</summary>
+          <div id="ia-liste-historique"></div>
+        </details>
       </div>
 
       <!-- Briefing du jour lu à voix haute (js/briefing.js) — voix gratuite du téléphone -->
@@ -664,6 +678,7 @@
 <script src="js/challenge-comptes.js"></script>
 <script src="js/briefing.js"></script>
 <script src="js/analyse-trades.js"></script>
+<script src="js/analyse-ia.js"></script>
 <script src="js/parametres.js"></script>
 <script src="js/profil-comptes.js"></script>
 <script src="js/profil-mon-compte.js"></script>

@@ -65,6 +65,7 @@
     enregistrer_analyse: (p) => { const l = lire("banc_analyses", []); l.unshift({ ...p, cree_le: new Date().toISOString(), actif: p.p_actif, horizon: p.p_horizon, direction: p.p_direction, confiance: p.p_confiance, prix_reference: p.p_prix_reference }); ecrire("banc_analyses", l); return "id"; },
     lister_mes_analyses: () => lire("banc_analyses", []),
     lister_positions_importees: () => lire("banc_positions", []),
+    mes_analyses_graphique: () => ({ moi: lire("banc_ia", []).length, total: lire("banc_ia", []).length + 3, limite_moi: 5, limite_total: 10, historique: lire("banc_ia", []) }),
   };
 
   window.supabase = {
@@ -90,6 +91,17 @@
             return { data: { ok: true }, error: null };
           }
           if (body.action === "comptes") return { data: { comptes: cx.flatMap(() => [{ cle: "live|1", nom: "NOVA 100K #1", solde: 98492.74, devise: "USD" }, { cle: "live|2", nom: "NOVA 50K (copie) #2", solde: 50880, devise: "USD" }]) }, error: null };
+          if (nom === "analyse-graphique") {
+            const liste = lire("banc_ia", []);
+            if (liste.length >= 5) return { data: null, error: { context: { json: async () => ({ erreur: "Tu as déjà utilisé tes 5 analyses d'aujourd'hui. Reviens demain." }) } } };
+            const analyse = { lisible: true, instrument: "XAUUSD", unite_de_temps: "15 min", tendance: { direction: "haussière", explication: "Creux ascendants." },
+              zones: [{ type: "résistance", prix: "4388", commentaire: "Sommet" }, { type: "support", prix: "4350", commentaire: "Creux" }],
+              scenario_achat: { conditions: "Cassure de 4388", entree: "4390", stop: "4375", objectifs: "4400" },
+              scenario_vente: { conditions: "Cassure de 4375", entree: "4374", stop: "4390", objectifs: "4360" },
+              invalidation: "Clôture sous 4350", resume: "Tendance haussière nette.", prudence: "Pas un conseil financier." };
+            ecrire("banc_ia", [{ id: String(liste.length), cree_le: new Date().toISOString(), question: body.question, reponse: analyse, cout_usd: 0.017 }, ...liste]);
+            return { data: { ok: true, analyse, cout_usd: 0.017 }, error: null };
+          }
           if (body.action === "supprimes") return { data: { trades: lire("banc_supprimes", []) }, error: null };
           if (body.action === "reimporter") {
             const t = lire("banc_supprimes", []).find((x) => x.tradeId === body.tradeId);
