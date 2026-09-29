@@ -191,10 +191,17 @@
   // (règles de Journal › Performance). Affiché en haut du résultat, sans bloquer.
   async function verifierMarges(r) {
     const calcul = dernierCalcul;
-    let marges = [];
-    try { marges = (await window.GoldAI.challenge?.margesComptes?.()) || []; } catch { return; }
+    let marges = [], jour = [];
+    try { marges = (await window.GoldAI.challenge?.margesComptes?.()) || []; } catch { /* pas de règles */ }
+    try { jour = (await window.GoldAI.gardeFou?.margesJour?.()) || []; } catch { /* pas de règles */ }
     if (calcul !== dernierCalcul || !r.ok || !(r.perteTotaleSl > 0)) return; // un autre calcul a pris la place
     const lignes = [];
+    // Perte max par jour (Performance › ⚙️ Règles) : ce trade au SL la dépasserait-il ?
+    for (const j of jour) {
+      if (j.reste <= 0) lignes.push(["rouge", `⛔ <strong>${esc(j.nom)}</strong> : perte max du jour déjà atteinte.`]);
+      else if (r.perteTotaleSl >= j.reste) lignes.push(["rouge", `⛔ Au SL, ce trade dépasse la perte max du jour de <strong>${esc(j.nom)}</strong> : perte ${montant(r.perteTotaleSl, r.devise)}, il ne reste que ${montant(j.reste, r.devise)} aujourd'hui.`]);
+      else if (r.perteTotaleSl >= 0.5 * j.reste) lignes.push(["orange", `⚠️ Sur <strong>${esc(j.nom)}</strong>, ce trade utilise ${nombre((r.perteTotaleSl / j.reste) * 100, 0)} % de ce qui reste de ta perte max du jour (${montant(j.reste, r.devise)}).`]);
+    }
     for (const m of marges) {
       if (m.devise !== r.devise) continue;
       const marge = m.etat.perte.marge;
@@ -207,7 +214,7 @@
     if (!lignes.length) return;
     zone.insertAdjacentHTML("afterbegin", `<div class="carte alerte-marges ${lignes.some((l) => l[0] === "rouge") ? "rouge" : "orange"}" id="alerte-marges">
       ${lignes.map((l) => `<p>${l[1]}</p>`).join("")}
-      <p class="texte-attenue petit">Calculé avec le solde TradeLocker et les règles de Journal › Performance (lot de ce calcul).</p></div>`);
+      <p class="texte-attenue petit">Calculé avec le solde TradeLocker, les trades du jour du journal et les règles de Journal › Performance (lot de ce calcul).</p></div>`);
   }
 
   async function calculer({ depuisTexte, confirme = false }) {

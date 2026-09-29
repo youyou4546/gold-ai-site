@@ -302,6 +302,13 @@
         </div>
         <div id="contenu-tradelocker"></div>
 
+        <details class="carte hidden" id="carte-supprimes-tl">
+          <summary><strong>🗑️ Trades importés que tu as supprimés</strong> <span class="texte-attenue petit" id="nb-supprimes-tl"></span></summary>
+          <p class="texte-attenue petit">Un trade importé puis supprimé du Journal ne revient pas tout seul. « Réimporter » le remet dans le Journal. ⚠️ Si tu l'as ressaisi à la main, supprime d'abord ta version manuelle, sinon il sera compté deux fois.</p>
+          <ul class="liste-noms-tl" id="liste-supprimes-tl"></ul>
+          <p class="alerte-donnees hidden" id="message-supprimes-tl" role="status"></p>
+        </details>
+
         <details class="carte" id="carte-ajout-tradelocker">
           <summary><strong>+ Ajouter une connexion TradeLocker</strong></summary>
           <p class="texte-attenue petit">Les identifiants de connexion à TradeLocker (ceux de ta prop firm). Un seul login suffit pour voir tous les comptes qui y sont rattachés.</p>

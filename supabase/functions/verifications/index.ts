@@ -323,7 +323,7 @@ async function alertesPrix() {
 
 // ------------------------------------------------------------------ 5. Perte max des comptes
 
-type Regles = { depart?: number; perteMax?: number; suiveuse?: boolean; plusHaut?: number };
+type Regles = { depart?: number; perteMax?: number; perteJour?: number; suiveuse?: boolean; plusHaut?: number };
 
 // Même calcul que js/noyau.js › etatChallenge (partie perte max).
 function etatPerte(r: Regles, equite: number) {
@@ -350,28 +350,49 @@ async function alertesPerteMax() {
       reglagesParCompte.set(c.compte_id, { regles: pc.reglesComptes || {}, surnoms: pc.surnomsComptes || {} });
     }
     const { regles, surnoms } = reglagesParCompte.get(c.compte_id)!;
-    if (!Object.values(regles).some((r) => Number(r?.perteMax) > 0)) continue;
+    const regle = (r?: Regles) => Number(r?.perteMax) > 0 || Number(r?.perteJour) > 0;
+    if (!Object.values(regles).some(regle)) continue;
     try {
       const { jeton, comptes } = await comptesDuLogin(c);
       for (const a of comptes) {
         const cle = `${c.environnement}|${a.id}`;
         const r = regles[cle];
-        if (!r || !(Number(r.perteMax) > 0)) continue;
+        if (!regle(r)) continue;
+        const nom = surnoms[cle] || `${String(a.name || "Compte")} #${a.accNum}`;
         // Équité (solde + trades ouverts) ; à défaut le solde.
         let equite = nb(a.accountBalance);
+        let jourNet: number | null = null; // résultat du jour : trades fermés (frais inclus) + trades ouverts
         try {
           const cols = await colonnes(c.environnement, jeton, Number(a.accNum));
           const etat = enObjet(cols.accountDetailsConfig || [], (((await tl(c.environnement, `/trade/accounts/${a.id}/state`, jeton, { accNum: Number(a.accNum) })).d as Record<string, unknown>)?.accountDetailsData as unknown[]) || []);
           equite = nb(etat.projectedBalance) ?? equite;
+          const ferme = nb(etat.todayNet);
+          if (ferme !== null) jourNet = ferme + (nb(etat.openNetPnL) ?? 0);
         } catch (e) { console.error("équité", a.accNum, String(e)); }
-        if (equite === null) continue;
+
+        // Perte max PAR JOUR (Performance › ⚙️ Règles › Perte max par jour).
+        const limiteJour = Number(r.perteJour);
+        if (limiteJour > 0 && jourNet !== null) {
+          const perte = Math.max(0, -jourNet), pct = (perte / limiteJour) * 100;
+          const seuilJ = pct >= 100 ? 100 : pct >= 90 ? 90 : pct >= 70 ? 70 : 0;
+          const cleJ = `pertejour|${cle}|${seuilJ}|${jour}`;
+          if (seuilJ && !(await dejaEnvoye(cleJ))) {
+            const reste = Math.max(0, limiteJour - perte);
+            const [titre, texte] = seuilJ === 100
+              ? [`⛔ ${nom} : perte max du jour atteinte`, `${dollars(perte)} perdus aujourd'hui (limite ${dollars(limiteJour)}). Arrête pour aujourd'hui.`]
+              : [`${seuilJ === 90 ? "🚨" : "⚠️"} ${nom} : ${seuilJ} % de ta perte max du jour`, `${dollars(perte)} perdus aujourd'hui, plus que ${dollars(reste)} avant la limite (${dollars(limiteJour)}).`];
+            await envoyer(titre, texte, { url: "./index.html#journal", tag: `pertejour-${cle}`, compteId: c.compte_id });
+            await memoriser(cleJ);
+          }
+        }
+
+        if (!(Number(r.perteMax) > 0) || equite === null) continue;
         const e = etatPerte(r, equite);
         if (!e) continue;
         const seuil = e.marge <= 0 ? 100 : e.pourcentage >= 90 ? 90 : e.pourcentage >= 70 ? 70 : 0;
         if (!seuil) continue;
         const cleNotif = `pertemax|${cle}|${seuil}|${jour}`;
         if (await dejaEnvoye(cleNotif)) continue;
-        const nom = surnoms[cle] || `${String(a.name || "Compte")} #${a.accNum}`;
         const [titre, texte] = seuil === 100
           ? [`⛔ ${nom} : perte max atteinte`, `Équité ${dollars(equite)}, sous le niveau de rupture (${dollars(e.niveau)}). Vérifie ton compte.`]
           : seuil === 90

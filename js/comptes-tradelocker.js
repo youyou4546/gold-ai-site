@@ -285,6 +285,49 @@
         </div>`).join("")}`;
   }
 
+  // ---------------------------------------------------------------- Trades supprimés → Réimporter
+
+  let supprimes = [];
+  async function chargerSupprimes() {
+    const r = await appeler("supprimes");
+    supprimes = r?.trades || [];
+    afficherSupprimes();
+  }
+
+  function afficherSupprimes() {
+    const carte = $("carte-supprimes-tl");
+    if (!carte) return;
+    carte.classList.toggle("hidden", !supprimes.length);
+    $("nb-supprimes-tl").textContent = supprimes.length ? `(${supprimes.length})` : "";
+    $("liste-supprimes-tl").innerHTML = supprimes.map((t) => {
+      const nom = surnoms[t.compteTl] || window.GoldAI.journal.obtenirTradesBruts().find((x) => x.compteTl === t.compteTl)?.compteTlNom || t.compteTl;
+      return `<li>
+        <span><strong class="${t.resultat >= 0 ? "positif" : "negatif"}">${argent(t.resultat, "USD", true)}</strong>
+          <span class="texte-attenue petit">· ${esc(nom)} · fermé le ${esc(U.jourHeure(Date.parse(t.fermeLe)))} · ${t.positions} position${t.positions > 1 ? "s" : ""}</span></span>
+        <button type="button" class="bouton secondaire bouton-petit" data-reimporter="${esc(t.tradeId)}">↩️ Réimporter</button>
+      </li>`;
+    }).join("");
+  }
+
+  async function reimporterTrade(bouton) {
+    const zone = $("message-supprimes-tl");
+    if (bouton.disabled) return; // double appui
+    bouton.disabled = true;
+    bouton.textContent = "Réimport…";
+    const r = await appeler("reimporter", { tradeId: bouton.dataset.reimporter });
+    zone.classList.remove("hidden");
+    if (r?.erreur) {
+      zone.textContent = r.erreur;
+      bouton.disabled = false;
+      bouton.textContent = "↩️ Réimporter";
+      return;
+    }
+    zone.textContent = r.importes ? "✓ Trade remis dans le Journal." : "TradeLocker n'a pas renvoyé ce trade pour l'instant : réessaie dans quelques minutes.";
+    await window.GoldAI.journal.chargerTousLesTrades(true);
+    window.dispatchEvent(new CustomEvent("goldai:trades")); // calendrier, objectif, garde-fou, ESS
+    await chargerSupprimes();
+  }
+
   // ---------------------------------------------------------------- Cycle de vie
 
   function ouvrir() {
@@ -295,6 +338,8 @@
     chargerSurnoms().then(() => { afficher(); afficherNoms(); });
     // Trades du journal : nécessaires au calcul de l'ESS des comptes financés.
     window.GoldAI.journal.chargerTousLesTrades().then(afficherNoms);
+    supprimes = []; afficherSupprimes();
+    chargerSupprimes();
     chargerNoms();
     afficher();
     charger();
@@ -338,6 +383,7 @@
       environnement = b.dataset.env;
       document.querySelectorAll("#formulaire-tradelocker .segmente button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
     }));
+    $("liste-supprimes-tl")?.addEventListener("click", (e) => { if (e.target.dataset.reimporter) reimporterTrade(e.target); });
     $("contenu-tradelocker")?.addEventListener("click", (e) => {
       const t = e.target;
       if (t.id === "rafraichir-tradelocker") charger();

@@ -15,7 +15,7 @@
   const J = () => window.GoldAI.journal;
 
   let comptes = [];      // [{ cle, nom, solde, devise }]
-  let regles = {};       // { cle: { depart, perteMax, objectif, suiveuse, plusHaut } }
+  let regles = {};       // { cle: { depart, perteMax, objectif, perteJour, suiveuse, plusHaut } }
   let enReglage = null;  // compte dont le formulaire de règles est ouvert
 
   const argent = (v, d = "USD", signe = false) => U.montant(v, d, { signe });
@@ -47,7 +47,9 @@
           <div class="champ"><label>Taille du compte au départ ($)</label><input name="depart" type="number" inputmode="decimal" step="any" min="0" value="${rg.depart ?? ""}" placeholder="ex. 100000"></div>
           <div class="champ"><label>Perte max ($)</label><input name="perteMax" type="number" inputmode="decimal" step="any" min="0" value="${rg.perteMax ?? ""}" placeholder="ex. 5000"></div>
           <div class="champ"><label>Objectif de profit ($)</label><input name="objectif" type="number" inputmode="decimal" step="any" min="0" value="${rg.objectif ?? ""}" placeholder="ex. 5000"></div>
+          <div class="champ"><label>Perte max par jour ($)</label><input name="perteJour" type="number" inputmode="decimal" step="any" min="0" value="${rg.perteJour ?? ""}" placeholder="ex. 3000"></div>
         </div>
+        <p class="texte-attenue petit">Perte max par jour : le garde-fou t'avertit à 70 %, bloque le calculateur à 100 %, et tu reçois une notification (calculée avec l'équité TradeLocker, trades ouverts compris).</p>
         <label class="case-a-cocher case-regle"><input type="checkbox" name="suiveuse" ${rg.suiveuse ? "checked" : ""}>
           <span><strong>Perte max « suiveuse »</strong><br>Le niveau de rupture monte avec ton plus haut solde, puis se bloque au solde de départ (ex. comptes Nova).</span></label>
         <div class="boutons-confirmation">
@@ -55,6 +57,22 @@
           <button type="submit" class="bouton bouton-petit">Enregistrer</button>
         </div>
       </form>`;
+  }
+
+  // Perte du jour de ce compte (trades du journal d'aujourd'hui) face à sa perte max par jour.
+  function blocPerteJour(c, d) {
+    const limite = Number(regles[c.cle]?.perteJour);
+    if (!(limite > 0)) return "";
+    const aujourdhui = window.GoldAI.gardeFou?.cleAujourdhui?.();
+    const net = J().obtenirTradesBruts().filter((t) => t.compteTl === c.cle && t.date === aujourdhui)
+      .reduce((s, t) => s + Number(t.resultat) - (Number(t.frais) || 0), 0);
+    const perte = Math.max(0, -net), reste = Math.max(0, limite - perte), pct = Math.min(100, (perte / limite) * 100);
+    return `<div class="bloc-challenge perte">
+        <div class="lib">Perte max du jour</div>
+        <div class="grand ${perte > 0 ? "negatif" : ""}">${argent(perte, d)} perdus aujourd'hui${perte >= limite ? " · ⛔ limite atteinte" : ""}</div>
+        <div class="barre-objectif"><div class="remplissage-objectif" style="width:${pct}%"></div></div>
+        <div class="pied"><span>Limite ${argent(limite, d)}</span><span>Reste <strong>${argent(reste, d)}</strong></span></div>
+      </div>`;
   }
 
   function carte(c) {
@@ -65,13 +83,16 @@
       <span>Solde <strong>${Number.isFinite(c.solde) ? argent(c.solde, d) : "—"}</strong>
       ${enReglage === c.cle ? "" : ` · <button type="button" class="lien-retour" data-regler="${esc(c.cle)}">⚙️ Règles</button>`}</span></div>`;
     if (enReglage === c.cle) return `<div class="carte carte-challenge">${entete}${formulaire(c)}</div>`;
+    const jour = blocPerteJour(c, d);
     if (!e || (!e.perte && !e.objectif)) {
+      if (jour) return `<div class="carte carte-challenge">${entete}${jour}</div>`;
       return `<div class="carte carte-challenge">${entete}
         <p class="texte-attenue petit">Indique la taille de départ, la perte max et l'objectif de ce compte pour suivre ton challenge ici.</p>
         <button type="button" class="bouton bouton-petit" data-regler="${esc(c.cle)}">⚙️ Régler ce compte</button></div>`;
     }
     const p = e.perte, o = e.objectif;
     return `<div class="carte carte-challenge">${entete}
+      ${jour}
       ${p ? `<div class="bloc-challenge perte">
         <div class="lib">Perte max</div>
         <div class="grand ${p.perdu > 0 ? "negatif" : ""}">${argent(p.perdu, d)} perdus${p.depassee ? " · ⛔ limite atteinte" : ""}</div>
@@ -141,6 +162,7 @@
       const compte = comptes.find((c) => c.cle === cle);
       regles[cle] = {
         depart: val("depart"), perteMax: val("perteMax"), objectif: val("objectif"),
+        perteJour: val("perteJour"),
         suiveuse: form.elements.suiveuse.checked,
         plusHaut: Math.max(val("depart") || 0, Number(compte?.solde) || 0),
       };
@@ -150,4 +172,5 @@
     });
   });
   window.addEventListener("goldai:filtre-compte", () => { if (!$("journal-performance")?.classList.contains("hidden")) afficher(); });
+  window.addEventListener("goldai:trades", () => { if (!$("journal-performance")?.classList.contains("hidden") && !enReglage) afficher(); });
 })();

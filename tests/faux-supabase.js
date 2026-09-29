@@ -89,6 +89,13 @@
             return { data: { ok: true }, error: null };
           }
           if (body.action === "comptes") return { data: { comptes: cx.flatMap(() => [{ cle: "live|1", nom: "NOVA 100K #1", solde: 98492.74, devise: "USD" }, { cle: "live|2", nom: "NOVA 50K (copie) #2", solde: 50880, devise: "USD" }]) }, error: null };
+          if (body.action === "supprimes") return { data: { trades: lire("banc_supprimes", []) }, error: null };
+          if (body.action === "reimporter") {
+            const t = lire("banc_supprimes", []).find((x) => x.tradeId === body.tradeId);
+            ecrire("banc_supprimes", lire("banc_supprimes", []).filter((x) => x.tradeId !== body.tradeId));
+            if (t) ecrire("banc_trades", [...lire("banc_trades", []), { id: t.tradeId, date_trade: t.fermeLe.slice(0, 10), resultat: t.resultat, compte_tl: t.compteTl, compte_tl_nom: "Réimporté", ouvert_le: t.fermeLe }]);
+            return { data: { ok: true, importes: t ? 1 : 0 }, error: null };
+          }
           if (body.action === "supprimer") { ecrire("banc_tl", cx.filter((c) => c.id !== body.id)); return { data: { ok: true }, error: null }; }
           const alea = () => Math.round((Math.random() - 0.4) * 30000) / 100;
           return { data: { lu_le: new Date().toISOString(), importes24h: 3, connexions: cx.map((c) => ({ ...c, comptes: [

@@ -3,10 +3,11 @@
 // 1. Règles du jour calculées en arrière-plan (trades du jour comptés en
 //    SIGNAUX : 1 trade = 1, peu importe ses TP ou ses copies sur d'autres
 //    comptes). Le bandeau du haut ne s'affiche que pour avertir (orange) ou
-//    quand une règle est atteinte (rouge) ; plus de compteur affiché. Règles : Profil › Général (max trades, pertes
-//    qui arrêtent la journée, gain qui arrête la journée) + limite de perte
-//    journalière des comptes de Profil › Mes comptes (la plus stricte si
-//    plusieurs comptes). Calcul : js/noyau.js › evaluerGardeFou.
+//    quand une règle est atteinte (rouge) ; plus de compteur affiché. Règles :
+//    Profil › Général (max trades, pertes qui arrêtent la journée, gain qui
+//    arrête la journée) + « Perte max par jour » de CHAQUE compte TradeLocker
+//    (Journal › Performance › ⚙️ Règles), comparée aux trades du jour de ce
+//    compte. Calcul : js/noyau.js › evaluerGardeFou.
 // 2. Blocage du calculateur quand une règle est atteinte (« Journée terminée »).
 // 3. Alerte dans le calculateur si une annonce USD à fort impact tombe dans
 //    les 30 prochaines minutes.
@@ -17,7 +18,7 @@
   const FENETRE_ANNONCE_MS = 30 * 60000;
 
   let regles = null;     // { maxTrades, pertesArret, seuilGain }
-  let limite = null;     // { montant, nomCompte } ou null
+  let limitesJour = [];  // [{ cle, nom, limite }] : perte max par jour de chaque compte
   let etat = null;       // résultat de evaluerGardeFou
   let chargement = null; // promesse en cours
   let jourCalcule = null;
@@ -38,13 +39,24 @@
     regles = { maxTrades: p?.max_trades_jour ?? null, pertesArret: p?.nombre_pertes_arret ?? null, seuilGain: p?.seuil_gain_arret ?? null };
   }
 
+  // Perte max par jour réglée sur chaque compte (Performance › ⚙️ Règles).
+  // (L'ancien écran « Mes comptes », vide depuis TradeLocker, n'est plus lu.)
   async function chargerLimite() {
-    const comptes = await window.GoldAI.comptesTrading.chargerComptes();
-    // Plusieurs comptes : la limite la plus stricte (en $) sert de référence.
-    limite = comptes
-      .map((c) => ({ montant: window.GoldAI.comptesTrading.calculerLimites(c, 0).dailyLossLimit, nomCompte: c.nom }))
-      .filter((x) => x.montant > 0)
-      .sort((a, b) => a.montant - b.montant)[0] || null;
+    const r = await window.GoldAI.reglagesCalculateur.charger();
+    const surnoms = r.surnomsComptes || {};
+    limitesJour = Object.entries(r.reglesComptes || {})
+      .filter(([, rg]) => Number(rg?.perteJour) > 0)
+      .map(([cle, rg]) => ({ cle, nom: surnoms[cle] || cle, limite: Number(rg.perteJour) }));
+  }
+
+  // Perte nette (positive) des trades du jour de chaque compte réglé.
+  function limitesDuJour() {
+    return limitesJour.map((l) => {
+      const net = tradesDuJour.filter((t) => t.compteTl === l.cle).reduce((s, t) => s + Number(t.resultat) - (Number(t.frais) || 0), 0);
+      const nom = l.nom !== l.cle ? l.nom
+        : (window.GoldAI.journal.obtenirTradesBruts().find((t) => t.compteTl === l.cle)?.compteTlNom || "Compte");
+      return { ...l, nom, perte: Math.max(0, -net) };
+    });
   }
 
   async function recalculer({ rechargerRegles = false } = {}) {
@@ -54,7 +66,7 @@
       const parJour = await window.GoldAI.journal.chargerTousLesTrades();
       jourCalcule = cleAujourdhui();
       tradesDuJour = parJour[jourCalcule] || [];
-      etat = N.evaluerGardeFou({ trades: tradesDuJour, regles, limitePerte: limite?.montant ?? null });
+      etat = N.evaluerGardeFou({ trades: tradesDuJour, regles, limitesComptes: limitesDuJour() });
       await majObjectifAtteint(parJour);
       afficherBandeau();
       afficherBlocageCalculateur();
@@ -165,7 +177,7 @@
   }
 
   function viderCache() {
-    regles = null; limite = null; etat = null; jourCalcule = null; tradesDuJour = []; objectifAtteint = false;
+    regles = null; limitesJour = []; etat = null; jourCalcule = null; tradesDuJour = []; objectifAtteint = false;
     clearInterval(minuterie);
     const zone = $("garde-fou");
     if (zone) { zone.hidden = true; zone.innerHTML = ""; }
@@ -176,10 +188,13 @@
   window.addEventListener("goldai:trades", () => recalculer());
   window.addEventListener("goldai:regles", () => recalculer({ rechargerRegles: true }));
   // Objectif modifié dans Profil › Général.
-  window.addEventListener("goldai:reglages-calculateur", async () => { if (etat) { await majObjectifAtteint(); afficherBandeau(); } });
+  // Objectif, perte max par jour d'un compte… modifiés : tout est recalculé.
+  window.addEventListener("goldai:reglages-calculateur", () => { if (etat) recalculer({ rechargerRegles: true }); });
   window.addEventListener("goldai:comptes", () => recalculer({ rechargerRegles: true }));
   window.addEventListener("goldai:donnees", () => { if ($("section-calculateur")?.classList.contains("actif")) afficherAlerteAnnonce(); });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.gardeFou = { demarrer, viderCache, recalculer, calculAutorise, gainDejaFaitAujourdhui, afficherAlerteAnnonce, annonceProche, etat: () => etat, cleAujourdhui };
+  window.GoldAI.gardeFou = { demarrer, viderCache, recalculer, calculAutorise, gainDejaFaitAujourdhui, afficherAlerteAnnonce, annonceProche, etat: () => etat, cleAujourdhui,
+    // Pour le calculateur : marge restante aujourd'hui sur chaque compte réglé.
+    margesJour: async () => { if (chargement) await chargement; if (!etat || jourCalcule !== cleAujourdhui()) await recalculer(); return etat?.limitesComptes || []; } };
 })();

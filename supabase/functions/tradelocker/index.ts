@@ -10,11 +10,12 @@
 //                  trades ouverts avec leur P&L).
 //  - "comptes"   : liste légère des comptes reliés (menu « Compte » du Journal).
 //  - "supprimer" : oublie une connexion (et son mot de passe chiffré).
+//  - "supprimes" / "reimporter" : trades importés puis supprimés du Journal, et leur réimport.
 // LECTURE SEULE : aucune route d'ordre n'est appelée ici.
 // Routes TradeLocker : les mêmes que la bibliothèque officielle « tradelocker » (Python).
 
 import { chiffrer, colonnes, comptesDuLogin, type Connexion, db, ErreurUtilisateur, expiration, enObjet, instruments, nb, seConnecter, tl } from "../_shared/tradelocker.ts";
-import { importerTout } from "../_shared/import-tradelocker.ts";
+import { importerTout, reimporter, tradesSupprimes } from "../_shared/import-tradelocker.ts";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -109,6 +110,17 @@ Deno.serve(async (req) => {
         } catch (e) { console.error("comptes", c.id, String(e)); }
       }
       return repondre({ comptes });
+    }
+
+    // Trades importés puis supprimés du Journal, et leur réimport à la demande.
+    if (corps.action === "supprimes") return repondre({ trades: await tradesSupprimes(compteId) });
+    if (corps.action === "reimporter") {
+      const tradeId = String(corps.tradeId || "");
+      if (!/^[0-9a-f-]{36}$/i.test(tradeId)) throw new ErreurUtilisateur("Trade inconnu.");
+      const r = await reimporter(compteId, tradeId);
+      if (r.introuvable || r.dejaLa) throw new ErreurUtilisateur("Ce trade n'est plus dans la liste des trades supprimés.");
+      if (r.connexionAbsente) throw new ErreurUtilisateur("La connexion TradeLocker de ce trade a été retirée : reconnecte-la d'abord.");
+      return repondre({ ok: true, importes: r.importes });
     }
 
     if (corps.action === "supprimer") {

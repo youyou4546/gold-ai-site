@@ -505,3 +505,16 @@ test("TP sans chiffre = TP runner, qui reçoit toujours son lot", () => {
   assert.ok(r.portions[3].lot > 0);
   assert.equal(r.contientTpOuvert, true);
 });
+
+test("garde-fou : perte max par jour, compte par compte", () => {
+  const trades = [{ resultat: -150, compteTl: "demo|1" }];
+  let g = N.evaluerGardeFou({ trades, regles: {}, limitesComptes: [{ nom: "TOPONE #1", limite: 200, perte: 150 }, { nom: "TOPONE #2", limite: 200, perte: 0 }] });
+  assert.equal(g.niveau, "attention");                 // 75 % sur #1
+  assert.equal(g.resteAvantLimite, 50);
+  assert.ok(g.alertes[0].texte.includes("TOPONE #1"));
+  assert.equal(g.aucuneRegle, false);
+  g = N.evaluerGardeFou({ trades, regles: {}, limitesComptes: [{ nom: "TOPONE #1", limite: 150, perte: 150 }] });
+  assert.equal(g.niveau, "bloque");
+  assert.equal(N.evaluerGardeFou({ trades, regles: {}, limitesComptes: [{ nom: "X", limite: 1000, perte: 150 }] }).niveau, "ok");
+  assert.equal(N.evaluerGardeFou({ trades, regles: {}, limitesComptes: [] }).aucuneRegle, true);
+});

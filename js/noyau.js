@@ -785,7 +785,12 @@
     return groupes.map((g) => ({ trades: g.trades, net: Math.round(g.trades.reduce((s, t) => s + net(t), 0) * 100) / 100 }));
   }
 
-  function evaluerGardeFou({ trades = [], regles = {}, limitePerte = null } = {}) {
+  /**
+   * limitesComptes : [{ nom, limite, perte }] — perte max par jour de chaque
+   * compte (Performance › ⚙️ Règles) et perte déjà prise aujourd'hui sur ce
+   * compte (en $, positive). La plus proche de sa limite donne l'alerte.
+   */
+  function evaluerGardeFou({ trades = [], regles = {}, limitePerte = null, limitesComptes = [] } = {}) {
     const net = Math.round(trades.reduce((s, t) => s + Number(t.resultat) - (Number(t.frais) || 0), 0) * 100) / 100;
     // Un signal = 1 trade, même s'il a plusieurs TP ou a été copié sur plusieurs comptes.
     const signaux = regrouperSignaux(trades);
@@ -815,11 +820,28 @@
       else if (perte >= 0.7 * limite) alertes.push({ cle: "limite", niveau: "attention", texte: `${Math.round((perte / limite) * 100)} % de ta limite de perte journalière déjà utilisée` });
     }
 
+    // Perte max par jour, compte par compte.
+    const parCompte = (limitesComptes || [])
+      .filter((c) => Number(c.limite) > 0)
+      .map((c) => {
+        const perte = Math.max(0, Math.round(Number(c.perte || 0) * 100) / 100), lim = Number(c.limite);
+        return { nom: c.nom, limite: lim, perte, reste: Math.max(0, Math.round((lim - perte) * 100) / 100), ratio: perte / lim };
+      })
+      .sort((a, b) => b.ratio - a.ratio);
+    const pire = parCompte[0];
+    if (pire) {
+      resteAvantLimite = resteAvantLimite === null ? pire.reste : Math.min(resteAvantLimite, pire.reste);
+      if (pire.ratio >= 1) alertes.push({ cle: "limite", niveau: "bloque", texte: `${pire.nom} : perte max du jour atteinte (${pire.perte} / ${pire.limite})` });
+      else if (pire.ratio >= 0.7) alertes.push({ cle: "limite", niveau: "attention", texte: `${pire.nom} : ${Math.round(pire.ratio * 100)} % de ta perte max du jour déjà utilisée (reste ${pire.reste})` });
+    }
+
     const ordre = { ok: 0, attention: 1, bloque: 2 };
     const niveau = alertes.reduce((n, a) => (ordre[a.niveau] > ordre[n] ? a.niveau : n), "ok");
-    alertes.sort((a, b) => ordre[b.niveau] - ordre[a.niveau]);
-    return { niveau, nb, net, pertes, maxTrades, resteAvantLimite, limite, alertes,
-      aucuneRegle: maxTrades === null && pertesArret === null && seuilGain === null && limite === null };
+    // La plus grave d'abord ; à gravité égale, l'argent avant le nombre de trades.
+    const priorite = { limite: 0, pertes: 1, gain: 2, trades: 3 };
+    alertes.sort((a, b) => ordre[b.niveau] - ordre[a.niveau] || (priorite[a.cle] ?? 9) - (priorite[b.cle] ?? 9));
+    return { niveau, nb, net, pertes, maxTrades, resteAvantLimite, limite, alertes, limitesComptes: parCompte,
+      aucuneRegle: maxTrades === null && pertesArret === null && seuilGain === null && limite === null && !parCompte.length };
   }
 
   /**

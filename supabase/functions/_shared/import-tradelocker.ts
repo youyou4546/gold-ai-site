@@ -7,7 +7,7 @@
 //     une fois toutes fermées : date de fermeture (fuseau de l'utilisateur),
 //     entrée / sortie moyennes, lots, profit total (détail par position dans la note) ;
 //  3. trades_importes_tl retient ce qui a été importé (jamais deux fois ; un trade
-//     supprimé du Journal ne revient pas).
+//     supprimé du Journal ne revient pas… sauf avec « Réimporter » : reimporter()).
 // Profit CALCULÉ : (sortie − entrée) × lots × taille du lot, dans la devise du prix.
 // TradeLocker ne donne pas le profit réel par trade : commissions et swap ne sont
 // pas inclus (écart possible de quelques $ avec le relevé du courtier).
@@ -33,13 +33,14 @@ const moyenne = (liste: Ordre[]) => {
 };
 const arrondi = (x: number, d = 2) => Math.round(x * 10 ** d) / 10 ** d;
 
-async function importerCompte(c: Connexion, jeton: string, a: Record<string, unknown>, fuseau: string) {
+async function importerCompte(c: Connexion, jeton: string, a: Record<string, unknown>, fuseau: string, debutForce?: number) {
   const env = c.environnement, id = Number(a.id), accNum = Number(a.accNum);
   const devise = String(a.currency || "USD");
   const depuis = Date.parse(c.import_depuis || new Date().toISOString());
   // Premier passage (derniere_synchro vide) : tout l'historique depuis import_depuis.
   // Ensuite : seulement les dernières heures (+ 7 jours pour retrouver l'ouverture des positions).
-  const debut = (c.derniere_synchro ? Date.parse(c.derniere_synchro) - MARGE_SYNCHRO_MS : depuis) - FENETRE_OUVERTURE_MS;
+  // Réimport : à partir d'une date donnée (le trade supprimé peut être ancien).
+  const debut = (debutForce ?? (c.derniere_synchro ? Date.parse(c.derniere_synchro) - MARGE_SYNCHRO_MS : depuis)) - FENETRE_OUVERTURE_MS;
 
   const cols = await colonnes(env, jeton, accNum);
   const histo = await tl(env, `/trade/accounts/${id}/ordersHistory`, jeton, { accNum, params: { from: debut, to: Date.now() } });
@@ -130,15 +131,53 @@ async function importerCompte(c: Connexion, jeton: string, a: Record<string, unk
   return importes;
 }
 
-export async function importerConnexion(c: Connexion) {
+export async function importerConnexion(c: Connexion, debutForce?: number) {
   const { jeton, comptes } = await comptesDuLogin(c);
   const fuseau = await fuseauUtilisateur(c.compte_id);
   let total = 0;
   for (const a of comptes) {
-    try { total += await importerCompte(c, jeton, a, fuseau); } catch (e) { console.error("import compte", a.accNum, String(e)); }
+    try { total += await importerCompte(c, jeton, a, fuseau, debutForce); } catch (e) { console.error("import compte", a.accNum, String(e)); }
   }
-  await db.from("comptes_tradelocker").update({ derniere_synchro: new Date().toISOString() }).eq("id", c.id);
+  if (debutForce === undefined) await db.from("comptes_tradelocker").update({ derniere_synchro: new Date().toISOString() }).eq("id", c.id);
   return total;
+}
+
+// Trades importés puis SUPPRIMÉS du Journal (leurs positions sont encore
+// mémorisées dans trades_importes_tl, ce qui les empêche de revenir).
+export async function tradesSupprimes(compteId: string) {
+  const { data: lignes } = await db.from("trades_importes_tl").select("cle, trade_id, resultat, ferme_le")
+    .eq("compte_id", compteId).not("trade_id", "is", null);
+  const ids = [...new Set((lignes || []).map((l) => l.trade_id as string))];
+  const existants = new Set<string>();
+  for (let i = 0; i < ids.length; i += 200) {
+    const { data } = await db.from("trades").select("id").in("id", ids.slice(i, i + 200));
+    (data || []).forEach((t) => existants.add(t.id as string));
+  }
+  const groupes = new Map<string, { tradeId: string; compteTl: string; positions: number; resultat: number; fermeLe: string }>();
+  for (const l of lignes || []) {
+    if (existants.has(l.trade_id as string)) continue;
+    const g = groupes.get(l.trade_id as string) || { tradeId: l.trade_id as string, compteTl: String(l.cle).split("|").slice(0, 2).join("|"), positions: 0, resultat: 0, fermeLe: l.ferme_le as string };
+    g.positions++;
+    g.resultat = arrondi(g.resultat + Number(l.resultat));
+    if (String(l.ferme_le) > g.fermeLe) g.fermeLe = l.ferme_le as string;
+    groupes.set(g.tradeId, g);
+  }
+  return [...groupes.values()].sort((a, b) => b.fermeLe.localeCompare(a.fermeLe));
+}
+
+// « Réimporter » un trade supprimé : on oublie ses positions, puis on relance
+// l'import sur sa période (il revient comme un nouveau trade du Journal).
+export async function reimporter(compteId: string, tradeId: string) {
+  const { data: lignes } = await db.from("trades_importes_tl").select("cle, ferme_le, connexion_id").eq("compte_id", compteId).eq("trade_id", tradeId);
+  if (!lignes?.length) return { importes: 0, introuvable: true };
+  const { data: existe } = await db.from("trades").select("id").eq("id", tradeId).maybeSingle();
+  if (existe) return { importes: 0, dejaLa: true };
+  const { data: connexion } = await db.from("comptes_tradelocker").select("*").eq("id", lignes[0].connexion_id).eq("compte_id", compteId).maybeSingle();
+  if (!connexion) return { importes: 0, connexionAbsente: true };
+  await db.from("trades_importes_tl").delete().eq("compte_id", compteId).eq("trade_id", tradeId);
+  const debut = Math.min(...lignes.map((l) => Date.parse(l.ferme_le as string))) - 86400000;
+  const importes = await importerConnexion(connexion as Connexion, debut);
+  return { importes };
 }
 
 export async function importerTout(compteId?: string) {
