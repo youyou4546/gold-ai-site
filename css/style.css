@@ -1864,7 +1864,32 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .type-zone { font-size: 10.5px; font-weight: 700; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: var(--bordure); }
 .type-zone.haut { background: var(--rouge-fond); color: var(--rouge); }
 .type-zone.bas { background: var(--vert-fond); color: var(--vert); }
-.scenario-ia { border: 1px solid var(--bordure); border-radius: var(--rayon); padding: 8px 12px; margin: 8px 0; }
+.verdict-ia { border-radius: var(--rayon); padding: 12px 14px; border: 1px solid var(--bordure); margin: 8px 0 4px; }
+.verdict-ia.achat { border-color: var(--vert); background: var(--vert-fond); }
+.verdict-ia.vente { border-color: var(--rouge); background: var(--rouge-fond); }
+.verdict-ia.attendre { border-color: var(--orange); background: var(--orange-fond); }
+.ligne-verdict { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.mot-verdict { font-size: 22px; font-weight: 800; letter-spacing: .02em; }
+.pastille-ia { font-size: 11px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--bordure); color: var(--texte-attenue); white-space: nowrap; }
+.contexte-ia, .annonces-ia, .echelle-ia { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.contexte-ia li, .annonces-ia li { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border: 1px solid var(--bordure); border-radius: 10px; }
+.fleche-ia { flex: 0 0 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; background: var(--bordure); color: var(--texte-attenue); }
+.fleche-ia.haut { background: var(--vert-fond); color: var(--vert); }
+.fleche-ia.bas { background: var(--rouge-fond); color: var(--rouge); }
+.annonces-ia li { flex-direction: column; gap: 2px; border-color: var(--orange); background: var(--orange-fond); }
+.quand-ia { font-size: 12px; font-weight: 700; color: var(--orange); }
+.echelle-ia { gap: 0; border-left: 2px solid var(--bordure); margin-left: 6px; }
+.echelle-ia li { display: flex; gap: 10px; align-items: baseline; padding: 6px 0 6px 12px; font-size: 13px; position: relative; }
+.echelle-ia li::before { content: ""; position: absolute; left: -5px; top: 12px; width: 8px; height: 8px; border-radius: 50%; background: var(--bordure); }
+.prix-niveau { flex: 0 0 auto; max-width: 45%; font-weight: 700; }
+.niveau-actuel { color: var(--accent); font-weight: 700; }
+.niveau-actuel::before { background: var(--accent) !important; }
+.scenario-ia { border: 1px solid var(--bordure); border-radius: var(--rayon); padding: 10px 12px; margin: 8px 0; opacity: .8; }
+.scenario-ia.principal { opacity: 1; border-width: 2px; }
 .scenario-ia.achat { border-color: var(--vert); }
 .scenario-ia.vente { border-color: var(--rouge); }
+.entete-scenario { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.chiffres-scenario { display: grid; gap: 4px; margin-top: 6px; }
+.chiffres-scenario > span { display: grid; grid-template-columns: 72px 1fr; gap: 8px; font-size: 13px; background: var(--fond-carte-survol); border-radius: 8px; padding: 6px 10px; }
+.chiffres-scenario strong { font-size: 13px; }
 .element-historique-ia { border-top: 1px solid var(--bordure); padding: 8px 0; font-size: 13px; }
