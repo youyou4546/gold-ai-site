@@ -1058,6 +1058,124 @@
     return { ...res, ess, eligible, marge: eligible ? r2(total - requis) : 0, manque: eligible ? 0 : r2(requis - total) };
   }
 
+  // =====================================================================
+  // 11. ANALYSE DE MES TRADES (onglet Analyse)
+  // =====================================================================
+
+  const JOURS_SEMAINE = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+  const MIN_ECHANTILLON = 4; // pas de conseil sur moins de 4 trades dans un groupe
+
+  /**
+   * Statistiques du journal. trades : { id, date, resultat, frais, sens, ouvertLe }.
+   * - positions : { idTrade: [résultat de chaque position, dans l'ordre de fermeture] }
+   *   (trades importés : position k gagnante = TPk atteint) ;
+   * - moment(trade) : { jour: 0-6 (0 = dimanche), heure: 0-23 } dans le fuseau de
+   *   l'utilisateur, ou null si l'heure d'ouverture est inconnue (trade saisi à la main).
+   * Renvoie les chiffres + des conseils en français.
+   */
+  function analyserTrades(trades, { positions = {}, moment = null } = {}) {
+    const r2 = (x) => Math.round(x * 100) / 100;
+    const net = (t) => Number(t.resultat) - (Number(t.frais) || 0);
+    const liste = (trades || []).filter((t) => Number.isFinite(Number(t.resultat)));
+    const groupe = (ts) => {
+      const nb = ts.length, gagnants = ts.filter((t) => net(t) > 0).length, perdants = ts.filter((t) => net(t) < 0).length;
+      return { nb, gagnants, perdants, net: r2(ts.reduce((s, t) => s + net(t), 0)),
+        taux: nb ? (gagnants / nb) * 100 : 0, tauxPerte: nb ? (perdants / nb) * 100 : 0 };
+    };
+    const infos = liste.map((t) => {
+      const m = moment ? moment(t) : null;
+      const [a, mo, j] = String(t.date).split("-").map(Number);
+      return { t, jour: m ? m.jour : new Date(Date.UTC(a, mo - 1, j)).getUTCDay(), heure: m ? m.heure : null };
+    });
+
+    const global = groupe(liste);
+    const gains = liste.filter((t) => net(t) > 0).map(net), pertes = liste.filter((t) => net(t) < 0).map((t) => -net(t));
+    const gainMoyen = gains.length ? r2(gains.reduce((s, x) => s + x, 0) / gains.length) : 0;
+    const perteMoyenne = pertes.length ? r2(pertes.reduce((s, x) => s + x, 0) / pertes.length) : 0;
+    const sommeGains = gains.reduce((s, x) => s + x, 0), sommePertes = pertes.reduce((s, x) => s + x, 0);
+
+    const parJour = [1, 2, 3, 4, 5, 6, 0].map((jour) => ({ jour, nom: JOURS_SEMAINE[jour], ...groupe(infos.filter((x) => x.jour === jour).map((x) => x.t)) }))
+      .filter((g) => g.nb > 0 || (g.jour >= 1 && g.jour <= 5));
+    const avecHeure = infos.filter((x) => x.heure !== null);
+    const parHeure = [...new Set(avecHeure.map((x) => x.heure))].sort((a, b) => a - b)
+      .map((heure) => ({ heure, ...groupe(avecHeure.filter((x) => x.heure === heure).map((x) => x.t)) }));
+    const parSens = {
+      buy: groupe(liste.filter((t) => String(t.sens).toLowerCase() === "buy")),
+      sell: groupe(liste.filter((t) => String(t.sens).toLowerCase() === "sell")),
+    };
+
+    // TP atteints : parmi les trades qui avaient au moins k positions.
+    const tps = [];
+    const detail = liste.map((t) => positions[t.id]).filter((p) => Array.isArray(p) && p.length);
+    const maxPos = Math.max(0, ...detail.map((p) => p.length));
+    for (let k = 1; k <= maxPos; k++) {
+      const avec = detail.filter((p) => p.length >= k);
+      const atteints = avec.filter((p) => Number(p[k - 1]) > 0).length;
+      tps.push({ numero: k, atteints, total: avec.length, pct: avec.length ? (atteints / avec.length) * 100 : 0 });
+    }
+
+    // Trade qui suit une perte, le même jour (« se refaire »).
+    const ordonnes = [...liste].sort((a, b) => (a.date === b.date
+      ? String(a.ouvertLe || "").localeCompare(String(b.ouvertLe || ""))
+      : String(a.date).localeCompare(String(b.date))));
+    const suivants = ordonnes.filter((t, i) => i > 0 && ordonnes[i - 1].date === t.date && net(ordonnes[i - 1]) < 0);
+    const apresPerte = groupe(suivants);
+
+    // ------------------------------------------------ Conseils
+    const conseils = [];
+    const pct = (x) => `${Math.round(x)} %`;
+    const usd = (x) => `${x < 0 ? "−" : ""}${Math.abs(Math.round(x)).toLocaleString("fr-FR")} $`;
+    const creneau = (h) => `entre ${h}h et ${h + 1}h`;
+    if (global.nb < 10) conseils.push({ niveau: "info", texte: `Seulement ${global.nb} trade${global.nb > 1 ? "s" : ""} analysé${global.nb > 1 ? "s" : ""} : les conseils deviendront fiables avec plus de trades.` });
+
+    const heuresSures = parHeure.filter((g) => g.nb >= MIN_ECHANTILLON);
+    heuresSures.filter((g) => g.tauxPerte >= 65).sort((a, b) => b.tauxPerte - a.tauxPerte || a.net - b.net).slice(0, 2).forEach((g) => {
+      conseils.push({ niveau: "attention", texte: `Tes trades ouverts ${creneau(g.heure)} perdent ${pct(g.tauxPerte)} du temps (${g.perdants} sur ${g.nb}, total ${usd(g.net)}) : évite ce créneau ou réduis ton risque.` });
+    });
+    const meilleureHeure = heuresSures.filter((g) => g.taux >= 60 && g.net > 0).sort((a, b) => b.net - a.net)[0];
+    if (meilleureHeure) conseils.push({ niveau: "ok", texte: `Ton meilleur créneau : ${creneau(meilleureHeure.heure)} (${pct(meilleureHeure.taux)} de trades gagnants, ${usd(meilleureHeure.net)}).` });
+
+    const joursSurs = parJour.filter((g) => g.nb >= MIN_ECHANTILLON);
+    const pireJour = joursSurs.filter((g) => g.tauxPerte >= 65 && g.net < 0).sort((a, b) => a.net - b.net)[0];
+    if (pireJour) conseils.push({ niveau: "attention", texte: `Le ${pireJour.nom}, tu perds ${pct(pireJour.tauxPerte)} de tes trades (total ${usd(pireJour.net)}).` });
+    const meilleurJour = joursSurs.filter((g) => g.taux >= 60 && g.net > 0).sort((a, b) => b.net - a.net)[0];
+    if (meilleurJour) conseils.push({ niveau: "ok", texte: `Ton meilleur jour : le ${meilleurJour.nom} (${pct(meilleurJour.taux)} de trades gagnants, ${usd(meilleurJour.net)}).` });
+
+    const { buy, sell } = parSens;
+    if (buy.nb >= MIN_ECHANTILLON && sell.nb >= MIN_ECHANTILLON && Math.abs(buy.taux - sell.taux) >= 25) {
+      const [fort, faible, nomFort, nomFaible] = buy.taux > sell.taux ? [buy, sell, "achats", "ventes"] : [sell, buy, "ventes", "achats"];
+      conseils.push({ niveau: "attention", texte: `Tes ${nomFaible} gagnent ${pct(faible.taux)} du temps contre ${pct(fort.taux)} pour tes ${nomFort} : sois plus sélectif sur les ${nomFaible}.` });
+    }
+
+    if (gains.length && pertes.length && perteMoyenne > gainMoyen) {
+      const seuil = (perteMoyenne / (perteMoyenne + gainMoyen)) * 100;
+      conseils.push({ niveau: global.taux >= seuil ? "info" : "attention",
+        texte: `Ta perte moyenne (${usd(perteMoyenne)}) dépasse ton gain moyen (${usd(gainMoyen)}) : il te faut plus de ${pct(seuil)} de trades gagnants pour être rentable (tu es à ${pct(global.taux)}).` });
+    }
+
+    const tp1 = tps[0];
+    if (tp1 && tp1.total >= MIN_ECHANTILLON && tp1.pct < 40) {
+      conseils.push({ niveau: "attention", texte: `TP1 n'est atteint que ${pct(tp1.pct)} du temps (${tp1.atteints} sur ${tp1.total}) : la plupart de tes trades partent directement au SL. Attends une meilleure confirmation avant d'entrer.` });
+    }
+    const dernierTp = tps.length >= 2 ? tps[tps.length - 1] : null;
+    if (dernierTp && dernierTp.total >= MIN_ECHANTILLON && dernierTp.pct < 30) {
+      conseils.push({ niveau: "info", texte: `TP${dernierTp.numero} n'est atteint que ${pct(dernierTp.pct)} du temps (${dernierTp.atteints} sur ${dernierTp.total}) : envisage une plus petite part sur ce TP dans ta répartition, ou de sécuriser plus tôt.` });
+    }
+
+    if (apresPerte.nb >= MIN_ECHANTILLON && apresPerte.tauxPerte >= 60) {
+      conseils.push({ niveau: "attention", texte: `Après une perte, ton trade suivant du même jour perd ${pct(apresPerte.tauxPerte)} du temps (${apresPerte.perdants} sur ${apresPerte.nb}) : fais une vraie pause après une perte.` });
+    }
+
+    return {
+      ...global, total: global.net, gainMoyen, perteMoyenne,
+      ratioGainPerte: perteMoyenne > 0 ? r2(gainMoyen / perteMoyenne) : null,
+      profitFactor: sommePertes > 0 ? r2(sommeGains / sommePertes) : null,
+      meilleur: liste.length ? r2(Math.max(...liste.map(net))) : null,
+      pire: liste.length ? r2(Math.min(...liste.map(net))) : null,
+      parJour, parHeure, parSens, tps, apresPerte, sansHeure: infos.length - avecHeure.length, conseils,
+    };
+  }
+
   const LIBELLE_TF = { "30min": "30 min", "1h": "1 h", "4h": "4 h", "1week": "1W" };
 
   const api = {
@@ -1067,7 +1185,7 @@
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
     scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou, regrouperSignaux, aUnTradeGagnant, etatChallenge,
     OBJECTIF_PAR_DEFAUT, debutPeriode, progressionObjectif, prochaineAnnonceDuJour,
-    slCourant, evaluerTouches, pnlEstime, alerteTouchee, distanceAlerte, situationCompte, calculerEss, LIBELLE_TF, LIBELLES_SPEC,
+    slCourant, evaluerTouches, pnlEstime, alerteTouchee, distanceAlerte, situationCompte, calculerEss, analyserTrades, JOURS_SEMAINE, LIBELLE_TF, LIBELLES_SPEC,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

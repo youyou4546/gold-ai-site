@@ -120,15 +120,30 @@
 
     <!-- ============ SECTION 3 : ANALYSE DE GRAPHIQUE (placeholder) ============ -->
     <section class="section" id="section-analyse">
-      <h2 class="titre-section">Analyse de graphique</h2>
+      <h2 class="titre-section">Analyse</h2>
+
+      <!-- Analyse de mes trades (js/analyse-trades.js), calculée avec le journal : gratuit -->
+      <div class="carte" id="carte-analyse-trades">
+        <h3 class="titre-bloc">📈 Analyse de mes trades</h3>
+        <div class="ligne-champs">
+          <div class="champ choix-compte-journal hidden" id="choix-compte-analyse"></div>
+          <div class="champ">
+            <label for="periode-analyse">Période</label>
+            <select id="periode-analyse">
+              <option value="30">30 derniers jours</option>
+              <option value="90">90 derniers jours</option>
+              <option value="tout" selected>Depuis le début</option>
+            </select>
+          </div>
+        </div>
+        <div id="contenu-analyse-trades"><p class="etat-vide">Chargement…</p></div>
+      </div>
+
+      <!-- Analyse de capture de graphique par l'IA : payante, pas encore activée -->
       <div class="placeholder">
         <div class="icone-placeholder">📊</div>
-        <h3>Bientôt disponible</h3>
-        <p>
-          Cette section permettra d'envoyer une capture d'écran de graphique pour recevoir une
-          analyse automatique. Elle nécessite l'API Claude (payante à l'usage) : elle ne sera
-          activée qu'après validation explicite du coût.
-        </p>
+        <h3>Analyse de graphique par l'IA — bientôt</h3>
+        <p>Envoie une capture de ton graphique pour recevoir tendance, zones clés, scénario et invalidation. Payant à l'usage : activé seulement après validation du prix.</p>
         <div class="zone-upload-desactivee">📷 Envoi de capture désactivé pour l'instant</div>
       </div>
 
@@ -648,6 +663,7 @@
 <script src="js/journal-performance.js"></script>
 <script src="js/challenge-comptes.js"></script>
 <script src="js/briefing.js"></script>
+<script src="js/analyse-trades.js"></script>
 <script src="js/parametres.js"></script>
 <script src="js/profil-comptes.js"></script>
 <script src="js/profil-mon-compte.js"></script>

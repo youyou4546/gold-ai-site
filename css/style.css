@@ -1808,3 +1808,19 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .details-ess strong { color: var(--texte); }
 .bloc-ess p { margin: 6px 0 0; }
 .lien-objectif { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; }
+
+/* Analyse › Analyse de mes trades (js/analyse-trades.js) */
+.sous-titre-analyse { margin: 18px 0 8px; font-size: 14px; }
+.ligne-analyse { display: grid; grid-template-columns: 78px 1fr auto; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid var(--bordure); font-size: 13px; }
+.lib-analyse { color: var(--texte); }
+.barre-analyse { height: 8px; background: var(--bordure); border-radius: 999px; overflow: hidden; }
+.barre-analyse span { display: block; height: 100%; border-radius: 999px; }
+.barre-analyse .gain { background: var(--vert); }
+.barre-analyse .perte { background: var(--rouge); }
+.val-analyse { text-align: right; line-height: 1.25; min-width: 96px; }
+.conseils-analyse { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.conseils-analyse li { padding: 10px 12px; border-radius: var(--rayon); border: 1px solid var(--bordure); font-size: 13.5px; line-height: 1.45; }
+.conseils-analyse li.attention { border-color: var(--orange); background: var(--orange-fond); }
+.conseils-analyse li.ok { border-color: var(--vert); background: var(--vert-fond); }
+.valeur-stat.positif { color: var(--vert); }
+.valeur-stat.negatif { color: var(--rouge); }

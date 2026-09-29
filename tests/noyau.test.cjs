@@ -518,3 +518,45 @@ test("garde-fou : perte max par jour, compte par compte", () => {
   assert.equal(N.evaluerGardeFou({ trades, regles: {}, limitesComptes: [{ nom: "X", limite: 1000, perte: 150 }] }).niveau, "ok");
   assert.equal(N.evaluerGardeFou({ trades, regles: {}, limitesComptes: [] }).aucuneRegle, true);
 });
+
+test("analyse de mes trades : chiffres, TP atteints, créneaux et conseils", () => {
+  const t = (id, date, heure, resultat, sens) => ({ id, date, resultat, sens, ouvertLe: heure === null ? null : `${date}T${String(heure).padStart(2, "0")}:10:00Z` });
+  const trades = [
+    // 11h : 4 pertes sur 5
+    t("a", "2026-09-21", 11, -100, "sell"), t("b", "2026-09-22", 11, -120, "sell"), t("c", "2026-09-23", 11, -80, "sell"),
+    t("d", "2026-09-24", 11, -90, "sell"), t("e", "2026-09-25", 11, 60, "sell"),
+    // 9h : 4 gains sur 4
+    t("f", "2026-09-21", 9, 200, "buy"), t("g", "2026-09-22", 9, 150, "buy"), t("h", "2026-09-23", 9, 180, "buy"), t("i", "2026-09-24", 9, 170, "buy"),
+    t("j", "2026-09-25", null, 50, null), // saisi à la main, sans heure
+  ];
+  const positions = { f: [50, 80, 70], g: [60, 90, -10], h: [40, 70, 70], i: [60, 60, 50], a: [-30, -30, -40] };
+  const moment = (x) => (x.ouvertLe ? { jour: new Date(x.ouvertLe).getUTCDay(), heure: new Date(x.ouvertLe).getUTCHours() } : null);
+  const r = N.analyserTrades(trades, { positions, moment });
+  assert.equal(r.nb, 10);
+  assert.equal(r.gagnants, 6);
+  assert.equal(r.sansHeure, 1);
+  assert.equal(r.parSens.buy.taux, 100);
+  assert.equal(r.parSens.sell.tauxPerte, 80);
+  assert.deepEqual(r.tps.map((x) => `${x.numero}:${x.atteints}/${x.total}`), ["1:4/5", "2:4/5", "3:3/5"]);
+  assert.equal(r.gainMoyen, 135);
+  assert.equal(r.perteMoyenne, 97.5);
+  const textes = r.conseils.map((c) => c.texte).join("\n");
+  assert.match(textes, /entre 11h et 12h perdent 80 %/);
+  assert.match(textes, /meilleur créneau : entre 9h et 10h/);
+  assert.match(textes, /Tes ventes gagnent 20 % du temps contre 100 %/);
+  // Journal vide : pas d'erreur
+  const vide = N.analyserTrades([], {});
+  assert.equal(vide.nb, 0);
+  assert.equal(vide.meilleur, null);
+});
+
+test("analyse : trade suivant une perte le même jour", () => {
+  const jours = ["2026-09-21", "2026-09-22", "2026-09-23", "2026-09-24"];
+  const trades = jours.flatMap((d, i) => [
+    { id: `p${i}`, date: d, resultat: -100, ouvertLe: `${d}T08:00:00Z` },
+    { id: `s${i}`, date: d, resultat: -50, ouvertLe: `${d}T09:00:00Z` },
+  ]);
+  const r = N.analyserTrades(trades, {});
+  assert.equal(r.apresPerte.nb, 4);
+  assert.ok(r.conseils.some((c) => c.texte.includes("Après une perte")));
+});

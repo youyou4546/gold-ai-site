@@ -51,7 +51,9 @@
   function lireFiltreMemorise() {
     let memorise = null;
     try { memorise = localStorage.getItem(cleFiltre()); } catch { /* ignoré */ }
-    filtreCompte = memorise || "tous";
+    // Sans choix mémorisé, on garde le compte maître déjà appliqué (sinon :
+    // « tous » → compte maître → événement → relecture → « tous »… en boucle).
+    filtreCompte = memorise || (filtreCompte !== "manuel" ? filtreCompte : "tous");
     if (!memorise) {
       window.GoldAI.reglagesCalculateur.charger().then((r) => {
         if (!r.compteMaitre || filtreCompte !== "tous") return;

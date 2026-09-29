@@ -64,6 +64,7 @@
     obtenir_cle_cotations: () => localStorage.banc_cle_td || null,
     enregistrer_analyse: (p) => { const l = lire("banc_analyses", []); l.unshift({ ...p, cree_le: new Date().toISOString(), actif: p.p_actif, horizon: p.p_horizon, direction: p.p_direction, confiance: p.p_confiance, prix_reference: p.p_prix_reference }); ecrire("banc_analyses", l); return "id"; },
     lister_mes_analyses: () => lire("banc_analyses", []),
+    lister_positions_importees: () => lire("banc_positions", []),
   };
 
   window.supabase = {
