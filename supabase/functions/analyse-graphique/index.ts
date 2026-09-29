@@ -6,7 +6,7 @@
 //     supabase/patch_analyse_graphique.sql) — la place est réservée AVANT l'appel ;
 //  2. rassemble le CONTEXTE DE MARCHÉ : prix corrélés à l'or de la page Marché
 //     (dollar, taux 10 ans, argent + corrélations mesurées), annonces
-//     économiques du jour et des 36 prochaines heures, actualités importantes,
+//     économiques DU JOUR seulement (journée de Toronto), actualités importantes,
 //     tendance de l'or sur plusieurs unités de temps (envoyée par l'app si la page
 //     Marché l'a calculée, sinon calculée ici avec les bougies 1 h et 4 h) ;
 //  3. demande à Claude Sonnet 5.5 une analyse qui combine la capture ET ce
@@ -105,7 +105,7 @@ Réponds en français simple, sans jargon inutile, et SOIS BREF : une phrase cou
 - Lis les prix sur l'axe de droite de la capture : ne donne que des niveaux que tu vois réellement ; s'ils sont illisibles, dis-le. "prix_num" = valeur centrale du niveau (nombre), "prix_actuel" = dernier prix visible (0 si illisible).
 - Tendance : celle de la capture, confrontée aux tendances multi-unités de temps du contexte (dis s'il y a accord ou désaccord).
 - Contexte : un élément par facteur utile (dollar, taux 10 ans, argent, tendance de fond, actualité importante…), avec son effet sur l'or selon le mouvement du jour et la corrélation mesurée.
-- Annonces : celles du jour et à venir qui comptent pour l'or (surtout USD à fort impact), quand (heure de Toronto) et quoi faire (ex. ne pas entrer dans les 30 min avant, attendre la publication).
+- Annonces : UNIQUEMENT celles d'aujourd'hui (liste du contexte) qui comptent pour l'or (surtout USD à fort impact), heure de Toronto et quoi faire (ex. ne pas entrer dans les 30 min avant, attendre la publication). Jamais d'annonce d'un autre jour ; liste vide s'il n'y en a pas.
 - Biais final : "achat", "vente" ou "attendre", avec une confiance. Choisis "attendre" si les signaux se contredisent ou si une annonce USD à fort impact tombe dans l'heure.
 - Un scénario d'achat ET un scénario de vente : conditions, entrée, stop, objectifs. Invalidation : ce qui rendrait l'analyse fausse.
 - "resume" : 2 phrases qui disent quoi faire. "prudence" : une phrase (pas un conseil financier).
@@ -202,17 +202,17 @@ async function contexteMarche(tendancesApp: any) {
     resumeApp.tendances = Object.fromEntries(Object.entries(tend).map(([tf, t]: [string, any]) => [tf, t?.etat]));
   }
 
-  // 3. Annonces du jour et des 36 prochaines heures (USD, ou fort impact)
+  // 3. Annonces du jour seulement (journée de Toronto) : USD, ou fort impact
   const cal = par.calendrier?.evenements || [];
   const maintenant = Date.now();
   // deno-lint-ignore no-explicit-any
   const annonces = (cal as any[])
     .filter((e) => e.horodatage_utc && (e.impact === "high" || (e.impact === "medium" && e.devise === "USD")))
     .map((e) => ({ e, ms: Date.parse(e.horodatage_utc) }))
-    .filter(({ ms }) => jourToronto(new Date(ms)) === jourToronto() || (ms > maintenant && ms - maintenant <= 36 * 3600000))
+    .filter(({ ms }) => jourToronto(new Date(ms)) === jourToronto())
     .sort((a, b) => a.ms - b.ms).slice(0, 15);
-  lignes.push("", "ANNONCES ÉCONOMIQUES (aujourd'hui et 36 prochaines heures) :");
-  if (!annonces.length) lignes.push("- aucune annonce importante");
+  lignes.push("", "ANNONCES ÉCONOMIQUES D'AUJOURD'HUI :");
+  if (!annonces.length) lignes.push("- aucune annonce importante aujourd'hui");
   for (const { e, ms } of annonces) {
     const v = e.valeurs?.[0] || {};
     const reste = ms > maintenant ? `dans ${Math.round((ms - maintenant) / 60000)} min` : "déjà publiée";

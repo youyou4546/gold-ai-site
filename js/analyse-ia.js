@@ -136,7 +136,7 @@
 
       ${a.tendance ? `<p class="petit"><strong>Tendance ${esc(a.tendance.direction)}</strong> — <span class="texte-attenue">${esc(a.tendance.explication)}</span></p>` : ""}
 
-      ${(a.annonces || []).length ? `<h4 class="sous-titre-analyse">Annonces à surveiller</h4>
+      ${(a.annonces || []).length ? `<h4 class="sous-titre-analyse">Annonces du jour</h4>
       <ul class="annonces-ia">${a.annonces.map((x) => `<li><span class="quand-ia">${esc(x.quand)}</span><span><strong>${esc(x.titre)}</strong><br><span class="texte-attenue petit">${esc(x.conseil)}</span></span></li>`).join("")}</ul>` : ""}
 
       ${echelle(a.zones, Number(a.prix_actuel))}
