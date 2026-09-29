@@ -109,6 +109,21 @@
     afficher();
   }
 
+  // Pour le calculateur : marge avant rupture de chaque compte réglé (solde relu au plus toutes les 60 s).
+  let cacheMarges = { t: 0, liste: null };
+  async function margesComptes() {
+    if (cacheMarges.liste && Date.now() - cacheMarges.t < 60000) return cacheMarges.liste;
+    await chargerRegles();
+    if (!Object.values(regles).some((r) => Number(r?.perteMax) > 0)) return [];
+    comptes = await J().comptesReliesAJour();
+    const liste = comptes
+      .map((c) => ({ cle: c.cle, nom: J().surnomDe(c.cle) || c.nom, devise: c.devise || "USD", etat: N.etatChallenge(regles[c.cle], c.solde) }))
+      .filter((x) => x.etat?.perte);
+    cacheMarges = { t: Date.now(), liste };
+    return liste;
+  }
+  window.GoldAI.challenge = { margesComptes };
+
   document.addEventListener("DOMContentLoaded", () => {
     $("bouton-ouvrir-performance")?.addEventListener("click", () => { enReglage = null; rafraichir(); });
     const zone = $("challenge-performance");

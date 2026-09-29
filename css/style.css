@@ -1784,3 +1784,8 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .texte-briefing { margin: 8px 0 0; padding-left: 20px; font-size: 14px; line-height: 1.55; }
 .texte-briefing li { padding: 2px 4px; border-radius: 6px; transition: background 0.2s; }
 .texte-briefing li.en-cours { background: var(--fond-carte-survol); color: var(--accent); }
+
+/* ---------- Calculateur : marge avant rupture des comptes ---------- */
+.alerte-marges p { margin: 0 0 6px; font-size: 14px; line-height: 1.45; }
+.alerte-marges.rouge { border-color: var(--rouge); background: var(--rouge-fond); }
+.alerte-marges.orange { border-color: var(--orange); background: var(--orange-fond); }

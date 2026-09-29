@@ -13,6 +13,9 @@
 //       toutes les 10 s pendant ~50 s à chaque passage → notif en quelques secondes.
 //     - Filet de sécurité : bougies 1 min Twelve Data toutes les 3 min (quota
 //       800/jour), pour les mèches trop rapides entre deux relevés.
+//  5. Perte max des comptes TradeLocker (règles réglées dans Journal › Performance) :
+//     notification à 70 %, 90 % puis 100 % de la perte max, sur l'ÉQUITÉ
+//     (trades ouverts compris). Une fois par seuil et par jour.
 //  4. Import des trades TradeLocker fermés dans le Journal, toutes les ~20 s
 //     (3 passages par minute, en arrière-plan ; _shared/import-tradelocker.ts).
 // Secrets de la fonction : VAPID_KEYS_B64 (clés de signature JWK, en base64) et
@@ -21,6 +24,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import * as webpush from "jsr:@negrel/webpush@0.5.0";
 import { importerTout } from "../_shared/import-tradelocker.ts";
+import { colonnes, comptesDuLogin, type Connexion, enObjet, nb, tl } from "../_shared/tradelocker.ts";
 
 const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
   auth: { persistSession: false },
@@ -317,6 +321,69 @@ async function alertesPrix() {
   await db.from("alertes_prix").delete().lt("touchee_le", new Date(Date.now() - 7 * 86400000).toISOString());
 }
 
+// ------------------------------------------------------------------ 5. Perte max des comptes
+
+type Regles = { depart?: number; perteMax?: number; suiveuse?: boolean; plusHaut?: number };
+
+// Même calcul que js/noyau.js › etatChallenge (partie perte max).
+function etatPerte(r: Regles, equite: number) {
+  const depart = Number(r.depart), perteMax = Number(r.perteMax);
+  if (!(depart > 0) || !(perteMax > 0) || !Number.isFinite(equite)) return null;
+  const plusHaut = Math.max(depart, Number(r.plusHaut) || 0, equite);
+  const niveau = r.suiveuse ? Math.min(plusHaut - perteMax, depart) : depart - perteMax;
+  const perdu = Math.max(0, niveau + perteMax - equite);
+  return { niveau, perdu, marge: equite - niveau, pourcentage: (perdu / perteMax) * 100 };
+}
+
+const dollars = (x: number) => `${Math.round(x).toLocaleString("fr-FR").replace(/\u202f|\u00a0/g, " ")} $`;
+
+async function alertesPerteMax() {
+  const { data: connexions } = await db.from("comptes_tradelocker").select("*");
+  if (!connexions?.length) return;
+  const jour = new Date().toISOString().slice(0, 10);
+  const reglagesParCompte = new Map<string, { regles: Record<string, Regles>; surnoms: Record<string, string> }>();
+
+  for (const c of connexions as Connexion[]) {
+    if (!reglagesParCompte.has(c.compte_id)) {
+      const { data } = await db.from("parametres_trading").select("parametres_calculateur").eq("compte_id", c.compte_id).maybeSingle();
+      const pc = (data?.parametres_calculateur || {}) as { reglesComptes?: Record<string, Regles>; surnomsComptes?: Record<string, string> };
+      reglagesParCompte.set(c.compte_id, { regles: pc.reglesComptes || {}, surnoms: pc.surnomsComptes || {} });
+    }
+    const { regles, surnoms } = reglagesParCompte.get(c.compte_id)!;
+    if (!Object.values(regles).some((r) => Number(r?.perteMax) > 0)) continue;
+    try {
+      const { jeton, comptes } = await comptesDuLogin(c);
+      for (const a of comptes) {
+        const cle = `${c.environnement}|${a.id}`;
+        const r = regles[cle];
+        if (!r || !(Number(r.perteMax) > 0)) continue;
+        // Équité (solde + trades ouverts) ; à défaut le solde.
+        let equite = nb(a.accountBalance);
+        try {
+          const cols = await colonnes(c.environnement, jeton, Number(a.accNum));
+          const etat = enObjet(cols.accountDetailsConfig || [], (((await tl(c.environnement, `/trade/accounts/${a.id}/state`, jeton, { accNum: Number(a.accNum) })).d as Record<string, unknown>)?.accountDetailsData as unknown[]) || []);
+          equite = nb(etat.projectedBalance) ?? equite;
+        } catch (e) { console.error("équité", a.accNum, String(e)); }
+        if (equite === null) continue;
+        const e = etatPerte(r, equite);
+        if (!e) continue;
+        const seuil = e.marge <= 0 ? 100 : e.pourcentage >= 90 ? 90 : e.pourcentage >= 70 ? 70 : 0;
+        if (!seuil) continue;
+        const cleNotif = `pertemax|${cle}|${seuil}|${jour}`;
+        if (await dejaEnvoye(cleNotif)) continue;
+        const nom = surnoms[cle] || `${String(a.name || "Compte")} #${a.accNum}`;
+        const [titre, texte] = seuil === 100
+          ? [`⛔ ${nom} : perte max atteinte`, `Équité ${dollars(equite)}, sous le niveau de rupture (${dollars(e.niveau)}). Vérifie ton compte.`]
+          : seuil === 90
+          ? [`🚨 ${nom} : 90 % de ta perte max`, `Plus que ${dollars(e.marge)} avant le niveau de rupture (${dollars(e.niveau)}). Arrête-toi ou réduis fortement ton risque.`]
+          : [`⚠️ ${nom} : 70 % de ta perte max`, `Plus que ${dollars(e.marge)} avant le niveau de rupture (${dollars(e.niveau)}). Réduis ton risque.`];
+        await envoyer(titre, texte, { url: "./index.html#journal", tag: `pertemax-${cle}`, compteId: c.compte_id });
+        await memoriser(cleNotif);
+      }
+    } catch (err) { console.error("perte max", c.id, String(err)); }
+  }
+}
+
 // ------------------------------------------------------------------ Point d'entrée
 
 Deno.serve(async (req) => {
@@ -341,7 +408,7 @@ Deno.serve(async (req) => {
   })();
   // deno-lint-ignore no-explicit-any
   (globalThis as any).EdgeRuntime?.waitUntil(imports);
-  for (const [nom, tache] of [["annonces", alertesAnnonces], ["trades", suiviTrades], ["alertes_prix", alertesPrix]] as const) {
+  for (const [nom, tache] of [["annonces", alertesAnnonces], ["trades", suiviTrades], ["alertes_prix", alertesPrix], ["perte_max", alertesPerteMax]] as const) {
     try { await tache(); resultat[nom] = "ok"; } catch (e) { resultat[nom] = String(e); console.error(nom, e); }
   }
   // Nettoyage de la mémoire des alertes (plus de 3 jours).

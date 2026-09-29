@@ -187,6 +187,29 @@
     document.getElementById("gain-annuler").focus();
   }
 
+  // Perte au SL comparée à la marge avant rupture de chaque compte TradeLocker
+  // (règles de Journal › Performance). Affiché en haut du résultat, sans bloquer.
+  async function verifierMarges(r) {
+    const calcul = dernierCalcul;
+    let marges = [];
+    try { marges = (await window.GoldAI.challenge?.margesComptes?.()) || []; } catch { return; }
+    if (calcul !== dernierCalcul || !r.ok || !(r.perteTotaleSl > 0)) return; // un autre calcul a pris la place
+    const lignes = [];
+    for (const m of marges) {
+      if (m.devise !== r.devise) continue;
+      const marge = m.etat.perte.marge;
+      if (marge <= 0) lignes.push(["rouge", `⛔ <strong>${esc(m.nom)}</strong> : la perte max est déjà atteinte.`]);
+      else if (r.perteTotaleSl >= marge) lignes.push(["rouge", `⛔ Ce trade peut faire sauter <strong>${esc(m.nom)}</strong> : perte au SL ${montant(r.perteTotaleSl, r.devise)}, il ne reste que ${montant(marge, r.devise)} avant le niveau de rupture.`]);
+      else if (r.perteTotaleSl >= 0.5 * marge) lignes.push(["orange", `⚠️ Sur <strong>${esc(m.nom)}</strong>, ce trade utilise ${nombre((r.perteTotaleSl / marge) * 100, 0)} % de ta marge avant rupture (${montant(marge, r.devise)}).`]);
+    }
+    const zone = document.getElementById("zone-resultat-calcul");
+    zone.querySelector("#alerte-marges")?.remove();
+    if (!lignes.length) return;
+    zone.insertAdjacentHTML("afterbegin", `<div class="carte alerte-marges ${lignes.some((l) => l[0] === "rouge") ? "rouge" : "orange"}" id="alerte-marges">
+      ${lignes.map((l) => `<p>${l[1]}</p>`).join("")}
+      <p class="texte-attenue petit">Calculé avec le solde TradeLocker et les règles de Journal › Performance (lot de ce calcul).</p></div>`);
+  }
+
   async function calculer({ depuisTexte, confirme = false }) {
     const zoneSignal = document.getElementById("zone-signal-interprete");
     const zoneResultat = document.getElementById("zone-resultat-calcul");
@@ -251,6 +274,7 @@
     const r = N.calculerPosition(signalCourant, reglages, tauxUtilise);
     dernierCalcul = r.ok ? { r, reglages, signal: { ...signalCourant } } : null;
     zoneResultat.innerHTML = r.ok ? afficherResultat(r, reglages, spec) : afficherBlocage(r, reglages, spec);
+    if (r.ok) verifierMarges(r);
     // Trades restants + compte à rebours de la prochaine annonce, avec le résultat.
     window.GoldAI.discipline?.afficher();
     if (repartitionForcee && r.ok) {
@@ -329,5 +353,5 @@
   });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.calculateur = { calculer };
+  window.GoldAI.calculateur = { calculer, verifierMarges };
 })();
