@@ -13,7 +13,7 @@
   let lectureCourante = null;   // résultat brut de lireSignal (ambiguïtés, lignes ignorées)
   let repartitionForcee = null; // répartition au prorata choisie pour CE calcul uniquement
   let taux = null;              // { taux, horodatageMs, source, manuel }
-  let dernierCalcul = null;     // { r, reglages } du dernier calcul réussi (boutons « Enregistrer » / « J'entre »)
+  let dernierCalcul = null;     // { r, reglages, signal } du dernier calcul réussi
   // Règle « arrêt après le premier trade gagnant » (Profil › Général) :
   let calculConfirme = false;     // « Continuer quand même » choisi pour le signal en cours
   let avertissementGain = null;   // { depuisTexte } tant que l'avertissement attend une réponse
@@ -166,11 +166,6 @@
       </div>
 
       ${afficherTotal(r)}
-
-      <div class="actions-calcul">
-        <button type="button" class="bouton" id="calc-entrer">▶ J'entre</button>
-        <button type="button" class="bouton secondaire" id="calc-enregistrer">📓 Enregistrer ce trade</button>
-      </div>
 
       ${r.contientTpOuvert ? afficherPlanSlRunner(signalCourant, reglages) : ""}
 
@@ -391,18 +386,6 @@
         const liste = document.getElementById("sig-liste-tps");
         const n = liste.querySelectorAll("input").length;
         liste.insertAdjacentHTML("beforeend", champ(`sig-tp-${n}`, `TP${n + 1}`, null));
-      } else if (t.id === "calc-entrer" && dernierCalcul) {
-        // Suivi en direct + notifications TP / SL (js/trade-en-cours.js).
-        await window.GoldAI.tradeEnCours.entrer(dernierCalcul.signal, dernierCalcul.r, dernierCalcul.reglages);
-      } else if (t.id === "calc-enregistrer" && dernierCalcul) {
-        // Fiche du Journal déjà remplie avec l'entrée et le plan du signal.
-        const s = dernierCalcul.signal;
-        const aujourdhui = window.GoldAI.gardeFou?.cleAujourdhui?.() || window.GoldAI.utils.cleJour(Date.now());
-        window.GoldAI.ficheTrade.ouvrir(null, aujourdhui, {
-          prixEntree: s.entree,
-          note: `${s.sens === "SELL" ? "Vente" : "Achat"} · entrée ${s.entree} · SL ${s.sl} · ${s.tps.map((x) => `TP${x.numero} ${x.prix}`).join(" · ")}
-`,
-        });
       } else if (t.closest("#calc-retour")) {
         reinitialiser();
         document.getElementById("champ-signal")?.scrollIntoView({ block: "center" });

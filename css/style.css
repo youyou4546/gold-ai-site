@@ -1653,8 +1653,6 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 @media (max-width: 360px) { .bloc-discipline { grid-template-columns: 1fr; } }
 
 /* ---------- Calculateur : boutons après calcul + trade en cours ---------- */
-.actions-calcul { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
-.actions-calcul .bouton { margin: 0; }
 .carte-trade-en-cours { border-color: var(--accent); box-shadow: var(--lueur-accent); }
 .carte-trade-en-cours.rouge { border-color: var(--rouge); box-shadow: none; background: var(--rouge-fond); }
 .carte-trade-en-cours.vert { border-color: var(--vert); box-shadow: none; background: var(--vert-fond); }
