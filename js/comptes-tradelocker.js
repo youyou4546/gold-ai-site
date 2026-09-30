@@ -1,8 +1,8 @@
 // Gold AI — Profil › Mes comptes TradeLocker : solde, équité, résultat du
 // jour et trades ouverts (avec leur P&L en direct) de TOUS tes comptes
-// TradeLocker. Les trades FERMÉS sont importés tout seuls dans le Journal
-// (Supabase, toutes les 5 min et à l'ouverture de cette page) ; ils restent
-// modifiables comme les autres. Données lues par la fonction Supabase
+// TradeLocker. Les trades FERMÉS sont importés dans le Journal au clic sur
+// « Actualiser les trades » (Journal) seulement ; ils restent modifiables
+// comme les autres. Données lues par la fonction Supabase
 // « tradelocker » (supabase/functions/tradelocker, tables
 // supabase/patch_comptes_tradelocker.sql et patch_import_tradelocker.sql).
 // Lecture seule : l'app ne passe aucun ordre. Rafraîchi toutes les 30 s tant
@@ -263,7 +263,7 @@
     zone.innerHTML = `
       <p class="texte-attenue petit maj-tradelocker">${erreur ? `⚠️ ${esc(erreur)} — ` : ""}Mis à jour ${esc(U.heure(donnees.lu_le))} · toutes les 30 s
         <button type="button" class="lien-retour" id="rafraichir-tradelocker">Actualiser</button></p>
-      <p class="texte-attenue petit">🔄 Tes trades fermés arrivent tout seuls dans le <strong>Journal</strong> (en moins d'une minute), modifiables comme les autres.
+      <p class="texte-attenue petit">🔄 Pour ajouter tes trades fermés au <strong>Journal</strong>, appuie sur « Actualiser les trades » dans le Journal. Ils restent modifiables comme les autres.
         ${donnees.importes24h ? `<strong>${donnees.importes24h}</strong> importé${donnees.importes24h > 1 ? "s" : ""} ces dernières 24 h.` : ""}
         Profit calculé sans commissions ni swap.</p>
       ${total}

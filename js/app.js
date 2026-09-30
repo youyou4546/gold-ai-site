@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (cible === "calculateur") {
       window.GoldAI?.gardeFou?.afficherAlerteAnnonce();
+      window.GoldAI?.calculateur?.restaurer();
     }
     if (cible === "profil" || cible === "calendrier") {
       window.GoldAI?.notifications?.rafraichir();

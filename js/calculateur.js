@@ -18,6 +18,22 @@
   let calculConfirme = false;     // « Continuer quand même » choisi pour le signal en cours
   let avertissementGain = null;   // { depuisTexte } tant que l'avertissement attend une réponse
 
+  // Le dernier calcul reste affiché (même après avoir changé d'onglet, fermé ou
+  // rechargé l'app) jusqu'au bouton « Retour » en bas du calculateur : il est
+  // mémorisé sur cet appareil, pour la personne connectée.
+  const cleMemoire = () => `goldai_dernier_calcul_${window.GoldAI.auth?.getNom?.() || "anonyme"}`;
+  function memoriserCalcul() {
+    try {
+      localStorage.setItem(cleMemoire(), JSON.stringify({ signal: signalCourant, lecture: lectureCourante, repartitionForcee, taux }));
+    } catch { /* stockage indisponible : le calcul reste affiché tant que l'app est ouverte */ }
+  }
+  function lireCalculMemorise() {
+    try { return JSON.parse(localStorage.getItem(cleMemoire()) || "null"); } catch { return null; }
+  }
+  function oublierCalcul() {
+    try { localStorage.removeItem(cleMemoire()); } catch { /* ignoré */ }
+  }
+
   function champ(id, label, valeur, { type = "number", manquant = false, options = null } = {}) {
     const classe = manquant ? "champ a-preciser" : "champ";
     if (options) {
@@ -92,6 +108,28 @@
       </div>`;
   }
 
+  // Bouton « Retour » en bas du calculateur : SEUL moyen de remettre le calculateur à zéro.
+  const boutonRetour = `<button type="button" class="bouton-retour bouton-retour-calcul" id="calc-retour"><span aria-hidden="true">←</span> Retour (nouveau calcul)</button>`;
+
+  // Encadré « Total » sous le détail : risque total au SL, gain total si tous les TP sont touchés.
+  function afficherTotal(r) {
+    const d = r.devise;
+    const runner = r.portions.some((p) => p.type === "ouvert");
+    return `
+      <div class="carte encadre-total-calcul">
+        <h3 class="titre-bloc">Total</h3>
+        <div class="ligne-total-calcul">
+          <span>Risque total si le SL est touché</span>
+          <strong class="negatif">▼ ${montant(r.perteTotaleSl, d)}</strong>
+        </div>
+        <div class="ligne-total-calcul">
+          <span>Gain total si tous les TP sont touchés</span>
+          <strong class="positif">▲ ${montant(r.gainTotalSiTousTps, d)}</strong>
+        </div>
+        ${runner ? `<p class="texte-attenue petit">+ le gain du TP runner, qui n'a pas de prix fixe (il laisse courir) : il n'est pas compté dans ce total.</p>` : ""}
+      </div>`;
+  }
+
   function afficherResultat(r, reglages, spec) {
     const d = r.devise;
     const lignes = r.portions.map((p) => `
@@ -127,6 +165,8 @@
         </div>
       </div>
 
+      ${afficherTotal(r)}
+
       <div class="actions-calcul">
         <button type="button" class="bouton" id="calc-entrer">▶ J'entre</button>
         <button type="button" class="bouton secondaire" id="calc-enregistrer">📓 Enregistrer ce trade</button>
@@ -136,7 +176,9 @@
 
       ${r.avertissements.length ? `<div class="carte">${r.avertissements.map((a) => `<div class="alerte-donnees">${esc(a)}</div>`).join("")}</div>` : ""}
 
-      ${r.tauxConversion !== 1 && taux ? `<p class="note-source">Conversion ${esc(spec.deviseProfit)} → ${esc(d)} au taux ${taux.taux} (${taux.manuel ? "saisi manuellement" : `${esc(taux.source)}, ${window.GoldAI.utils.jourHeure(taux.horodatageMs)}`}).</p>` : ""}`;
+      ${r.tauxConversion !== 1 && taux ? `<p class="note-source">Conversion ${esc(spec.deviseProfit)} → ${esc(d)} au taux ${taux.taux} (${taux.manuel ? "saisi manuellement" : `${esc(taux.source)}, ${window.GoldAI.utils.jourHeure(taux.horodatageMs)}`}).</p>` : ""}
+
+      ${boutonRetour}`;
   }
 
   function afficherBlocage(r, reglages, spec) {
@@ -157,7 +199,7 @@
         ${r.choixRepartition ? `<button type="button" class="bouton secondaire bouton-petit" id="calc-prorata">Répartir au prorata sur les TP chiffrés (ce calcul seulement)</button>` : ""}</div>`;
     }
     if (r.avertissements.length) html += `<div class="carte">${r.avertissements.map((a) => `<div class="alerte-donnees">${esc(a)}</div>`).join("")}</div>`;
-    return html;
+    return html + boutonRetour;
   }
 
   // Avertissement (pas un blocage) si un trade gagnant est déjà enregistré aujourd'hui
@@ -244,6 +286,8 @@
     if (depuisTexte) {
       const texte = document.getElementById("champ-signal").value;
       if (!texte.trim()) {
+        // Un calcul est affiché : on le garde (seul « Retour » l'efface).
+        if (signalCourant) { document.getElementById("champ-signal").focus(); return; }
         zoneSignal.innerHTML = "";
         zoneResultat.innerHTML = `<p class="etat-vide">Colle d'abord un signal dans le champ ci-dessus.</p>`;
         return;
@@ -281,12 +325,52 @@
     const r = N.calculerPosition(signalCourant, reglages, tauxUtilise);
     dernierCalcul = r.ok ? { r, reglages, signal: { ...signalCourant } } : null;
     zoneResultat.innerHTML = r.ok ? afficherResultat(r, reglages, spec) : afficherBlocage(r, reglages, spec);
+    memoriserCalcul();
     if (r.ok) verifierMarges(r);
     // Trades restants + compte à rebours de la prochaine annonce, avec le résultat.
     window.GoldAI.discipline?.afficher();
     if (repartitionForcee && r.ok) {
       zoneResultat.insertAdjacentHTML("afterbegin", `<div class="alerte-donnees">Répartition au prorata utilisée pour ce calcul seulement : ${repartitionForcee.map((x) => `${nombre(x, 1)} %`).join(" / ")} (tes paramètres enregistrés ne changent pas).</div>`);
     }
+  }
+
+  // « Retour » : remet le calculateur à zéro pour un nouveau calcul.
+  function reinitialiser({ oublier = true } = {}) {
+    if (oublier) oublierCalcul();
+    signalCourant = null;
+    lectureCourante = null;
+    repartitionForcee = null;
+    taux = null;
+    dernierCalcul = null;
+    calculConfirme = false;
+    avertissementGain = null;
+    const zoneSignal = document.getElementById("zone-signal-interprete");
+    if (zoneSignal) { zoneSignal.innerHTML = ""; zoneSignal.classList.add("hidden"); }
+    const zoneResultat = document.getElementById("zone-resultat-calcul");
+    if (zoneResultat) zoneResultat.innerHTML = "";
+    window.GoldAI.discipline?.masquer();
+  }
+
+  // Au retour sur le calculateur (onglet, ouverture de l'app) : le dernier calcul
+  // est toujours là. S'il n'est plus en mémoire (app rechargée), on le refait à
+  // l'identique à partir du signal mémorisé.
+  async function restaurer() {
+    if (!window.GoldAI.auth?.getToken?.() || avertissementGain) return;
+    if (signalCourant) {
+      if (dernierCalcul) window.GoldAI.discipline?.afficher();
+      return;
+    }
+    const m = lireCalculMemorise();
+    if (!m?.signal || !m.lecture) return;
+    lectureCourante = m.lecture;
+    signalCourant = m.signal;
+    repartitionForcee = m.repartitionForcee || null;
+    taux = m.taux || null;
+    const zoneSignal = document.getElementById("zone-signal-interprete");
+    zoneSignal.innerHTML = afficherSignalEditable(signalCourant, lectureCourante);
+    zoneSignal.classList.toggle("hidden", !(lectureCourante.ambiguites.length || lectureCourante.aPreciser.length));
+    // confirme : l'avertissement « déjà un trade gagnant » a déjà été vu pour ce calcul.
+    await calculer({ depuisTexte: false, confirme: true });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -319,10 +403,15 @@
           note: `${s.sens === "SELL" ? "Vente" : "Achat"} · entrée ${s.entree} · SL ${s.sl} · ${s.tps.map((x) => `TP${x.numero} ${x.prix}`).join(" · ")}
 `,
         });
+      } else if (t.closest("#calc-retour")) {
+        reinitialiser();
+        document.getElementById("champ-signal")?.scrollIntoView({ block: "center" });
       } else if (t.id === "gain-annuler") {
-        // Aucun calcul affiché ; le signal collé reste dans le champ.
+        // Nouveau calcul annulé : le calcul précédent (s'il y en a un) revient.
         avertissementGain = null;
         document.getElementById("zone-resultat-calcul").innerHTML = "";
+        signalCourant = null;
+        restaurer();
       } else if (t.id === "gain-continuer" && avertissementGain) {
         calculer({ depuisTexte: avertissementGain.depuisTexte, confirme: true });
       } else if (t.id === "aller-general") {
@@ -360,5 +449,7 @@
   });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.calculateur = { calculer, verifierMarges };
+  window.GoldAI.calculateur = { calculer, verifierMarges, restaurer,
+    // Déconnexion : on vide l'écran (le calcul reste mémorisé pour cette personne).
+    viderCache: () => reinitialiser({ oublier: false }) };
 })();

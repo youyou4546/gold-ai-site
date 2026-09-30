@@ -16,14 +16,13 @@
 //  5. Perte max des comptes TradeLocker (règles réglées dans Journal › Performance) :
 //     notification à 70 %, 90 % puis 100 % de la perte max, sur l'ÉQUITÉ
 //     (trades ouverts compris). Une fois par seuil et par jour.
-//  4. Import des trades TradeLocker fermés dans le Journal, toutes les ~20 s
-//     (3 passages par minute, en arrière-plan ; _shared/import-tradelocker.ts).
+//  (L'import des trades TradeLocker dans le Journal ne se fait plus ici : seulement
+//   au clic sur « Actualiser les trades », via la fonction tradelocker.)
 // Secrets de la fonction : VAPID_KEYS_B64 (clés de signature JWK, en base64) et
 // CRON_SECRET (seul pg_cron peut la déclencher).
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 import * as webpush from "jsr:@negrel/webpush@0.5.0";
-import { importerTout } from "../_shared/import-tradelocker.ts";
 import { colonnes, comptesDuLogin, type Connexion, enObjet, nb, tl } from "../_shared/tradelocker.ts";
 
 const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
@@ -420,15 +419,8 @@ Deno.serve(async (req) => {
   const direct = alertesPrixDirect().catch((e) => console.error("alertes direct", e));
   // deno-lint-ignore no-explicit-any
   (globalThis as any).EdgeRuntime?.waitUntil(direct);
-  // Import TradeLocker → Journal : 3 passages espacés de 20 s, en arrière-plan.
-  const imports = (async () => {
-    for (let i = 0; i < 3; i++) {
-      if (i) await new Promise((r) => setTimeout(r, 20000));
-      try { const n = await importerTout(); if (n) console.log(`${n} trade(s) TradeLocker importé(s)`); } catch (e) { console.error("import TradeLocker", e); }
-    }
-  })();
-  // deno-lint-ignore no-explicit-any
-  (globalThis as any).EdgeRuntime?.waitUntil(imports);
+  // Import TradeLocker → Journal : plus automatique, seulement au clic sur
+  // « Actualiser les trades » dans le Journal (fonction tradelocker, action « importer »).
   for (const [nom, tache] of [["annonces", alertesAnnonces], ["trades", suiviTrades], ["alertes_prix", alertesPrix], ["perte_max", alertesPerteMax]] as const) {
     try { await tache(); resultat[nom] = "ok"; } catch (e) { resultat[nom] = String(e); console.error(nom, e); }
   }

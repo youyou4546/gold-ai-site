@@ -11,7 +11,8 @@
 // Profit CALCULÉ : (sortie − entrée) × lots × taille du lot, dans la devise du prix.
 // TradeLocker ne donne pas le profit réel par trade : commissions et swap ne sont
 // pas inclus (écart possible de quelques $ avec le relevé du courtier).
-// Appelé par « verifications » (toutes les ~20 s) et par « tradelocker » (ouverture de la page).
+// Appelé UNIQUEMENT par « tradelocker » (action « importer ») quand l'utilisateur
+// appuie sur « Actualiser les trades » dans le Journal : plus d'import automatique.
 
 import { colonnes, comptesDuLogin, type Connexion, db, detailsInstrument, enObjet, instruments, nb, tl } from "./tradelocker.ts";
 
@@ -180,14 +181,18 @@ export async function reimporter(compteId: string, tradeId: string) {
   return { importes };
 }
 
-export async function importerTout(compteId?: string) {
+// `erreurs` (facultatif) reçoit un message par connexion TradeLocker injoignable.
+export async function importerTout(compteId?: string, erreurs?: string[]) {
   let requete = db.from("comptes_tradelocker").select("*");
   if (compteId) requete = requete.eq("compte_id", compteId);
   const { data, error } = await requete;
   if (error) throw error;
   let total = 0;
   for (const c of (data || []) as Connexion[]) {
-    try { total += await importerConnexion(c); } catch (e) { console.error("import connexion", c.id, String(e)); }
+    try { total += await importerConnexion(c); } catch (e) {
+      console.error("import connexion", c.id, String(e));
+      erreurs?.push(`${c.email} : TradeLocker ne répond pas pour l'instant.`);
+    }
   }
   return total;
 }

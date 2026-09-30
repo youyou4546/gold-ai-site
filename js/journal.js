@@ -206,6 +206,7 @@
     cacheTradesBruts = null;
     filtreCompte = "tous";
     comptesRelies = null;
+    document.querySelectorAll(".message-actualiser-trades").forEach((m) => { m.textContent = ""; });
     document.getElementById("journal-calendrier")?.classList.add("hidden");
     document.getElementById("journal-performance")?.classList.add("hidden");
     document.getElementById("journal-alertes")?.classList.add("hidden");
@@ -430,6 +431,41 @@
     return { ok: true };
   }
 
+  // « Actualiser les trades » : va chercher les trades fermés sur TradeLocker
+  // UNIQUEMENT à ce moment-là (plus d'import automatique). Le serveur retient
+  // chaque position déjà importée : recliquer n'ajoute jamais un trade deux fois.
+  let actualisationEnCours = false;
+  async function actualiserTrades() {
+    if (actualisationEnCours || !token()) return;
+    actualisationEnCours = true;
+    const boutons = document.querySelectorAll(".bouton-actualiser-trades");
+    const messages = document.querySelectorAll(".message-actualiser-trades");
+    const ecrire = (texte, classe = "") => messages.forEach((m) => { m.textContent = texte; m.className = `texte-attenue petit message-actualiser-trades ${classe}`; });
+    boutons.forEach((b) => { b.disabled = true; b.textContent = "⏳ Recherche sur TradeLocker…"; });
+    ecrire("");
+    try {
+      const { data, error } = await client().functions.invoke("tradelocker", { body: { token: token(), action: "importer" } });
+      let corps = data;
+      if (error) { try { corps = await error.context?.json(); } catch { corps = null; } }
+      if (corps?.erreur === "SESSION_INVALIDE") { window.GoldAI.auth.forcerDeconnexion("Ta session a expiré, reconnecte-toi."); return; }
+      if (error || !corps?.ok) {
+        ecrire(corps?.erreur && corps.erreur !== "PATCH_ABSENT" ? corps.erreur : "Impossible de joindre le serveur. Vérifie ta connexion et réessaie.", "erreur");
+        return;
+      }
+      await chargerTousLesTrades(true);
+      window.dispatchEvent(new CustomEvent("goldai:trades"));
+      const n = corps.importes || 0;
+      const texte = n ? `✓ ${n} nouveau${n > 1 ? "x" : ""} trade${n > 1 ? "s" : ""} ajouté${n > 1 ? "s" : ""} au journal.` : "✓ Aucun nouveau trade : ton journal est à jour.";
+      const heure = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+      ecrire(`${texte} (${heure})${corps.erreurs?.length ? ` — ${corps.erreurs.join(" ")}` : ""}`, corps.erreurs?.length ? "erreur" : "ok");
+    } catch {
+      ecrire("Impossible de joindre le serveur. Vérifie ta connexion et réessaie.", "erreur");
+    } finally {
+      actualisationEnCours = false;
+      boutons.forEach((b) => { b.disabled = false; b.textContent = "🔄 Actualiser les trades"; });
+    }
+  }
+
   function fermerModaleJour() {
     document.getElementById("modale-jour").classList.remove("visible");
     dateJourSelectionne = null;
@@ -469,8 +505,10 @@
       if (!document.getElementById("journal-calendrier").classList.contains("hidden")) afficherMoisCourant();
     });
 
-    // Trades importés de TradeLocker en arrière-plan : le Journal se met à jour
-    // tout seul quand il est affiché (toutes les 30 s) et au retour sur l'app.
+    document.querySelectorAll(".bouton-actualiser-trades").forEach((b) => b.addEventListener("click", actualiserTrades));
+
+    // Trades ajoutés depuis un autre appareil : le Journal se relit (base de
+    // l'app seulement, pas TradeLocker) quand il est affiché, toutes les 30 s.
     async function relireSiAffiche() {
       if (document.hidden || !window.GoldAI.auth.getToken()) return;
       if (!document.getElementById("section-journal")?.classList.contains("actif")) return;

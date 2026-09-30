@@ -102,6 +102,14 @@
             ecrire("banc_ia", [{ id: String(liste.length), cree_le: new Date().toISOString(), question: body.question, reponse: analyse, cout_usd: 0.017 }, ...liste]);
             return { data: { ok: true, analyse, cout_usd: 0.017 }, error: null };
           }
+          // « Actualiser les trades » : 1 trade à importer la première fois, plus rien ensuite (anti-doublon).
+          if (body.action === "importer") {
+            if (!cx.length) return { data: null, error: { context: { json: async () => ({ erreur: "Aucun compte TradeLocker relié : ajoute-le d'abord dans Profil › Mes comptes TradeLocker." }) } } };
+            if (localStorage.banc_importe === "1") return { data: { ok: true, importes: 0, erreurs: [] }, error: null };
+            localStorage.banc_importe = "1";
+            ecrire("banc_trades", [...lire("banc_trades", []), { id: crypto.randomUUID(), date_trade: new Date().toISOString().slice(0, 10), resultat: 179.53, compte_tl: "live|1", compte_tl_nom: "NOVA 100K #1", ouvert_le: new Date().toISOString(), instrument: "XAUUSD" }]);
+            return { data: { ok: true, importes: 1, erreurs: [] }, error: null };
+          }
           if (body.action === "supprimes") return { data: { trades: lire("banc_supprimes", []) }, error: null };
           if (body.action === "reimporter") {
             const t = lire("banc_supprimes", []).find((x) => x.tradeId === body.tradeId);

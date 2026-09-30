@@ -661,6 +661,16 @@ h2.titre-section {
   margin-top: 16px;
 }
 
+/* Journal › « Actualiser les trades » (import TradeLocker à la demande) */
+.bloc-actualiser-trades {
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+}
+.bloc-actualiser-trades .message-actualiser-trades:empty { display: none; }
+.bloc-actualiser-trades .message-actualiser-trades { margin: 8px 0 0; }
+.message-actualiser-trades.ok { color: var(--vert); }
+.message-actualiser-trades.erreur { color: var(--rouge); }
+
 .tuile-journal {
   display: flex;
   flex-direction: column;
@@ -1893,3 +1903,24 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .chiffres-scenario > span { display: grid; grid-template-columns: 72px 1fr; gap: 8px; font-size: 13px; background: var(--fond-carte-survol); border-radius: 8px; padding: 6px 10px; }
 .chiffres-scenario strong { font-size: 13px; }
 .element-historique-ia { border-top: 1px solid var(--bordure); padding: 8px 0; font-size: 13px; }
+
+/* Calculateur › encadré « Total » et bouton « Retour » en bas */
+.encadre-total-calcul {
+  border: 2px solid var(--accent);
+  box-shadow: var(--lueur-accent);
+}
+.ligne-total-calcul {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  font-size: 15px;
+}
+.ligne-total-calcul + .ligne-total-calcul { border-top: 1px solid var(--bordure); }
+.ligne-total-calcul strong { font-size: 20px; white-space: nowrap; }
+.bouton-retour-calcul {
+  width: 100%;
+  justify-content: center;
+  margin: 18px 0 0;
+}

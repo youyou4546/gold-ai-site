@@ -4,10 +4,10 @@
 //  - "ajouter"   : vérifie email / mot de passe / serveur auprès de TradeLocker,
 //                  puis les enregistre (mot de passe CHIFFRÉ, AES-GCM, clé
 //                  TL_CLE_CHIFFREMENT gardée dans les secrets de la fonction).
-//  - "lister"    : importe d'abord les trades fermés dans le Journal
-//                  (_shared/import-tradelocker.ts), puis pour chaque connexion
-//                  tous les comptes TradeLocker (solde, équité, résultat du jour,
-//                  trades ouverts avec leur P&L).
+//  - "importer"  : importe les trades fermés dans le Journal (_shared/import-tradelocker.ts).
+//                  Seul moment où l'import a lieu : bouton « Actualiser les trades » du Journal.
+//  - "lister"    : pour chaque connexion tous les comptes TradeLocker (solde, équité,
+//                  résultat du jour, trades ouverts avec leur P&L). N'importe rien.
 //  - "comptes"   : liste légère des comptes reliés (menu « Compte » du Journal).
 //  - "supprimer" : oublie une connexion (et son mot de passe chiffré).
 //  - "supprimes" / "reimporter" : trades importés puis supprimés du Journal, et leur réimport.
@@ -128,10 +128,16 @@ Deno.serve(async (req) => {
       return repondre({ ok: true });
     }
 
-    // Import des trades fermés depuis le dernier passage (l'import automatique tourne aussi toutes les 5 min).
-    if (corps.action === "lister" && corps.importer !== false) {
-      try { await importerTout(compteId); } catch (e) { console.error("import", String(e)); }
+    // « Actualiser les trades » (Journal) : import des trades fermés, à la demande seulement.
+    // Anti-doublon : trades_importes_tl retient chaque position déjà importée.
+    if (corps.action === "importer") {
+      const { count } = await db.from("comptes_tradelocker").select("id", { count: "exact", head: true }).eq("compte_id", compteId);
+      if (!count) throw new ErreurUtilisateur("Aucun compte TradeLocker relié : ajoute-le d'abord dans Profil › Mes comptes TradeLocker.");
+      const erreurs: string[] = [];
+      const importes = await importerTout(compteId, erreurs);
+      return repondre({ ok: true, importes, erreurs });
     }
+
     const { data, error } = await db.from("comptes_tradelocker").select("*").eq("compte_id", compteId).order("cree_le");
     if (error) throw error;
     const connexions = await Promise.all(((data || []) as Connexion[]).map(lireConnexion));
