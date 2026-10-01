@@ -143,7 +143,8 @@
         ${window.GoldAI.direct?.champLien(e) || ""}
         <p class="texte-attenue petit">Avec un lien, le direct s'affiche dans Marché à l'heure prévue (chrono 30 min avant).</p>
         ${e.valeurs[0]?.url ? `<p class="petit"><a href="${esc(e.valeurs[0].url)}" target="_blank" rel="noopener noreferrer">Fiche ${esc(e.sources.join(", "))}</a></p>` : ""}`;
-      const ligne = window.GoldAI.direct?.lienDe(e.id) ? "Lien du direct ajouté ▶" : "Discours : l'or réagit au ton";
+      const ligne = window.GoldAI.direct?.lienDe(e.id) ? "Lien du direct ajouté ▶"
+        : N.chaineOfficielle(e) ? `Direct auto : chaîne ${N.chaineOfficielle(e).nom} ▶` : "Discours : l'or réagit au ton";
       return carteCompacte({ id: e.id, heureTxt, impact: e.impact, nom: e.titre, ligne, biais: "discours", detail });
     }
     const v = e.valeurs[0] || {};

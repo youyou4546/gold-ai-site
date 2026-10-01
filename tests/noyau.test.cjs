@@ -597,3 +597,11 @@ test("discours : détection, phases, lien YouTube", () => {
   assert.equal(N.lecteurYoutube("pas un lien"), null);
   assert.equal(N.lecteurYoutube("https://evil.com/watch?v=dQw4w9WgXcQ"), null);
 });
+
+test("discours : chaîne officielle automatique", () => {
+  assert.equal(N.chaineOfficielle({ titre: "President Trump Speaks", devise: "USD" }).nom, "Maison-Blanche");
+  assert.equal(N.chaineOfficielle({ titre: "FOMC Press Conference", devise: "USD" }).nom, "Réserve fédérale");
+  assert.equal(N.chaineOfficielle({ titre: "Fed Chair Powell Speaks", devise: "USD" }).nom, "Réserve fédérale");
+  assert.equal(N.chaineOfficielle({ titre: "FOMC Member Waller Speaks", devise: "USD" }), null);
+  assert.match(N.lecteurYoutube(N.chaineOfficielle({ titre: "President Trump Speaks", devise: "USD" }).url), /live_stream\?channel=UCYxRlFDqcWM4y7FfpiAN3KQ/);
+});

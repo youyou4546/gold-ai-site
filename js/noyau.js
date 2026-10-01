@@ -1234,6 +1234,21 @@
     return "cache";
   }
 
+  // Chaînes officielles qui diffusent elles-mêmes certains discours en direct
+  // (identifiants vérifiés sur youtube.com/@WhiteHouse et /@federalreserve).
+  // Le lecteur montre « le direct en cours de la chaîne ». Les discours des
+  // membres de la Fed (hors président) sont diffusés par leurs organisateurs :
+  // pas de chaîne automatique pour eux.
+  const CHAINES_OFFICIELLES = [
+    { test: (e) => /\bpresident trump\b/i.test(e.titre), nom: "Maison-Blanche", id: "UCYxRlFDqcWM4y7FfpiAN3KQ" },
+    { test: (e) => e.devise === "USD" && /\b(fomc press conference|fed chair)\b/i.test(e.titre), nom: "Réserve fédérale", id: "UCAzhpt9DmG6PnHXjmJTvRGQ" },
+  ];
+
+  function chaineOfficielle(evenement) {
+    const c = CHAINES_OFFICIELLES.find((x) => x.test({ titre: String(evenement?.titre || ""), devise: evenement?.devise }));
+    return c ? { nom: c.nom, url: `https://www.youtube.com/channel/${c.id}/live` } : null;
+  }
+
   /**
    * Lien YouTube collé par l'utilisateur → adresse du lecteur intégré, ou null.
    * Accepte : watch?v=…, youtu.be/…, /live/…, /embed/…, /shorts/… et
@@ -1266,7 +1281,7 @@
     calculerPosition, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
     ema, atr, calculerTendance, separerBougies,
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
-    scorePriorite, analyserImpact, biaisAnnonceOr, sessionsMarche, SESSIONS_MARCHE, estDiscours, phaseDiscours, lecteurYoutube, evaluerGardeFou, regrouperSignaux, aUnTradeGagnant, etatChallenge,
+    scorePriorite, analyserImpact, biaisAnnonceOr, sessionsMarche, SESSIONS_MARCHE, estDiscours, phaseDiscours, lecteurYoutube, chaineOfficielle, evaluerGardeFou, regrouperSignaux, aUnTradeGagnant, etatChallenge,
     OBJECTIF_PAR_DEFAUT, debutPeriode, progressionObjectif, prochaineAnnonceDuJour,
     slCourant, evaluerTouches, pnlEstime, alerteTouchee, distanceAlerte, situationCompte, calculerEss, analyserTrades, JOURS_SEMAINE, LIBELLE_TF, LIBELLES_SPEC,
   };

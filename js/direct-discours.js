@@ -33,6 +33,9 @@
   }
 
   const lienDe = (id) => liens[id]?.url || "";
+  // Lien utilisé pour le lecteur : celui que tu as collé, sinon la chaîne
+  // officielle (Maison-Blanche pour Trump, Fed pour son président).
+  const lienEffectif = (e) => lienDe(e.id) || N.chaineOfficielle(e)?.url || "";
 
   // Enregistre (ou efface si vide) le lien d'un discours. Renvoie un message d'erreur ou null.
   async function enregistrerLien(evenement, url) {
@@ -53,6 +56,7 @@
   // Petit champ « lien du direct » (réutilisé dans la carte du discours des Annonces).
   function champLien(evenement) {
     const actuel = lienDe(evenement.id);
+    const auto = N.chaineOfficielle(evenement);
     return `
       <div class="champ-lien-direct" data-evenement="${esc(evenement.id)}">
         <label class="petit texte-attenue" for="lien-${esc(evenement.id)}">Lien YouTube du direct</label>
@@ -60,6 +64,7 @@
           <input type="url" id="lien-${esc(evenement.id)}" inputmode="url" placeholder="https://youtube.com/watch?v=…" value="${esc(actuel)}">
           <button type="button" class="bouton bouton-petit" data-lien-direct="enregistrer">${actuel ? "Modifier" : "Ajouter"}</button>
         </div>
+        ${auto && !actuel ? `<p class="petit texte-attenue">Sans lien : direct de la chaîne ${esc(auto.nom)} automatiquement.</p>` : ""}
         <p class="petit message-lien-direct" aria-live="polite"></p>
       </div>`;
   }
@@ -92,7 +97,7 @@
   }
 
   function carte({ e, ms, phase }, maintenant) {
-    const lecteur = N.lecteurYoutube(lienDe(e.id));
+    const lecteur = N.lecteurYoutube(lienEffectif(e));
     const entete = `
       <div class="entete-discours">
         <span class="etiquette-discours">🎙 Discours</span>
@@ -117,7 +122,7 @@
       <article class="carte carte-discours" data-evenement="${esc(e.id)}">
         ${entete}
         ${rebours}
-        ${lecteur ? `<p class="petit centre-discours">▶ Le direct s'affichera ici à l'heure prévue.</p>` : champLien(e)}
+        ${lecteur ? `<p class="petit centre-discours">▶ Le direct${lienDe(e.id) ? "" : ` (chaîne ${esc(N.chaineOfficielle(e).nom)})`} s'affichera ici à l'heure prévue.</p>` : champLien(e)}
         ${phase === "en_cours" ? `<div class="pied-discours"><span></span><button type="button" class="bouton secondaire bouton-petit" data-lien-direct="masquer">Terminé ✕</button></div>` : ""}
       </article>`;
   }
@@ -131,7 +136,7 @@
     if (liste.length) chargerLiens(); // relit de temps en temps (lien ajouté sur un autre appareil)
     // Redessiné seulement quand quelque chose change vraiment (sinon la vidéo se rechargerait),
     // et jamais pendant que tu tapes un lien dans ce bloc.
-    const cle = liste.map((x) => `${x.e.id}|${x.phase}|${lienDe(x.e.id)}`).join(";");
+    const cle = liste.map((x) => `${x.e.id}|${x.phase}|${lienEffectif(x.e)}`).join(";");
     const saisie = zone.contains(document.activeElement) && document.activeElement.tagName === "INPUT";
     if (cle !== cleAffichee && !saisie) {
       zone.innerHTML = liste.length ? `<h3 class="titre-bloc-annonces">Discours</h3>${liste.map((x) => carte(x, maintenant)).join("")}` : "";
@@ -180,5 +185,5 @@
   setInterval(afficher, 1000);
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.direct = { afficher, champLien, lienDe, chargerLiens };
+  window.GoldAI.direct = { afficher, champLien, lienDe, lienEffectif, chargerLiens };
 })();
