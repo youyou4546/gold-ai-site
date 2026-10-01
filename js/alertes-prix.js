@@ -1,4 +1,4 @@
-// Gold AI — Journal › Suivre le prix : alertes sur un prix ou une zone de l'or.
+// Gold AI — Analyse › Suivre le prix (tout en bas) : alertes sur un prix ou une zone de l'or.
 //
 // - Tu entres un prix (ex. 2650) ou une zone (ex. 2650 – 2660).
 // - L'alerte est enregistrée sur ton profil (supabase/patch_alertes_prix.sql).
@@ -21,7 +21,8 @@
   let rendu = null;
 
   const rpc = (nom, params = {}) => U.rpc(nom, { p_token: window.GoldAI.auth.getToken(), ...params });
-  const ouverte = () => !$("journal-alertes")?.classList.contains("hidden");
+  // Bloc « Suivre le prix » : en bas de l'onglet Analyse (plus dans le Journal).
+  const ouverte = () => !!$("section-analyse")?.classList.contains("actif");
 
   function prixDirect() {
     const c = window.GoldAI.cotations.instantane();
@@ -146,11 +147,6 @@
   // ---------------------------------------------------------------- Cycle de vie
 
   function ouvrir() {
-    $("journal-accueil").classList.add("hidden");
-    $("journal-calendrier")?.classList.add("hidden");
-    $("journal-performance")?.classList.add("hidden");
-    $("journal-analyse")?.classList.add("hidden");
-    $("journal-alertes").classList.remove("hidden");
     message("");
     afficherPrix();
     afficherListe();
@@ -161,20 +157,12 @@
     minuterie = setInterval(() => { if (ouverte() && !document.hidden) charger(); }, 60000);
   }
 
-  function fermer() {
-    clearInterval(minuterie);
-    $("journal-alertes").classList.add("hidden");
-    $("journal-accueil").classList.remove("hidden");
-  }
-
   function viderCache() {
     alertes = null;
     clearInterval(minuterie);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    $("bouton-ouvrir-alertes")?.addEventListener("click", ouvrir);
-    $("bouton-retour-alertes")?.addEventListener("click", fermer);
     $("formulaire-alerte")?.addEventListener("submit", creer);
     document.querySelectorAll("#journal-alertes .segmente button").forEach((b) => b.addEventListener("click", () => choisirType(b.dataset.type)));
     $("liste-alertes")?.addEventListener("click", (e) => {

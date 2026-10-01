@@ -209,7 +209,6 @@
     document.querySelectorAll(".message-actualiser-trades").forEach((m) => { m.textContent = ""; });
     document.getElementById("journal-calendrier")?.classList.add("hidden");
     document.getElementById("journal-performance")?.classList.add("hidden");
-    document.getElementById("journal-alertes")?.classList.add("hidden");
     document.getElementById("journal-analyse")?.classList.add("hidden");
     document.getElementById("journal-accueil")?.classList.remove("hidden");
   }

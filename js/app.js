@@ -5,10 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const sections = document.querySelectorAll("main .section");
 
   function allerA(cible) {
-    // « alertes » = Journal › Suivre le prix (ouvert depuis une notification d'alerte).
+    // « alertes » = Analyse › Suivre le prix, tout en bas (ouvert depuis une notification d'alerte).
     if (cible === "alertes") {
-      allerA("journal");
-      window.GoldAI?.alertesPrix?.ouvrir();
+      allerA("analyse");
+      document.getElementById("journal-alertes")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
     onglets.forEach((o) => o.classList.toggle("actif", o.dataset.section === cible));
@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (cible === "analyse") {
       window.GoldAI?.analyseIa?.rafraichir();
+      window.GoldAI?.alertesPrix?.ouvrir();
     }
     if (cible === "calculateur") {
       window.GoldAI?.gardeFou?.afficherAlerteAnnonce();
