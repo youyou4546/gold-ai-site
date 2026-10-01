@@ -93,6 +93,9 @@
     window.GoldAI.dernierObjectif = p; // repris par le briefing vocal (js/briefing.js)
     const nomCompte = reglages.surnomsComptes?.[reglages.compteMaitre]
       || trades.find((t) => t.compteTl === reglages.compteMaitre)?.compteTlNom || "compte maître";
+    // Objectif atteint : la barre disparaît (elle revient à la période suivante).
+    // Le rectangle du haut reste visible seulement si le garde-fou a une alerte.
+    if (p.atteint) { zone.hidden = true; zone.innerHTML = ""; return; }
     const m = (v) => U.montant(v, "USD");
     zone.className = `bloc-objectif${p.atteint ? " atteint" : ""}`;
     zone.hidden = false;
