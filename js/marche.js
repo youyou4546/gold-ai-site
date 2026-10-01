@@ -81,8 +81,12 @@
   }
 
   function afficher() {
-    const liste = document.getElementById("liste-actifs-marche");
-    if (!liste) return;
+    // L'or et les actifs liés sont dessinés séparément : les blocs Sessions et
+    // Discours placés entre les deux ne sont jamais redessinés à chaque cotation
+    // (sinon la vidéo d'un direct se rechargerait sans arrêt).
+    const zoneOr = document.getElementById("or-marche");
+    const zoneLies = document.getElementById("actifs-lies-marche");
+    if (!zoneOr || !zoneLies) return;
     const jeu = window.GoldAI.donnees.obtenir("marche");
     const etatDonnees = window.GoldAI.donnees.etat();
     const contenu = jeu?.contenu;
@@ -96,8 +100,8 @@
     }
 
     const autres = (contenu?.actifs || []).filter((a) => a.cle !== "or");
-    liste.innerHTML = `
-      <div class="carte liste-lignes">${ligneOr()}</div>
+    zoneOr.innerHTML = `<div class="carte liste-lignes">${ligneOr()}</div>`;
+    zoneLies.innerHTML = `
       <h3 class="titre-bloc-annonces">Actifs liés</h3>
       <div class="carte liste-lignes">${autres.map(ligneActifPublie).join("") || '<p class="etat-vide">Chargement…</p>'}</div>`
       + (etatDonnees.erreur ? `<p class="note-source">ⓘ ${esc(etatDonnees.erreur)}</p>` : "");
@@ -111,6 +115,8 @@
 
   function charger() {
     afficher();
+    window.GoldAI.sessionsMarche?.afficher();
+    window.GoldAI.direct?.afficher();
     window.GoldAI.donnees.charger();
   }
 

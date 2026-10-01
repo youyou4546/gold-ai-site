@@ -84,6 +84,7 @@
     haussier: { classe: "haussier", texte: "Haussier or", fleche: "↑" },
     baissier: { classe: "baissier", texte: "Baissier or", fleche: "↓" },
     neutre: { classe: "neutre", texte: "Neutre", fleche: "" },
+    discours: { classe: "discours", texte: "🎙 Discours", fleche: "" },
   };
   const LIBELLE_IMPACT_COURT = { high: "Élevé", medium: "Moyen", low: "Faible", holiday: "Férié" };
 
@@ -131,6 +132,20 @@
     const ms = e.horodatage_utc ? Date.parse(e.horodatage_utc) : null;
     const expl = trouverExplication(e.titre);
     const b = N.biaisAnnonceOr(e, expl);
+    // Discours / conférence de presse : pas de chiffre à comparer, l'or réagit
+    // au ton. Badge « Discours » et champ pour le lien YouTube du direct.
+    if (N.estDiscours(e)) {
+      const rebours = ms ? U.compteARebours(e.horodatage_utc, maintenant) : null;
+      const heureTxt = ms ? `${U.formaterDate(ms, { weekday: "short" })} ${U.heure(ms)}` : esc(e.precision_heure || "—");
+      const detail = `
+        <p class="texte-attenue petit">${esc(e.pays)} · ${esc(e.devise)}${rebours ? ` · ${rebours}` : ""}${ms ? ` · ${U.jourLong(ms)} (${esc(U.fuseau())})` : ""}</p>
+        <p>Pas de chiffre publié : l'or réagit au ton (plus ferme sur les taux → or sous pression ; plus souple → or soutenu).</p>
+        ${window.GoldAI.direct?.champLien(e) || ""}
+        <p class="texte-attenue petit">Avec un lien, le direct s'affiche dans Marché à l'heure prévue (chrono 30 min avant).</p>
+        ${e.valeurs[0]?.url ? `<p class="petit"><a href="${esc(e.valeurs[0].url)}" target="_blank" rel="noopener noreferrer">Fiche ${esc(e.sources.join(", "))}</a></p>` : ""}`;
+      const ligne = window.GoldAI.direct?.lienDe(e.id) ? "Lien du direct ajouté ▶" : "Discours : l'or réagit au ton";
+      return carteCompacte({ id: e.id, heureTxt, impact: e.impact, nom: e.titre, ligne, biais: "discours", detail });
+    }
     const v = e.valeurs[0] || {};
     const res = e.valeurs.find((x) => x.resultat)?.resultat || null;
     const rebours = ms ? U.compteARebours(e.horodatage_utc, maintenant) : null;
@@ -175,6 +190,8 @@
   function afficher() {
     const zone = document.getElementById("contenu-annonces");
     if (!zone) return;
+    // Pas de rafraîchissement pendant que tu colles un lien YouTube dans une carte.
+    if (zone.contains(document.activeElement) && document.activeElement.tagName === "INPUT") return;
     const maintenant = Date.now();
     const jeuActus = window.GoldAI.donnees.obtenir("actualites");
     const jeuCal = window.GoldAI.donnees.obtenir("calendrier");
@@ -201,7 +218,8 @@
     const evs = evenementsCalendrier().filter((e) => filtrerEvenement(e, maintenant));
     const msDe = (e) => (e.horodatage_utc ? Date.parse(e.horodatage_utc) : Date.parse(`${e.date_utc}T00:00:00Z`));
     // Les annonces « Neutre » (sans effet clair sur l'or) ne sont pas affichées.
-    const aVenir = evs.filter((e) => msDe(e) > maintenant && N.biaisAnnonceOr(e, trouverExplication(e.titre)).biais !== "neutre")
+    // Exception : les discours (Trump, Fed, BCE…) sont toujours montrés.
+    const aVenir = evs.filter((e) => msDe(e) > maintenant && (N.estDiscours(e) || N.biaisAnnonceOr(e, trouverExplication(e.titre)).biais !== "neutre"))
       .sort((a, b) => {
         // Les 24 prochaines heures classées par priorité, le reste par date.
         const pa = msDe(a) - maintenant < 24 * 3600000, pb = msDe(b) - maintenant < 24 * 3600000;
@@ -278,5 +296,11 @@
   });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.calendrier = { charger, afficher, evenementsCalendrier };
+  // Discours suivis (mêmes devises / impacts que la liste), pour le bloc Marché.
+  function discoursSuivis() {
+    return evenementsCalendrier().filter((e) => N.estDiscours(e)
+      && DEVISES_SUIVIES.includes(e.devise) && e.impact !== "low" && e.impact !== "holiday");
+  }
+
+  window.GoldAI.calendrier = { charger, afficher, evenementsCalendrier, discoursSuivis };
 })();

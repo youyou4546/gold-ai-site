@@ -1176,6 +1176,89 @@
     };
   }
 
+  // =====================================================================
+  // SESSIONS DE MARCHÉ (Asie / Londres / New York) et DISCOURS EN DIRECT
+  // =====================================================================
+  //
+  // Mêmes horaires UTC que le robot (scripts/robot_xauusd_funded.py) :
+  // Asie 0 h–8 h, Londres 7 h–16 h, New York 13 h–21 h. Aucune session le
+  // samedi et le dimanche (UTC) : le marché de l'or est fermé.
+  const SESSIONS_MARCHE = [
+    { cle: "asie", nom: "Asie", debut: 0, fin: 8 },
+    { cle: "londres", nom: "Londres", debut: 7, fin: 16 },
+    { cle: "newyork", nom: "New York", debut: 13, fin: 21 },
+  ];
+
+  /**
+   * Sessions vues depuis l'instant `maintenant` (ms) :
+   *  - actives : sessions ouvertes en ce moment (deux en même temps si chevauchement)
+   *  - sessions : pour chacune, son créneau en cours ou le prochain { debutMs, finMs, active }
+   *  - prochaine : prochaine ouverture (utile quand aucune n'est active)
+   */
+  function sessionsMarche(maintenant) {
+    const H = 3600000, J = 24 * H;
+    const minuit = Math.floor(maintenant / J) * J;
+    const creneaux = [];
+    for (let d = -1; d <= 8; d++) {
+      const jour = minuit + d * J;
+      const js = new Date(jour).getUTCDay();
+      if (js === 0 || js === 6) continue;
+      SESSIONS_MARCHE.forEach((s) => creneaux.push({ cle: s.cle, nom: s.nom, debutMs: jour + s.debut * H, finMs: jour + s.fin * H }));
+    }
+    const actif = (c) => c.debutMs <= maintenant && maintenant < c.finMs;
+    const sessions = SESSIONS_MARCHE.map((s) => {
+      const c = creneaux.filter((x) => x.cle === s.cle && x.finMs > maintenant).sort((a, b) => a.debutMs - b.debutMs)[0];
+      return { ...c, active: actif(c) };
+    });
+    const actives = sessions.filter((s) => s.active);
+    const prochaine = [...sessions].filter((s) => !s.active).sort((a, b) => a.debutMs - b.debutMs)[0] || null;
+    return { actives, sessions, prochaine };
+  }
+
+  // Événement du calendrier qui est un discours / une conférence de presse
+  // (titres Forex Factory : « … Speaks », « … Press Conference », « … Testifies »).
+  function estDiscours(evenement) {
+    return /\b(speaks|speech|press conference|testifies|testimony|remarks)\b/i.test(String(evenement?.titre || ""));
+  }
+
+  /**
+   * Phase du bloc « discours » de la section Marché :
+   *  "cache" (plus de 30 min avant, ou plus de 90 min après), "chrono" (≤ 30 min avant),
+   *  "en_cours" (de l'heure prévue à +90 min).
+   */
+  function phaseDiscours(debutMs, maintenant, { avantMin = 30, apresMin = 90 } = {}) {
+    if (!Number.isFinite(debutMs)) return "cache";
+    if (maintenant < debutMs - avantMin * 60000) return "cache";
+    if (maintenant < debutMs) return "chrono";
+    if (maintenant < debutMs + apresMin * 60000) return "en_cours";
+    return "cache";
+  }
+
+  /**
+   * Lien YouTube collé par l'utilisateur → adresse du lecteur intégré, ou null.
+   * Accepte : watch?v=…, youtu.be/…, /live/…, /embed/…, /shorts/… et
+   * /channel/UC… (direct en cours de la chaîne, quel qu'il soit).
+   */
+  function lecteurYoutube(lien) {
+    let u;
+    try { u = new URL(String(lien || "").trim()); } catch { return null; }
+    const hote = u.hostname.replace(/^(www\.|m\.)/, "");
+    const ID = /^[A-Za-z0-9_-]{11}$/;
+    let id = null;
+    if (hote === "youtu.be") id = u.pathname.split("/")[1];
+    else if (hote === "youtube.com" || hote === "youtube-nocookie.com") {
+      const morceaux = u.pathname.split("/").filter(Boolean);
+      if (morceaux[0] === "watch") id = u.searchParams.get("v");
+      else if (["live", "embed", "shorts"].includes(morceaux[0]) && morceaux[1] !== "live_stream") id = morceaux[1];
+      else if (morceaux[0] === "channel" && /^UC[A-Za-z0-9_-]{22}$/.test(morceaux[1] || "")) {
+        return `https://www.youtube.com/embed/live_stream?channel=${morceaux[1]}&autoplay=1&mute=1`;
+      } else if (morceaux[0] === "embed" && morceaux[1] === "live_stream" && /^UC[A-Za-z0-9_-]{22}$/.test(u.searchParams.get("channel") || "")) {
+        return `https://www.youtube.com/embed/live_stream?channel=${u.searchParams.get("channel")}&autoplay=1&mute=1`;
+      }
+    }
+    return id && ID.test(id) ? `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&playsinline=1` : null;
+  }
+
   const LIBELLE_TF = { "30min": "30 min", "1h": "1 h", "4h": "4 h", "1week": "1W" };
 
   const api = {
@@ -1183,7 +1266,7 @@
     calculerPosition, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
     ema, atr, calculerTendance, separerBougies,
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
-    scorePriorite, analyserImpact, biaisAnnonceOr, evaluerGardeFou, regrouperSignaux, aUnTradeGagnant, etatChallenge,
+    scorePriorite, analyserImpact, biaisAnnonceOr, sessionsMarche, SESSIONS_MARCHE, estDiscours, phaseDiscours, lecteurYoutube, evaluerGardeFou, regrouperSignaux, aUnTradeGagnant, etatChallenge,
     OBJECTIF_PAR_DEFAUT, debutPeriode, progressionObjectif, prochaineAnnonceDuJour,
     slCourant, evaluerTouches, pnlEstime, alerteTouchee, distanceAlerte, situationCompte, calculerEss, analyserTrades, JOURS_SEMAINE, LIBELLE_TF, LIBELLES_SPEC,
   };

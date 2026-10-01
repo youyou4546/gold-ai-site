@@ -1922,3 +1922,35 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
   justify-content: center;
   margin: 18px 0 0;
 }
+
+/* ---------- Marché : session de marché (js/sessions-marche.js) ---------- */
+.carte-sessions { padding: 14px; }
+.statut-session { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 15px; }
+.point-session { width: 9px; height: 9px; border-radius: 50%; background: var(--texte-attenue); flex-shrink: 0; }
+.point-session.actif { background: var(--vert); box-shadow: 0 0 6px var(--vert); }
+.grille-sessions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px; }
+.case-session { background: var(--fond); border: 1px solid var(--bordure); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.case-session.active { border-color: rgba(47, 224, 163, 0.55); background: var(--vert-fond); }
+.nom-session { font-size: 12px; color: var(--texte-attenue); }
+.case-session.active .nom-session { color: var(--vert); font-weight: 700; }
+.heures-session { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.note-sessions { margin: 8px 0 0; font-size: 11px; color: var(--texte-attenue); text-align: right; }
+@media (max-width: 380px) { .heures-session { font-size: 12.5px; } }
+
+/* ---------- Marché : discours à venir, chrono puis direct (js/direct-discours.js) ---------- */
+.carte-discours { padding: 14px; margin-bottom: 10px; }
+.entete-discours { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.etiquette-discours { font-size: 12px; font-weight: 800; color: var(--accent); }
+.nom-discours { font-weight: 700; flex: 1; min-width: 0; }
+.chrono-discours { font-size: 40px; font-weight: 800; text-align: center; margin: 12px 0 2px; font-variant-numeric: tabular-nums; color: var(--accent); }
+.chrono-discours.en-cours { font-size: 22px; color: var(--vert); }
+.centre-discours { text-align: center; margin: 4px 0 0; }
+.video-direct { position: relative; width: 100%; aspect-ratio: 16 / 9; margin-top: 12px; border-radius: 10px; overflow: hidden; background: #000; }
+.video-direct iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.pied-discours { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; }
+.champ-lien-direct { margin-top: 12px; }
+.rangee-lien-direct { display: flex; gap: 6px; margin-top: 4px; }
+.rangee-lien-direct input { flex: 1; min-width: 0; padding: 10px 12px; background: var(--fond); border: 1px solid var(--bordure); border-radius: 8px; color: var(--texte); font-size: 16px; }
+.rangee-lien-direct input:focus { outline: none; border-color: var(--accent); }
+.message-lien-direct { margin: 4px 0 0; min-height: 1em; }
+.badge-or.discours { background: rgba(34, 211, 238, 0.12); color: var(--accent); border-color: rgba(34, 211, 238, 0.4); }

@@ -560,3 +560,40 @@ test("analyse : trade suivant une perte le même jour", () => {
   assert.equal(r.apresPerte.nb, 4);
   assert.ok(r.conseils.some((c) => c.texte.includes("Après une perte")));
 });
+
+test("sessions de marché : chevauchement, creux du soir, week-end", () => {
+  const noms = (r) => r.actives.map((s) => s.nom).join("+");
+  // Mercredi 30/09/2026 14:00 UTC (10:00 à Québec) : Londres et New York
+  assert.equal(noms(N.sessionsMarche(Date.parse("2026-09-30T14:00:00Z"))), "Londres+New York");
+  // 07:30 UTC : Asie et Londres
+  assert.equal(noms(N.sessionsMarche(Date.parse("2026-09-30T07:30:00Z"))), "Asie+Londres");
+  // 22:00 UTC (18:00 à Québec) : aucune, prochaine = Asie à 00:00 UTC
+  const creux = N.sessionsMarche(Date.parse("2026-09-30T22:00:00Z"));
+  assert.equal(creux.actives.length, 0);
+  assert.equal(creux.prochaine.nom, "Asie");
+  assert.equal(new Date(creux.prochaine.debutMs).toISOString(), "2026-10-01T00:00:00.000Z");
+  // Samedi : rien jusqu'au lundi 00:00 UTC (dimanche 20:00 à Québec)
+  const samedi = N.sessionsMarche(Date.parse("2026-10-03T12:00:00Z"));
+  assert.equal(samedi.actives.length, 0);
+  assert.equal(new Date(samedi.prochaine.debutMs).toISOString(), "2026-10-05T00:00:00.000Z");
+});
+
+test("discours : détection, phases, lien YouTube", () => {
+  assert.ok(N.estDiscours({ titre: "President Trump Speaks" }));
+  assert.ok(N.estDiscours({ titre: "RBA Press Conference" }));
+  assert.ok(!N.estDiscours({ titre: "CPI m/m" }));
+  const t = Date.parse("2026-09-30T19:30:00Z");
+  assert.equal(N.phaseDiscours(t, t - 31 * 60000), "cache");
+  assert.equal(N.phaseDiscours(t, t - 10 * 60000), "chrono");
+  assert.equal(N.phaseDiscours(t, t + 60 * 60000), "en_cours");
+  assert.equal(N.phaseDiscours(t, t + 91 * 60000), "cache");
+  const attendu = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&playsinline=1";
+  assert.equal(N.lecteurYoutube("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=5"), attendu);
+  assert.equal(N.lecteurYoutube("https://youtu.be/dQw4w9WgXcQ?si=abc"), attendu);
+  assert.equal(N.lecteurYoutube("https://youtube.com/live/dQw4w9WgXcQ?feature=share"), attendu);
+  assert.equal(N.lecteurYoutube("https://m.youtube.com/watch?v=dQw4w9WgXcQ"), attendu);
+  assert.match(N.lecteurYoutube("https://www.youtube.com/channel/UCYxRlFDqcWM4y7FfpiAN3KQ/live"), /live_stream\?channel=UCYxRlFDqcWM4y7FfpiAN3KQ/);
+  assert.equal(N.lecteurYoutube("https://www.youtube.com/@WhiteHouse"), null);
+  assert.equal(N.lecteurYoutube("pas un lien"), null);
+  assert.equal(N.lecteurYoutube("https://evil.com/watch?v=dQw4w9WgXcQ"), null);
+});

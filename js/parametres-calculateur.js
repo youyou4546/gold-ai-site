@@ -215,6 +215,7 @@
       compteMaitre: cache?.compteMaitre,         // compte maître (Profil › Mes comptes TradeLocker), conservé tel quel
       statutsComptes: cache?.statutsComptes,     // statut Évaluation / Financé par compte (même endroit), conservé tel quel
       seuilEss: cache?.seuilEss,                 // seuil ESS (Profil › Général), conservé tel quel
+      liensDirect: cache?.liensDirect,           // liens YouTube des discours (Annonces / Marché), conservés tels quels
     };
     if (r.risqueMode === "pourcentage" && !(r.solde > 0)) erreurs.push("Indique le solde du compte (nécessaire pour un risque en %).");
     if (!(r.risqueValeur > 0)) erreurs.push("Indique la valeur du risque.");
