@@ -114,29 +114,51 @@
 
   // ---------------------------------------------------------------- Calculateur
 
+  // Règle atteinte : le calculateur affiche « Journée terminée », mais un bouton
+  // permet de le débloquer pour une occasion exceptionnelle (valable jusqu'à
+  // la fin de la journée, sur cet appareil). Un rappel rouge reste affiché.
+  const CLE_FORCE = "goldai_garde_fou_force";
+  function forceAujourdhui() {
+    try { return localStorage.getItem(CLE_FORCE) === cleAujourdhui(); } catch { return false; }
+  }
+
   function afficherBlocageCalculateur() {
     const zone = $("blocage-calculateur");
     const carteSaisie = $("carte-saisie-signal");
     if (!zone || !carteSaisie) return;
     const bloque = etat?.niveau === "bloque";
-    carteSaisie.classList.toggle("hidden", bloque);
+    const force = bloque && forceAujourdhui();
+    carteSaisie.classList.toggle("hidden", bloque && !force);
     zone.classList.toggle("hidden", !bloque);
-    if (bloque) {
-      zone.innerHTML = `
-        <div class="icone-blocage" aria-hidden="true">⛔</div>
-        <h3>Journée terminée</h3>
-        <ul>${etat.alertes.filter((a) => a.niveau === "bloque").map((a) => `<li>${esc(texteAlerte(a))}</li>`).join("")}</ul>
-        <p class="texte-attenue petit">Le calculateur se rouvre demain. Le trade de trop pour « se refaire » est celui qui fait perdre les comptes.</p>`;
-      $("zone-signal-interprete").innerHTML = "";
-      $("zone-resultat-calcul").innerHTML = "";
+    zone.classList.toggle("debloque", force);
+    if (!bloque) return;
+    const regles = etat.alertes.filter((a) => a.niveau === "bloque").map((a) => esc(texteAlerte(a)));
+    if (force) {
+      zone.innerHTML = `<p class="rappel-debloque">⛔ ${regles.join(" · ")}<br><span class="texte-attenue petit">Calculateur débloqué exceptionnellement pour aujourd'hui.</span></p>`;
+      return;
     }
+    zone.innerHTML = `
+      <div class="icone-blocage" aria-hidden="true">⛔</div>
+      <h3>Journée terminée</h3>
+      <ul>${regles.map((r) => `<li>${r}</li>`).join("")}</ul>
+      <p class="texte-attenue petit">Le trade de trop pour « se refaire » est celui qui fait perdre les comptes.</p>
+      <button type="button" class="bouton secondaire" id="garde-fou-forcer">Calculer quand même (occasion exceptionnelle)</button>`;
+    $("zone-signal-interprete").innerHTML = "";
+    $("zone-resultat-calcul").innerHTML = "";
   }
+
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("#garde-fou-forcer")) {
+      try { localStorage.setItem(CLE_FORCE, cleAujourdhui()); } catch { /* ignoré */ }
+      afficherBlocageCalculateur();
+    }
+  });
 
   // Attend le calcul du jour avant de dire si le calculateur est autorisé.
   async function calculAutorise() {
     if (chargement) await chargement;
     if (!etat || jourCalcule !== cleAujourdhui()) await recalculer();
-    return etat?.niveau !== "bloque";
+    return etat?.niveau !== "bloque" || forceAujourdhui();
   }
 
   // Un trade gagnant est-il déjà enregistré aujourd'hui (journée locale) ?

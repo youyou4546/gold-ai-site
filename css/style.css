@@ -1959,3 +1959,8 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .choix-compte-bas { margin-top: 14px; }
 /* Analyse › Suivre le prix (tout en bas, après le Briefing) */
 .bloc-suivre-prix { margin-top: 16px; }
+
+/* Calculateur débloqué malgré une règle atteinte : simple rappel rouge */
+.blocage-calculateur.debloque { text-align: left; padding: 10px 14px; margin-bottom: 12px; }
+.rappel-debloque { margin: 0; font-weight: 600; color: var(--rouge); }
+.blocage-calculateur #garde-fou-forcer { margin-top: 6px; }
