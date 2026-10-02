@@ -99,7 +99,9 @@
     // compteur « X trades sur N » ni de « reste … avant ta limite ». Les règles
     // continuent de tourner : le rectangle réapparaît seulement pour AVERTIR
     // (orange) ou quand une règle BLOQUE la journée (rouge).
-    const alertes = objectifAtteint ? etat.alertes.filter((a) => !(a.cle === "trades" && a.niveau !== "bloque")) : etat.alertes;
+    // « Plus qu'un seul trade autorisé » n'est jamais affiché en haut (demande de
+    // l'utilisateur) : seul le blocage « nombre max de trades atteint » y apparaît.
+    const alertes = etat.alertes.filter((a) => !(a.cle === "trades" && a.niveau !== "bloque"));
     const principale = alertes[0]; // alertes triées : la plus grave en premier
     if (!principale) { zone.hidden = true; zone.innerHTML = ""; return; }
     const niveau = principale.niveau;
