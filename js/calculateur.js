@@ -211,78 +211,66 @@
       </div>${boutonRetour}`;
   }
 
-  // Résultat « lots par TP » : une position par TP, tableau + risque + ESS en 3 scénarios.
+  // Résultat « lots par TP » (une position par TP), présenté comme l'ancien calcul :
+  // tableau des objectifs + ligne SL, une ligne ESS, encadré Total.
   function afficherLotsParTp(r, reglages, ctx) {
     const d = r.devise;
     const lot = (x) => `${nombre(x, r.decimalesLot)}`;
     const lignes = r.lignes.map((l) => `
       <tr>
-        <th scope="row">TP${l.numero}<br><span class="texte-attenue">${prixAffiche(l.prix)}</span></th>
-        <td>${nombre(l.distance, 2)}</td>
-        <td><strong>${lot(l.lot)}</strong>${l.sousMin ? `<br><span class="texte-attenue">⚠️ sous le min.</span>` : l.plafonne ? `<br><span class="texte-attenue">plafond</span>` : l.lotMaxAtteint ? `<br><span class="texte-attenue">lot max</span>` : ""}</td>
+        <th scope="row">TP${l.numero}</th>
+        <td>${prixAffiche(l.prix)}</td>
+        <td><strong>${lot(l.lot)}</strong>${l.sousMin ? `<br><span class="texte-attenue">sous le min.</span>` : l.plafonne ? `<br><span class="texte-attenue">plafond</span>` : ""}</td>
         <td class="positif">${l.gain > 0 ? `▲ ${montant(l.gain, d)}` : "—"}</td>
-        <td>${montant(l.cumul, d)}</td>
       </tr>`).join("");
-    const risquePct = reglages.solde > 0 ? (r.risqueAvantTp1 / reglages.solde) * 100 : null;
-    const ligne = (lib, val, classe = "") => `<div class="ligne-total-calcul"><span>${lib}</span><strong class="${classe}">${val}</strong></div>`;
 
-    // ESS : records PAR JOURNÉE ; 3 scénarios pour le résultat de ce trade.
+    // ESS requis (seuil) et ESS si tous les TP sont touchés (records par journée).
     const e = N.essDuTrade({ trades: ctx.tradesCompte, aujourdhui: ctx.aujourdhui, seuil: ctx.seuil,
-      gainTp1: r.gainTp1 - r.risqueApresTp1, risque: r.risqueAvantTp1, gainTous: r.cumulTotal });
-    const pctEss = (x) => (x?.calculable ? `${nombre(x.ess, 2)} %` : "—");
-    const classeEss = (x) => (x?.calculable ? (x.eligible ? "positif" : "negatif") : "");
-    const alertes = [];
-    if (e.battraitGain) alertes.push(`⚠️ Ce trade bat ton record et fait monter le seuil ESS : nouveau record ${montant(e.nouveauRecord, d)} (ancien : ${montant(e.recordGain, d)}).`);
-    if (e.battraitPerte) alertes.push(`⚠️ Au SL, ta journée serait à ${montant(e.jourSiSl, d)}, pire que ta plus grosse journée perdante (${montant(-e.recordPerte, d)}) : ça fait monter le seuil ESS.`);
-    const a = e.actuel;
+      gainTp1: r.gainTp1, risque: r.risqueAvantTp1, gainTous: r.cumulTotal });
+    const t = e.siTous;
+    const ligneEss = `<p class="petit">ESS requis : ≤ ${nombre(t.seuil, 0)} % · si tous les TP sont touchés : <strong class="${t.calculable ? (t.eligible ? "positif" : "negatif") : ""}">${t.calculable ? `${nombre(t.ess, 2)} % ${t.eligible ? "✅" : "❌"}` : "—"}</strong></p>`;
+    const avertissements = r.avertissements.filter((a) => !a.startsWith("Plafond") && !a.startsWith("TP runner"));
 
     return `
       <div class="grille-stats-perf">
-        ${carteChiffre("Objectif restant", montant(r.objectifRestant, d), r.profitJour ? `déjà ${montant(r.profitJour, d)} aujourd'hui` : "")}
-        ${carteChiffre("Lot total", `${lot(r.lotTotal)} lot`, "", "carte-mise-en-avant")}
+        ${carteChiffre("Objectif restant", montant(r.objectifRestant, d))}
+        ${carteChiffre("Lot utilisé", `${lot(r.lotTotal)} lot`, "", "carte-mise-en-avant")}
       </div>
 
       <div class="carte">
-        <h3 class="titre-bloc">Lots par TP <span class="texte-attenue petit">· une position par TP</span></h3>
+        <h3 class="titre-bloc">Répartition des objectifs</h3>
         <div class="tableau-defilant">
           <table class="tableau-portions compact">
-            <thead><tr><th scope="col">TP</th><th scope="col">Dist.</th><th scope="col">Lot</th><th scope="col">Gain</th><th scope="col">Cumul</th></tr></thead>
+            <thead><tr><th scope="col">Obj.</th><th scope="col">Prix</th><th scope="col">Lot</th><th scope="col">Résultat</th></tr></thead>
             <tbody>${lignes}
               <tr class="ligne-sl">
-                <th scope="row">Total</th><td></td><td><strong>${lot(r.lotTotal)}</strong></td><td></td><td><strong class="positif">${montant(r.cumulTotal, d)}</strong></td>
+                <th scope="row">SL</th>
+                <td>${prixAffiche(signalCourant.sl)}</td>
+                <td><strong>${lot(r.lotTotal)}</strong></td>
+                <td class="negatif">▼ ${montant(r.risqueAvantTp1, d)}</td>
               </tr>
             </tbody>
           </table>
         </div>
+        ${ligneEss}
         <button type="button" class="bouton secondaire bouton-petit" id="calc-copier-lots">📋 Copier les lots</button>
         <p class="texte-attenue petit" id="calc-copie-message" aria-live="polite"></p>
       </div>
 
       <div class="carte encadre-total-calcul">
-        <h3 class="titre-bloc">Risque</h3>
-        ${ligne("Risque avant TP1 (SL touché)", `▼ ${montant(r.risqueAvantTp1, d)}`, "negatif")}
-        ${risquePct !== null ? `<p class="texte-attenue petit">Soit ${nombre(risquePct, 2)} % du solde (${montant(reglages.solde, d)}).</p>` : ""}
-        ${ligne("Risque après TP1", r.slEntreeApresTp1 ? `${montant(0, d)} <span class="texte-attenue petit">SL à l'entrée</span>` : `▼ ${montant(r.risqueApresTp1, d)}`, r.slEntreeApresTp1 ? "positif" : "negatif")}
-        ${ligne("Ratio R:R (TP1)", `1 : ${nombre(Math.abs(r.lignes[0].distance) / Math.abs(signalCourant.entree - signalCourant.sl), 2)}`)}
+        <h3 class="titre-bloc">Total</h3>
+        <div class="ligne-total-calcul">
+          <span>Risque total si le SL est touché</span>
+          <strong class="negatif">▼ ${montant(r.risqueAvantTp1, d)}</strong>
+        </div>
+        <div class="ligne-total-calcul">
+          <span>Gain total si tous les TP sont touchés</span>
+          <strong class="positif">▲ ${montant(r.cumulTotal, d)}</strong>
+        </div>
+        ${r.slEntreeApresTp1 ? `<p class="texte-attenue petit">Après TP1 : SL à l'entrée, plus de risque.</p>` : ""}
       </div>
 
-      ${r.avertissements.length || alertes.length
-        ? `<div class="carte alerte-marges orange">${[...r.avertissements.map(esc), ...alertes].map((x) => `<p>${x.startsWith("⚠️") ? x : `⚠️ ${x}`}</p>`).join("")}</div>`
-        : `<div class="carte"><p class="positif">✅ Aucun lot sous le minimum, et ce trade ne bat aucun record de journée.</p></div>`}
-
-      <div class="carte">
-        <h3 class="titre-bloc">ESS</h3>
-        ${a.nbJours || e.profitJour ? `
-          ${ligne("ESS actuel", pctEss(a), classeEss(a))}
-          ${ligne("1) SL touché avant TP1", pctEss(e.siSl), classeEss(e.siSl))}
-          ${ligne(`2) TP1 touché puis retour à l'entrée`, pctEss(e.siTp1), classeEss(e.siTp1))}
-          ${ligne("3) Tous les TP touchés", pctEss(e.siTous), classeEss(e.siTous))}
-          ${ligne(`Bénéfice total requis (seuil ${nombre(a.seuil, 0)} %)`, a.nbJours ? montant(a.requis, d) : "—")}
-          ${a.nbJours ? (a.calculable && a.eligible ? ligne("Marge restante", montant(a.marge, d), "positif") : ligne("Il manque", montant(a.manque, d), "negatif")) : ""}
-          <p class="texte-attenue petit">Réussi si ESS ≤ ${nombre(a.seuil, 0)} % et bénéfice net > 0. Bénéfice net actuel : ${montant(a.total, d)} (${esc(ctx.nomCompte)}, trades du Journal). « — » = bénéfice net pas positif.</p>`
-          : `<p class="texte-attenue petit">Aucun jour de trading dans le Journal pour ${esc(ctx.nomCompte)} : ESS pas encore calculable.</p>
-          ${ligne("Si tous les TP sont touchés", pctEss(e.siTous), classeEss(e.siTous))}`}
-      </div>
+      ${avertissements.length ? `<div class="carte">${avertissements.map((a) => `<div class="alerte-donnees">${esc(a)}</div>`).join("")}</div>` : ""}
 
       ${boutonRetour}`;
   }
