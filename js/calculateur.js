@@ -150,8 +150,8 @@
       <div class="carte">
         <h3 class="titre-bloc">Répartition des objectifs</h3>
         <div class="tableau-defilant">
-          <table class="tableau-portions">
-            <thead><tr><th scope="col">Objectif</th><th scope="col">Prix</th><th scope="col">Répartition</th><th scope="col">Lot</th><th scope="col">Résultat</th></tr></thead>
+          <table class="tableau-portions compact">
+            <thead><tr><th scope="col">Obj.</th><th scope="col">Prix</th><th scope="col">%</th><th scope="col">Lot</th><th scope="col">Résultat</th></tr></thead>
             <tbody>${lignes}
               <tr class="ligne-sl">
                 <th scope="row">SL</th>

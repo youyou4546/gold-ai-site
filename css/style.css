@@ -1291,6 +1291,13 @@ main > .section {
 .liste-plan-sl { list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.9; }
 .liste-plan-sl .texte-attenue { font-size: 12px; }
 .tableau-portions .ligne-sl th, .tableau-portions .ligne-sl td { border-top: 1px solid var(--bordure); }
+/* Calculateur › Répartition des objectifs : tient dans la largeur d'un téléphone, sans glisser. */
+.tableau-portions.compact { min-width: 0; font-size: 12px; }
+.tableau-portions.compact th, .tableau-portions.compact td { padding: 8px 3px; }
+.tableau-portions.compact th:first-child, .tableau-portions.compact td:first-child { padding-left: 0; white-space: normal; }
+.tableau-portions.compact th:last-child, .tableau-portions.compact td:last-child { padding-right: 0; }
+.tableau-portions.compact thead th { font-size: 10px; letter-spacing: 0; }
+.tableau-portions.compact .texte-attenue { white-space: normal; font-size: 11px; }
 .grille-sl-runner { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0 12px; }
 .grille-sl-runner .champ label { font-size: 12px; }
 .ligne-repartition { display: grid; grid-template-columns: 48px 1fr auto 44px; align-items: center; gap: 8px; margin-bottom: 8px; }
