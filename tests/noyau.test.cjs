@@ -578,6 +578,49 @@ test("calculateur : lot pour l'objectif du jour (part TP1)", () => {
   assert.ok(sansSl.erreurs.includes("Stop-loss manquant."));
 });
 
+test("lots par TP : exemple de référence (0,50 / 0,05 / 0,03 / 0,02 ; risque 300 $)", () => {
+  // Or : 100 $ par lot pour 1 $ de mouvement (tick 0,01 = 1 $). SL 5 $, TP à 5 / 10 / 15 / 20 $.
+  const signal = N.lireSignal(["XAUUSD SELL", "Entry 4335", "SL 4340", "TP1 4330", "TP2 4325", "TP3 4320", "TP4 4315"].join("\n"));
+  const rl = N.reglagesLotsPourCompte({}, null); // défauts : objectif 250, bonus 50/50/50, plafond 400
+  assert.deepEqual([rl.objectif, rl.bonus, rl.plafond, rl.slEntreeApresTp1], [250, [50, 50, 50], 400, true]);
+  const r = N.calculerLotsParTp(signal, REGLAGES_TEST, rl, { profitJour: 0 });
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.deepEqual(r.lignes.map((l) => l.lot), [0.5, 0.05, 0.03, 0.02]);
+  assert.deepEqual(r.lignes.map((l) => l.gain), [250, 50, 45, 40]);
+  assert.deepEqual(r.lignes.map((l) => l.cumul), [250, 300, 345, 385]);
+  assert.equal(r.lotTotal, 0.6);
+  assert.equal(r.risqueAvantTp1, 300);
+  assert.equal(r.risqueApresTp1, 0);         // SL à l'entrée après TP1
+  // Sans « SL à l'entrée » : les lots restants (0,10) gardent leur risque
+  assert.equal(N.calculerLotsParTp(signal, REGLAGES_TEST, { ...rl, slEntreeApresTp1: false }).risqueApresTp1, 50);
+  // Profit déjà fait : 100 $ → TP1 vise 150 $
+  assert.equal(N.calculerLotsParTp(signal, REGLAGES_TEST, rl, { profitJour: 100 }).lignes[0].lot, 0.3);
+  // Plafond 320 $ : TP1 250 + TP2 50 = 300, TP3 réduit à 20 $ (0,01 lot), TP4 à 0
+  const p = N.calculerLotsParTp(signal, REGLAGES_TEST, { ...rl, plafond: 320 });
+  assert.deepEqual(p.lignes.map((l) => l.lot), [0.5, 0.05, 0.01, 0]);
+  assert.ok(p.lignes[3].plafonne);
+  // Objectif atteint → pas de lot
+  assert.equal(N.calculerLotsParTp(signal, REGLAGES_TEST, rl, { profitJour: 260 }).objectifAtteint, true);
+  // Seulement 2 TP : on calcule les TP présents
+  const deux = N.calculerLotsParTp(N.lireSignal("XAUUSD SELL\nEntry 4335\nSL 4340\nTP1 4330\nTP2 4325"), REGLAGES_TEST, rl);
+  assert.deepEqual(deux.lignes.map((l) => l.lot), [0.5, 0.05]);
+  // Bonus trop petit pour le lot minimum → 0 et signalé
+  const minus = N.calculerLotsParTp(signal, REGLAGES_TEST, { ...rl, bonus: [50, 50, 1] });
+  assert.equal(minus.lignes[3].lot, 0);
+  assert.ok(minus.lignes[3].sousMin);
+  // TP1 trop proche : lot maximum atteint → alerte
+  const proche = N.calculerLotsParTp(signal, { ...REGLAGES_TEST, instruments: { XAUUSD: { ...REGLAGES_TEST.instruments.XAUUSD, lotMax: 0.2 } } }, rl);
+  assert.equal(proche.lignes[0].lot, 0.2);
+  assert.ok(proche.avertissements.some((a) => a.includes("TP1 trop proche")));
+  // SL manquant
+  assert.ok(N.calculerLotsParTp({ ...signal, sl: null }, REGLAGES_TEST, rl).erreurs.includes("Stop-loss manquant."));
+  // Réduction pour tenir dans 200 $ de risque : TP4, TP3, TP2 d'abord, puis TP1
+  const red = N.reduireLotsParTp(r, 200);
+  assert.deepEqual(red.lots, [0.4, 0, 0, 0]);
+  assert.equal(red.risque, 200);
+  assert.deepEqual(N.reduireLotsParTp(r, 280).lots, [0.5, 0.05, 0.01, 0]);
+});
+
 test("ESS d'un trade : records par journée, ESS projeté TP1 / SL", () => {
   const trades = [
     { date: "2026-09-28", resultat: 40.86 },

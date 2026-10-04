@@ -22,6 +22,8 @@
   ];
 
   let cache = null;          // réglages chargés
+  let lotsEdition = null;    // « Lots par TP » en cours d'édition : { _defaut: {...}, "env|id": {...} }
+  let compteLots = "_defaut"; // compte affiché dans « Lots par TP »
   let stockage = null;       // "supabase" | "appareil"
 
   function cleLocale() {
@@ -103,6 +105,56 @@
     return (valeurs?.length ? valeurs : [null]).map((pct, i) => ligneRepartition(pct, i, groupe)).join("");
   }
 
+  // « Lots par TP » : réglages du compte choisi (ou par défaut pour tous les comptes).
+  function noteLots(cle) {
+    if (cle === "_defaut") return "";
+    return lotsEdition?.[cle]
+      ? `Ce compte a ses propres réglages. <button type="button" class="lien-retour" id="lots-revenir-defaut">Revenir aux réglages par défaut</button>`
+      : "Ce compte utilise les réglages par défaut : une modification lui crée ses propres réglages.";
+  }
+
+  function champsLots(cle) {
+    const N = window.GoldAI.noyau;
+    const v = N.reglagesLotsPourCompte({ lotsParTp: lotsEdition || {} }, cle === "_defaut" ? null : cle);
+    const num = (id, lib, val, ph) => `<div class="champ"><label for="${id}">${lib}</label><input type="number" id="${id}" class="champ-lots" inputmode="decimal" step="any" min="0" value="${val ?? ""}" placeholder="${ph}" /></div>`;
+    return `
+      ${cle !== "_defaut" ? `<p class="aide" id="lots-note">${noteLots(cle)}</p>` : ""}
+      <div class="ligne-champs">
+        ${num("lots-objectif", "Objectif quotidien ($)", v.objectif, "250")}
+        ${num("lots-plafond", "Plafond de gain du jour ($)", v.plafond, "400")}
+      </div>
+      <div class="ligne-champs">
+        ${[0, 1, 2].map((i) => num(`lots-bonus-${i}`, `Bonus TP${i + 2} ($)`, v.bonus[i] ?? v.bonus[v.bonus.length - 1], "50")).join("")}
+      </div>
+      <label class="case-a-cocher"><input type="checkbox" id="lots-sl-entree" class="champ-lots" ${v.slEntreeApresTp1 ? "checked" : ""}/> SL au point d'entrée après TP1</label>`;
+  }
+
+  function lireChampsLots() {
+    const val = (id) => { const c = document.getElementById(id); return c && c.value.trim() !== "" ? Number(c.value) : null; };
+    if (!document.getElementById("lots-objectif")) return;
+    lotsEdition = { ...(lotsEdition || {}) };
+    const nouveau = !lotsEdition[compteLots];
+    lotsEdition[compteLots] = {
+      objectif: val("lots-objectif") ?? window.GoldAI.noyau.LOTS_PAR_TP_DEFAUT.objectif,
+      plafond: val("lots-plafond"),
+      bonus: [0, 1, 2].map((i) => val(`lots-bonus-${i}`) ?? 0),
+      slEntreeApresTp1: document.getElementById("lots-sl-entree").checked,
+    };
+    const note = document.getElementById("lots-note");
+    if (nouveau && note) note.innerHTML = noteLots(compteLots); // les champs restent tels quels (pas de perte de saisie)
+  }
+
+  async function remplirComptesLots() {
+    const menu = document.getElementById("lots-compte");
+    if (!menu) return;
+    let comptes = [];
+    try { comptes = (await window.GoldAI.journal?.comptesPourFiche?.()) || []; } catch { /* pas de comptes */ }
+    const maitre = cache?.compteMaitre;
+    menu.innerHTML = `<option value="_defaut">Tous les comptes (par défaut)</option>`
+      + comptes.map((c) => `<option value="${esc(c.cle)}" ${c.cle === compteLots ? "selected" : ""}>${esc(c.nom)}${c.cle === maitre ? " ⭐" : ""}</option>`).join("");
+    menu.value = compteLots;
+  }
+
   function carteInstrument(sym, spec) {
     return `<div class="carte-instrument" data-instrument="${esc(sym)}">
       <div class="entete-instrument">
@@ -127,6 +179,7 @@
   function afficherFormulaire(r) {
     const zone = document.getElementById("zone-parametres-calculateur");
     if (!zone) return;
+    lotsEdition = JSON.parse(JSON.stringify(r.lotsParTp || {}));
     zone.innerHTML = `
       ${stockage === "appareil" ? `<div class="alerte-donnees">Sauvegarde en ligne indisponible (patch Supabase non installé) : ces réglages sont gardés sur cet appareil seulement.</div>` : ""}
       <div class="ligne-champs">
@@ -166,6 +219,15 @@
       <p class="aide">Laissé vide : le groupe « 4 TP » sert aussi pour les signaux à 3 TP.</p>
 
       <p class="aide">Un TP sans chiffre dans le signal = <strong>TP runner</strong> : il compte comme un TP et prend la portion qui suit les TP chiffrés (ex. TP1, TP2, TP3 + runner → 4 TP).</p>
+      <p class="aide">La répartition ne sert plus que si le Journal est illisible : le calculateur utilise « Lots par TP » ci-dessous.</p>
+
+      <label class="label-groupe">Lots par TP (calculateur)</label>
+      <p class="aide">Une position par TP : le TP1 rapporte à lui seul l'objectif restant du jour, chaque TP suivant rapporte son bonus, sans dépasser le plafond du jour. Le calculateur utilise les réglages du compte maître ⭐.</p>
+      <div class="champ">
+        <label for="lots-compte">Compte</label>
+        <select id="lots-compte"><option value="_defaut">Tous les comptes (par défaut)</option></select>
+      </div>
+      <div id="zone-lots-compte">${champsLots(compteLots)}</div>
 
       <label class="label-groupe">Instruments</label>
       <div id="liste-instruments">${Object.entries(r.instruments || {}).map(([s, spec]) => carteInstrument(s, spec)).join("") || ""}</div>
@@ -180,6 +242,7 @@
       <p class="message-succes" id="message-parametres-calculateur"></p>
       <button class="bouton" id="bouton-sauvegarder-calculateur">Enregistrer les paramètres du calculateur</button>`;
     majTotalRepartition();
+    remplirComptesLots();
   }
 
   function lireRepartition(groupe = "") {
@@ -221,6 +284,7 @@
       statutsComptes: cache?.statutsComptes,     // statut Évaluation / Financé par compte (même endroit), conservé tel quel
       seuilEss: cache?.seuilEss,                 // seuil ESS (Profil › Général), conservé tel quel
       liensDirect: cache?.liensDirect,           // liens YouTube des discours (Annonces / Marché), conservés tels quels
+      lotsParTp: lotsEdition ?? cache?.lotsParTp, // « Lots par TP » par compte (ce formulaire)
     };
     if (r.risqueMode === "pourcentage" && !(r.solde > 0)) erreurs.push("Indique le solde du compte (nécessaire pour un risque en %).");
     if (!(r.risqueValeur > 0)) erreurs.push("Indique la valeur du risque.");
@@ -228,6 +292,11 @@
     const total = r.repartition.reduce((s, x) => s + x, 0);
     if (!r.repartition.length || r.repartition.some((x) => !(x > 0))) erreurs.push("Chaque portion de la répartition doit être supérieure à 0 %.");
     else if (Math.abs(total - 100) > 1e-6) erreurs.push(`La répartition doit totaliser 100 % (actuellement ${Math.round(total * 100) / 100} %).`);
+    Object.entries(r.lotsParTp || {}).forEach(([cle, l]) => {
+      const nom = cle === "_defaut" ? "par défaut" : "de ce compte";
+      if (!(l.objectif > 0)) erreurs.push(`Lots par TP (${nom}) : l'objectif quotidien doit être supérieur à 0.`);
+      if (l.plafond !== null && l.plafond > 0 && l.plafond < l.objectif) erreurs.push(`Lots par TP (${nom}) : le plafond de gain du jour est plus petit que l'objectif.`);
+    });
     if (r.repartition3.length) {
       const total3 = r.repartition3.reduce((s, x) => s + x, 0);
       if (r.repartition3.some((x) => !(x > 0))) erreurs.push("Répartition « 3 TP » : chaque portion doit être supérieure à 0 %.");
@@ -302,8 +371,16 @@
     const zone = document.getElementById("zone-parametres-calculateur");
     if (!zone) return;
 
-    zone.addEventListener("input", (e) => { if (e.target.classList.contains("champ-rep")) majTotalRepartition(); });
+    zone.addEventListener("input", (e) => {
+      if (e.target.classList.contains("champ-rep")) majTotalRepartition();
+      if (e.target.classList.contains("champ-lots")) lireChampsLots();
+    });
     zone.addEventListener("change", (e) => {
+      if (e.target.classList.contains("champ-lots")) lireChampsLots();
+      if (e.target.id === "lots-compte") {
+        compteLots = e.target.value;
+        document.getElementById("zone-lots-compte").innerHTML = champsLots(compteLots);
+      }
       if (e.target.name === "calc-risque-mode") {
         const montant = e.target.value === "montant";
         document.getElementById("unite-risque").textContent = montant ? `(${document.getElementById("calc-devise").value})` : "(%)";
@@ -325,6 +402,11 @@
         valeurs.splice(Number(t.dataset.supprRep), 1);
         document.getElementById(`liste-repartition${groupe}`).innerHTML = lignesRepartition(valeurs, groupe);
         majTotalRepartition();
+      } else if (t.id === "lots-revenir-defaut") {
+        lotsEdition = { ...(lotsEdition || {}) };
+        delete lotsEdition[compteLots];
+        document.getElementById("zone-lots-compte").innerHTML = champsLots(compteLots);
+        planifierAuto();
       } else if (t.id === "ajouter-instrument") {
         document.getElementById("liste-instruments").insertAdjacentHTML("beforeend", carteInstrument(document.querySelector("#liste-instruments .carte-instrument") ? "" : "XAUUSD", null));
       } else if (t.hasAttribute("data-suppr-instrument")) {

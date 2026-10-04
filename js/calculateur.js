@@ -131,7 +131,7 @@
       </div>`;
   }
 
-  function afficherResultat(r, reglages, spec, ctx = null) {
+  function afficherResultat(r, reglages, spec) {
     const d = r.devise;
     const lignes = r.portions.map((p) => `
       <tr>
@@ -144,7 +144,7 @@
 
     return `
       <div class="grille-stats-perf">
-        ${r.modeLot === "objectif" ? carteChiffre("Objectif restant", montant(r.objectifRestant, d)) : carteChiffre("Risque demandé", montant(r.risqueDemande, d))}
+        ${carteChiffre("Risque demandé", montant(r.risqueDemande, d))}
         ${carteChiffre("Lot utilisé", `${nombre(r.lotTotal, 2)} lot`, "", "carte-mise-en-avant")}
       </div>
 
@@ -168,8 +168,6 @@
 
       ${afficherTotal(r)}
 
-      ${afficherObjectifEtEss(r, reglages, ctx)}
-
       ${r.contientTpOuvert ? afficherPlanSlRunner(signalCourant, reglages) : ""}
 
       ${r.avertissements.length ? `<div class="carte">${r.avertissements.map((a) => `<div class="alerte-donnees">${esc(a)}</div>`).join("")}</div>` : ""}
@@ -183,7 +181,9 @@
   // Contexte lu dans les réglages et le Journal : objectif (Profil › Général), compte
   // maître (Mes comptes TradeLocker), seuil ESS, trades du compte. null si indisponible
   // (le lot est alors calculé selon le risque, comme avant).
-  const LIBELLE_PERIODE = { jour: "du jour", semaine: "de la semaine", mois: "du mois" };
+  // Contexte lu dans les réglages et le Journal : compte maître (Mes comptes TradeLocker),
+  // résultat déjà fait aujourd'hui sur ce compte, trades du compte pour l'ESS, seuil ESS.
+  // null si le Journal est illisible (le lot est alors calculé selon le risque, comme avant).
   async function contexteObjectif(reglages) {
     try {
       const J = window.GoldAI.journal;
@@ -191,71 +191,107 @@
       const trades = Object.values((await J.chargerTousLesTrades()) || {}).flat();
       const aujourdhui = window.GoldAI.gardeFou?.cleAujourdhui?.() || window.GoldAI.utils.cleJour(Date.now());
       const compte = reglages.compteMaitre || "";
-      const p = N.progressionObjectif(trades, { ...(reglages.objectif || {}), compteId: "", compteTl: compte }, aujourdhui);
+      const duCompte = trades.filter((t) => !compte || t.compteTl === compte);
+      const profitJour = Math.round(duCompte.filter((t) => t.date === aujourdhui).reduce((s, t) => s + Number(t.resultat) - (Number(t.frais) || 0), 0) * 100) / 100;
       const st = (reglages.statutsComptes || {})[compte] || {};
       const depuis = st.statut === "finance" ? st.depuis : null;
       return {
-        montant: p.montant, periode: p.periode || "jour", realise: p.realise,
-        restant: Math.max(0, Math.round((p.montant - p.realise) * 100) / 100),
-        aujourdhui, seuil: reglages.seuilEss,
-        tradesCompte: trades.filter((t) => (!compte || t.compteTl === compte) && (!depuis || t.date >= depuis)),
+        compte, aujourdhui, profitJour, seuil: reglages.seuilEss,
+        tradesCompte: duCompte.filter((t) => !depuis || t.date >= depuis),
         nomCompte: compte ? (reglages.surnomsComptes?.[compte] || trades.find((t) => t.compteTl === compte)?.compteTlNom || "compte maître") : "tous les comptes",
       };
     } catch { return null; }
   }
 
-  function afficherObjectifAtteint(ctx) {
+  function afficherObjectifAtteint(r, ctx) {
     return `
       <div class="carte encadre-total-calcul">
-        <h3 class="titre-bloc">🎯 Objectif ${LIBELLE_PERIODE[ctx.periode] || "du jour"} atteint</h3>
-        <p>Déjà <strong class="positif">${montant(ctx.realise, "USD")}</strong> sur ${montant(ctx.montant, "USD")} (${esc(ctx.nomCompte)}) : pas de lot proposé.</p>
+        <h3 class="titre-bloc">🎯 Objectif du jour atteint</h3>
+        <p>Déjà <strong class="positif">${montant(r.profitJour, "USD")}</strong> sur ${montant(r.objectif, "USD")} (${esc(ctx.nomCompte)}) : pas de lot proposé.</p>
       </div>${boutonRetour}`;
   }
 
-  function afficherObjectifEtEss(r, reglages, ctx) {
-    if (!ctx || r.modeLot !== "objectif") return "";
+  // Résultat « lots par TP » : une position par TP, tableau + risque + ESS en 3 scénarios.
+  function afficherLotsParTp(r, reglages, ctx) {
     const d = r.devise;
-    const tps = r.portions.filter((p) => p.type === "tp");
-    const gainTp1 = tps[0]?.gainAuTp || 0;
-    const risque = r.perteTotaleSl;
-    const s = signalCourant;
-    const distSl = Math.abs(s.entree - s.sl);
-    const rr = distSl > 0 ? Math.abs(s.tps[0].prix - s.entree) / distSl : null;
-    const risquePct = reglages.solde > 0 ? (risque / reglages.solde) * 100 : null;
-    const e = N.essDuTrade({ trades: ctx.tradesCompte, aujourdhui: ctx.aujourdhui, seuil: ctx.seuil, gainTp1, risque });
-    const pctEss = (x) => (x.calculable ? `${nombre(x.ess, 2)} %` : "—");
-    const classeEss = (x) => (x.calculable ? (x.eligible ? "positif" : "negatif") : "");
+    const lot = (x) => `${nombre(x, r.decimalesLot)}`;
+    const lignes = r.lignes.map((l) => `
+      <tr>
+        <th scope="row">TP${l.numero}<br><span class="texte-attenue">${prixAffiche(l.prix)}</span></th>
+        <td>${nombre(l.distance, 2)}</td>
+        <td><strong>${lot(l.lot)}</strong>${l.sousMin ? `<br><span class="texte-attenue">⚠️ sous le min.</span>` : l.plafonne ? `<br><span class="texte-attenue">plafond</span>` : l.lotMaxAtteint ? `<br><span class="texte-attenue">lot max</span>` : ""}</td>
+        <td class="positif">${l.gain > 0 ? `▲ ${montant(l.gain, d)}` : "—"}</td>
+        <td>${montant(l.cumul, d)}</td>
+      </tr>`).join("");
+    const risquePct = reglages.solde > 0 ? (r.risqueAvantTp1 / reglages.solde) * 100 : null;
     const ligne = (lib, val, classe = "") => `<div class="ligne-total-calcul"><span>${lib}</span><strong class="${classe}">${val}</strong></div>`;
 
+    // ESS : records PAR JOURNÉE ; 3 scénarios pour le résultat de ce trade.
+    const e = N.essDuTrade({ trades: ctx.tradesCompte, aujourdhui: ctx.aujourdhui, seuil: ctx.seuil,
+      gainTp1: r.gainTp1 - r.risqueApresTp1, risque: r.risqueAvantTp1, gainTous: r.cumulTotal });
+    const pctEss = (x) => (x?.calculable ? `${nombre(x.ess, 2)} %` : "—");
+    const classeEss = (x) => (x?.calculable ? (x.eligible ? "positif" : "negatif") : "");
     const alertes = [];
-    if (e.battraitGain) alertes.push(`⚠️ Ce trade bat ton record et fait monter le seuil ESS : si le TP1 est touché, ta journée sera à ${montant(e.jourSiTp1, d)}, ta plus grosse journée gagnante est ${montant(e.recordGain, d)}.`);
+    if (e.battraitGain) alertes.push(`⚠️ Ce trade bat ton record et fait monter le seuil ESS : nouveau record ${montant(e.nouveauRecord, d)} (ancien : ${montant(e.recordGain, d)}).`);
     if (e.battraitPerte) alertes.push(`⚠️ Au SL, ta journée serait à ${montant(e.jourSiSl, d)}, pire que ta plus grosse journée perdante (${montant(-e.recordPerte, d)}) : ça fait monter le seuil ESS.`);
-
     const a = e.actuel;
+
     return `
-      <div class="carte encadre-total-calcul">
-        <h3 class="titre-bloc">🎯 Objectif ${LIBELLE_PERIODE[ctx.periode] || "du jour"}</h3>
-        ${ligne("Objectif restant", montant(ctx.restant, d))}
-        <p class="texte-attenue petit">Déjà fait : ${montant(ctx.realise, d)} sur ${montant(ctx.montant, d)} (${esc(ctx.nomCompte)}). Lot calculé pour que la part TP1 rapporte l'objectif restant.</p>
-        ${ligne("Gain au TP1", `▲ ${montant(gainTp1, d)}`, "positif")}
-        ${tps[1] ? ligne(`Gain au TP2`, `▲ ${montant(tps[1].gainAuTp, d)}`, "positif") : ""}
-        ${ligne("Risque si le SL est touché", `▼ ${montant(risque, d)}`, "negatif")}
-        ${risquePct !== null ? `<p class="texte-attenue petit">Soit ${nombre(risquePct, 2)} % du solde (${montant(reglages.solde, d)}).</p>` : ""}
-        ${ligne("Ratio R:R (TP1)", rr !== null ? `1 : ${nombre(rr, 2)}` : "—")}
+      <div class="grille-stats-perf">
+        ${carteChiffre("Objectif restant", montant(r.objectifRestant, d), r.profitJour ? `déjà ${montant(r.profitJour, d)} aujourd'hui` : "")}
+        ${carteChiffre("Lot total", `${lot(r.lotTotal)} lot`, "", "carte-mise-en-avant")}
       </div>
-      ${alertes.length ? `<div class="carte alerte-marges orange">${alertes.map((x) => `<p>${x}</p>`).join("")}</div>` : ""}
+
+      <div class="carte">
+        <h3 class="titre-bloc">Lots par TP <span class="texte-attenue petit">· une position par TP</span></h3>
+        <div class="tableau-defilant">
+          <table class="tableau-portions compact">
+            <thead><tr><th scope="col">TP</th><th scope="col">Dist.</th><th scope="col">Lot</th><th scope="col">Gain</th><th scope="col">Cumul</th></tr></thead>
+            <tbody>${lignes}
+              <tr class="ligne-sl">
+                <th scope="row">Total</th><td></td><td><strong>${lot(r.lotTotal)}</strong></td><td></td><td><strong class="positif">${montant(r.cumulTotal, d)}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button type="button" class="bouton secondaire bouton-petit" id="calc-copier-lots">📋 Copier les lots</button>
+        <p class="texte-attenue petit" id="calc-copie-message" aria-live="polite"></p>
+      </div>
+
+      <div class="carte encadre-total-calcul">
+        <h3 class="titre-bloc">Risque</h3>
+        ${ligne("Risque avant TP1 (SL touché)", `▼ ${montant(r.risqueAvantTp1, d)}`, "negatif")}
+        ${risquePct !== null ? `<p class="texte-attenue petit">Soit ${nombre(risquePct, 2)} % du solde (${montant(reglages.solde, d)}).</p>` : ""}
+        ${ligne("Risque après TP1", r.slEntreeApresTp1 ? `${montant(0, d)} <span class="texte-attenue petit">SL à l'entrée</span>` : `▼ ${montant(r.risqueApresTp1, d)}`, r.slEntreeApresTp1 ? "positif" : "negatif")}
+        ${ligne("Ratio R:R (TP1)", `1 : ${nombre(Math.abs(r.lignes[0].distance) / Math.abs(signalCourant.entree - signalCourant.sl), 2)}`)}
+      </div>
+
+      ${r.avertissements.length || alertes.length
+        ? `<div class="carte alerte-marges orange">${[...r.avertissements.map(esc), ...alertes].map((x) => `<p>${x.startsWith("⚠️") ? x : `⚠️ ${x}`}</p>`).join("")}</div>`
+        : `<div class="carte"><p class="positif">✅ Aucun lot sous le minimum, et ce trade ne bat aucun record de journée.</p></div>`}
+
       <div class="carte">
         <h3 class="titre-bloc">ESS</h3>
-        ${alertes.length ? "" : `<p class="positif">✅ Ce trade ne bat ni ta plus grosse journée gagnante ni ta plus grosse journée perdante.</p>`}
-        ${a.nbJours ? `
+        ${a.nbJours || e.profitJour ? `
           ${ligne("ESS actuel", pctEss(a), classeEss(a))}
-          ${ligne("ESS si TP1 touché", pctEss(e.siTp1), classeEss(e.siTp1))}
-          ${ligne("ESS si SL touché", pctEss(e.siSl), classeEss(e.siSl))}
-          ${ligne(`Bénéfice total requis (seuil ${nombre(a.seuil, 0)} %)`, montant(a.requis, d))}
-          ${a.calculable && a.eligible ? ligne("Marge restante", montant(a.marge, d), "positif") : ligne("Il manque", montant(a.manque, d), "negatif")}
-          <p class="texte-attenue petit">Réussi si ESS ≤ ${nombre(a.seuil, 0)} % et bénéfice net > 0. Bénéfice net actuel : ${montant(a.total, d)} (${esc(ctx.nomCompte)}, trades du Journal).</p>`
-          : `<p class="texte-attenue petit">Aucun jour de trading dans le Journal pour ${esc(ctx.nomCompte)} : ESS pas encore calculable.</p>`}
-      </div>`;
+          ${ligne("1) SL touché avant TP1", pctEss(e.siSl), classeEss(e.siSl))}
+          ${ligne(`2) TP1 touché puis retour à l'entrée`, pctEss(e.siTp1), classeEss(e.siTp1))}
+          ${ligne("3) Tous les TP touchés", pctEss(e.siTous), classeEss(e.siTous))}
+          ${ligne(`Bénéfice total requis (seuil ${nombre(a.seuil, 0)} %)`, a.nbJours ? montant(a.requis, d) : "—")}
+          ${a.nbJours ? (a.calculable && a.eligible ? ligne("Marge restante", montant(a.marge, d), "positif") : ligne("Il manque", montant(a.manque, d), "negatif")) : ""}
+          <p class="texte-attenue petit">Réussi si ESS ≤ ${nombre(a.seuil, 0)} % et bénéfice net > 0. Bénéfice net actuel : ${montant(a.total, d)} (${esc(ctx.nomCompte)}, trades du Journal). « — » = bénéfice net pas positif.</p>`
+          : `<p class="texte-attenue petit">Aucun jour de trading dans le Journal pour ${esc(ctx.nomCompte)} : ESS pas encore calculable.</p>
+          ${ligne("Si tous les TP sont touchés", pctEss(e.siTous), classeEss(e.siTous))}`}
+      </div>
+
+      ${boutonRetour}`;
+  }
+
+  // Texte copié par « Copier les lots » : une ligne par TP.
+  function texteLots(r, signal) {
+    return [`${signal.instrument} ${signal.sens} ${signal.entree} — SL ${signal.sl}`]
+      .concat(r.lignes.map((l) => `TP${l.numero} ${l.prix} : ${nombre(l.lot, r.decimalesLot)} lot`))
+      .concat([`Total : ${nombre(r.lotTotal, r.decimalesLot)} lot`]).join("\n");
   }
 
   function afficherBlocage(r, reglages, spec) {
@@ -319,6 +355,13 @@
     const spec = calcul?.reglages?.instruments?.[calcul?.signal?.instrument];
     const perteParLot = r.lotTotal > 0 ? r.perteTotaleSl / r.lotTotal : 0;
     const lotReduit = (reste) => {
+      if (r.modeLot === "parTp") {
+        if (!(reste > 0)) return "";
+        const red = N.reduireLotsParTp(r, reste);
+        return red.possible
+          ? ` Lots réduits proposés : <strong>${red.lots.map((x, i) => `TP${r.lignes[i].numero} ${nombre(x, r.decimalesLot)}`).join(" · ")}</strong> (total ${nombre(red.lotTotal, r.decimalesLot)} lot, perte au SL ≈ ${montant(red.risque, r.devise)}).`
+          : " Aucun lot possible : même le lot minimum dépasserait la limite.";
+      }
       if (!spec || !(perteParLot > 0) || !(reste > 0)) return "";
       const pas = Number(spec.pasLot);
       let lot = Math.floor(reste / perteParLot / pas + 1e-9) * pas;
@@ -414,12 +457,15 @@
       tauxUtilise = taux?.taux ?? null;
     }
 
-    // Lot calculé pour l'objectif restant (part TP1) ; sans Journal lisible : selon le risque.
+    // Lots par TP (réglages « Lots par TP » du compte maître) ; sans Journal lisible :
+    // ancien calcul selon le risque et la répartition.
     const ctx = await contexteObjectif(reglages);
-    const r = N.calculerPosition(signalCourant, reglages, tauxUtilise, ctx ? { objectifRestant: ctx.restant } : {});
+    const r = ctx
+      ? N.calculerLotsParTp(signalCourant, reglages, N.reglagesLotsPourCompte(reglages, ctx.compte), { profitJour: ctx.profitJour, tauxConversion: tauxUtilise })
+      : N.calculerPosition(signalCourant, reglages, tauxUtilise);
     dernierCalcul = r.ok ? { r, reglages, signal: { ...signalCourant } } : null;
-    zoneResultat.innerHTML = r.ok ? afficherResultat(r, reglages, spec, ctx)
-      : r.objectifAtteint ? afficherObjectifAtteint(ctx) : afficherBlocage(r, reglages, spec);
+    zoneResultat.innerHTML = r.ok ? (r.modeLot === "parTp" ? afficherLotsParTp(r, reglages, ctx) : afficherResultat(r, reglages, spec))
+      : r.objectifAtteint ? afficherObjectifAtteint(r, ctx) : afficherBlocage(r, reglages, spec);
     memoriserCalcul();
     if (r.ok) verifierMarges(r);
     // Trades restants + compte à rebours de la prochaine annonce, avec le résultat.
@@ -515,6 +561,11 @@
       } else if (t.id === "aller-general") {
         window.GoldAI.app.allerA("profil");
         document.getElementById("bouton-ouvrir-parametres").click();
+      } else if (t.id === "calc-copier-lots" && dernierCalcul?.r?.modeLot === "parTp") {
+        const texte = texteLots(dernierCalcul.r, dernierCalcul.signal);
+        const msg = document.getElementById("calc-copie-message");
+        try { await navigator.clipboard.writeText(texte); msg.textContent = "✓ Lots copiés"; }
+        catch { msg.textContent = texte; } // presse-papiers refusé : le texte est affiché pour le copier à la main
       } else if (t.id === "calc-prorata") {
         const reglages = await window.GoldAI.reglagesCalculateur.charger();
         const nb = signalCourant.tps.length + (signalCourant.tpOuverts ? 1 : 0);
