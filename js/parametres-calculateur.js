@@ -253,7 +253,7 @@
       const total = valeurs.reduce((s, x) => s + (x || 0), 0);
       const ok = Math.abs(total - 100) < 1e-6;
       zone.className = `total-rep ${ok ? "ok" : "ko"}`;
-      zone.textContent = `Total : ${Math.round(total * 100) / 100} % ${ok ? "✓" : "(doit faire 100 %)"}`;
+      zone.textContent = `Total : ${Math.round(total * 100) / 100} % ${ok ? "✓" : "— pas enregistré tant que ce n'est pas 100 %"}`;
     });
   }
 
@@ -368,7 +368,8 @@
     if (!zone) return;
 
     zone.addEventListener("input", (e) => {
-      if (e.target.classList.contains("champ-rep")) majTotalRepartition();
+      // Répartition : enregistrée dès que le total fait 100 % (sans attendre de quitter la case).
+      if (e.target.classList.contains("champ-rep")) { majTotalRepartition(); planifierAuto(); }
       if (e.target.classList.contains("champ-lots")) lireChampsLots();
     });
     zone.addEventListener("change", (e) => {
