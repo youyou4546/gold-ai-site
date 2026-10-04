@@ -767,7 +767,8 @@ h2.titre-section {
 .grille-jours-entetes,
 .grille-calendrier {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* pas de samedi/dimanche : on ne trade pas ces jours */
+  /* lundi → vendredi (pas de samedi/dimanche : on ne trade pas ces jours), puis le total de la semaine */
+  grid-template-columns: repeat(5, minmax(0, 1fr)) minmax(0, 1.2fr);
   gap: 5px;
 }
 
@@ -834,6 +835,17 @@ h2.titre-section {
 .case-jour.jour-perte .numero-jour {
   color: var(--texte);
 }
+
+/* Jours du mois d'avant / d'après qui complètent la semaine : grisés. */
+.case-jour.autre-mois { opacity: 0.45; }
+
+/* Case « total de la semaine », après le vendredi. */
+.case-jour.case-semaine { cursor: default; border-style: dashed; min-width: 0; }
+.case-jour .resultat-jour { font-size: clamp(8px, 2.6vw, 10px); max-width: 100%; overflow: hidden; text-overflow: clip; white-space: nowrap; }
+.case-jour.case-semaine .numero-jour { font-size: 10px; text-transform: uppercase; }
+.case-jour.case-semaine .resultat-jour { color: var(--texte-attenue); }
+.case-jour.case-semaine.jour-gain .resultat-jour { color: var(--vert); }
+.case-jour.case-semaine.jour-perte .resultat-jour { color: var(--rouge); }
 
 .case-jour.aujourdhui {
   border-color: var(--accent);

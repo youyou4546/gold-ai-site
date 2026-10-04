@@ -40,6 +40,14 @@
     return `${signe}$${Math.abs(valeur).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
 
+  // Version courte pour les cases du calendrier : sans centimes à partir de 1 000 $
+  // (sinon le montant déborde de la case sur un téléphone).
+  function formaterDollarsCourt(valeur) {
+    if (Math.abs(valeur) < 1000) return formaterDollars(valeur);
+    const signe = valeur < 0 ? "-" : "+";
+    return `${signe}$${Math.round(Math.abs(valeur)).toLocaleString("fr-FR")}`;
+  }
+
   // ---------------------------------------------------------------- Filtre « Compte »
   // Partagé par le Calendrier et la Performance : « tous », un compte
   // TradeLocker ("live|123"), ou « manuel » (trades saisis à la main).
@@ -222,54 +230,65 @@
 
     document.getElementById("nom-mois-affiche").textContent = `${NOMS_MOIS[moisAffiche]} ${anneeAffichee}`;
 
-    const premierJourDuMois = new Date(anneeAffichee, moisAffiche, 1);
     const nombreJoursDansLeMois = new Date(anneeAffichee, moisAffiche + 1, 0).getDate();
 
-    // Grille sans samedi/dimanche (on ne trade pas ces jours-là) : 5 colonnes
-    // L M M J V. Si le mois commence un week-end, aucune case vide n'est
-    // nécessaire — la semaine suivante démarre proprement au lundi.
-    const jourSemaineDebut = premierJourDuMois.getDay(); // 0=dimanche..6=samedi
-    const decalageDebut = jourSemaineDebut >= 1 && jourSemaineDebut <= 5 ? jourSemaineDebut - 1 : 0;
+    // Grille sans samedi/dimanche (on ne trade pas ces jours-là). Chaque ligne va
+    // du lundi au vendredi, même si la semaine déborde sur le mois d'avant ou
+    // d'après (ces jours-là sont grisés), puis une case « total de la semaine ».
+    // Première ligne : la semaine du 1er (ou la suivante si le 1er tombe un week-end).
+    const premier = new Date(anneeAffichee, moisAffiche, 1);
+    const lundi = new Date(premier);
+    const js = premier.getDay(); // 0=dimanche..6=samedi
+    lundi.setDate(1 + (js === 0 ? 1 : js === 6 ? 2 : 1 - js));
+    const dernier = new Date(anneeAffichee, moisAffiche, nombreJoursDansLeMois);
 
     grille.innerHTML = "";
-
-    for (let i = 0; i < decalageDebut; i++) {
-      const caseVide = document.createElement("div");
-      caseVide.className = "case-jour vide";
-      grille.appendChild(caseVide);
-    }
+    const maintenant = new Date(); // relu à chaque affichage : l'app peut rester ouverte après minuit
+    const cleAujourdhui = cleDate(maintenant.getFullYear(), maintenant.getMonth(), maintenant.getDate());
 
     let totalMois = 0;
-
+    // Compte quand même un trade éventuellement noté un week-end.
     for (let jour = 1; jour <= nombreJoursDansLeMois; jour++) {
-      const cle = cleDate(anneeAffichee, moisAffiche, jour);
-      const tradesJour = filtrerParCompte(tousLesTrades[cle]);
-      const somme = sommeDuJour(tradesJour);
-      totalMois += somme; // compte quand même un trade éventuellement noté un week-end
+      totalMois += sommeDuJour(filtrerParCompte(tousLesTrades[cleDate(anneeAffichee, moisAffiche, jour)]));
+    }
 
-      const jourSemaine = new Date(anneeAffichee, moisAffiche, jour).getDay();
-      if (jourSemaine === 0 || jourSemaine === 6) continue; // pas de case pour samedi/dimanche
+    while (lundi <= dernier) {
+      let totalSemaine = 0;
+      let tradesSemaine = 0;
+      for (let k = 0; k < 7; k++) {
+        const d = new Date(lundi.getFullYear(), lundi.getMonth(), lundi.getDate() + k);
+        const cle = cleDate(d.getFullYear(), d.getMonth(), d.getDate());
+        const tradesJour = filtrerParCompte(tousLesTrades[cle]);
+        const somme = sommeDuJour(tradesJour);
+        totalSemaine += somme; // samedi/dimanche compris, sans case à eux
+        tradesSemaine += tradesJour.length;
+        if (k >= 5) continue;
 
-      const caseJour = document.createElement("div");
-      caseJour.className = "case-jour";
-      if (somme > 0) caseJour.classList.add("jour-gain");
-      if (somme < 0) caseJour.classList.add("jour-perte");
-      const maintenant = new Date(); // relu à chaque affichage : l'app peut rester ouverte après minuit
-      if (
-        jour === maintenant.getDate() &&
-        moisAffiche === maintenant.getMonth() &&
-        anneeAffichee === maintenant.getFullYear()
-      ) {
-        caseJour.classList.add("aujourdhui");
+        const caseJour = document.createElement("div");
+        caseJour.className = "case-jour";
+        if (d.getMonth() !== moisAffiche) caseJour.classList.add("autre-mois");
+        if (somme > 0) caseJour.classList.add("jour-gain");
+        if (somme < 0) caseJour.classList.add("jour-perte");
+        if (cle === cleAujourdhui) caseJour.classList.add("aujourdhui");
+        caseJour.innerHTML = `
+          <span class="numero-jour">${d.getDate()}</span>
+          ${tradesJour.length > 0 ? `<span class="resultat-jour">${formaterDollarsCourt(somme)}</span>` : ""}
+        `;
+        caseJour.addEventListener("click", () => ouvrirModaleJour(cle));
+        grille.appendChild(caseJour);
       }
 
-      caseJour.innerHTML = `
-        <span class="numero-jour">${jour}</span>
-        ${tradesJour.length > 0 ? `<span class="resultat-jour">${formaterDollars(somme)}</span>` : ""}
+      const caseSemaine = document.createElement("div");
+      caseSemaine.className = "case-jour case-semaine";
+      if (tradesSemaine && totalSemaine > 0) caseSemaine.classList.add("jour-gain");
+      if (tradesSemaine && totalSemaine < 0) caseSemaine.classList.add("jour-perte");
+      caseSemaine.innerHTML = `
+        <span class="numero-jour">Sem.</span>
+        <span class="resultat-jour">${tradesSemaine ? formaterDollarsCourt(totalSemaine) : "—"}</span>
       `;
+      grille.appendChild(caseSemaine);
 
-      caseJour.addEventListener("click", () => ouvrirModaleJour(cle));
-      grille.appendChild(caseJour);
+      lundi.setDate(lundi.getDate() + 7);
     }
 
     const zoneTotalMois = document.getElementById("total-mois");
