@@ -52,7 +52,7 @@ window.GoldAI = window.GoldAI || {};
   // prochain affichage de l'app — pour ne jamais montrer les réglages ou les
   // comptes d'un utilisateur au moment où un autre vient de se connecter.
   function reinitialiserSousVues() {
-    ["journal-performance", "profil-parametres", "profil-comptes", "profil-mon-compte", "profil-tradelocker"].forEach((id) => {
+    ["journal-performance", "journal-analyse", "journal-ess", "profil-parametres", "profil-mon-compte", "profil-tradelocker"].forEach((id) => {
       document.getElementById(id)?.classList.add("hidden");
     });
     document.getElementById("profil-accueil")?.classList.remove("hidden");
@@ -82,7 +82,6 @@ window.GoldAI = window.GoldAI || {};
     localStorage.removeItem(CLE_SESSION);
     localStorage.removeItem(CLE_NOM);
     window.GoldAI.journal?.viderCache();
-    window.GoldAI.comptesTrading?.viderCache();
     window.GoldAI.parametres?.viderCache();
     window.GoldAI.profilCompte?.viderCache();
     window.GoldAI.chat?.arreterRafraichissement();
@@ -207,7 +206,6 @@ window.GoldAI = window.GoldAI || {};
     localStorage.removeItem(CLE_SESSION);
     localStorage.removeItem(CLE_NOM);
     window.GoldAI.journal?.viderCache();
-    window.GoldAI.comptesTrading?.viderCache();
     window.GoldAI.parametres?.viderCache();
     window.GoldAI.profilCompte?.viderCache();
     window.GoldAI.chat?.arreterRafraichissement();

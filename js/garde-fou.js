@@ -23,6 +23,7 @@
   let chargement = null; // promesse en cours
   let jourCalcule = null;
   let tradesDuJour = [];
+  let tradesMaitre = [];   // trades du jour du compte maître (règles du garde-fou)
   let objectifAtteint = false; // objectif de profit (Profil › Général) atteint → plus de « X trades sur N »
 
   const $ = (id) => document.getElementById(id);
@@ -63,10 +64,15 @@
     if (!window.GoldAI.auth.getToken()) return null;
     const tache = (async () => {
       if (!regles || rechargerRegles) await Promise.all([chargerRegles(), chargerLimite()]);
-      const parJour = await window.GoldAI.journal.chargerTousLesTrades();
+      const [parJour, reglages] = await Promise.all([window.GoldAI.journal.chargerTousLesTrades(), window.GoldAI.reglagesCalculateur.charger().catch(() => ({}))]);
       jourCalcule = cleAujourdhui();
       tradesDuJour = parJour[jourCalcule] || [];
-      etat = N.evaluerGardeFou({ trades: tradesDuJour, regles, limitesComptes: limitesDuJour() });
+      // Règles (trades max, pertes, arrêt après un gain) : compte maître seulement, comme
+      // l'objectif et le calculateur (+ trades saisis à la main sans compte). Sans compte
+      // maître : tous les comptes. Les pertes max PAR COMPTE gardent les trades de chaque compte.
+      const maitre = reglages?.compteMaitre;
+      tradesMaitre = maitre ? tradesDuJour.filter((t) => t.compteTl === maitre || !t.compteTl) : tradesDuJour;
+      etat = N.evaluerGardeFou({ trades: tradesMaitre, regles, limitesComptes: limitesDuJour() });
       await majObjectifAtteint(parJour);
       afficherBandeau();
       afficherBlocageCalculateur();
@@ -83,7 +89,8 @@
       const reglages = await window.GoldAI.reglagesCalculateur.charger();
       if (!reglages.compteMaitre) { objectifAtteint = false; return; }
       const trades = Object.values(parJour || await window.GoldAI.journal.chargerTousLesTrades()).flat();
-      objectifAtteint = N.progressionObjectif(trades, { ...(reglages.objectif || {}), compteId: "", compteTl: reglages.compteMaitre }, cleAujourdhui()).atteint;
+      const tl = await window.GoldAI.compteMaitre?.lire(reglages.compteMaitre, "XAUUSD", { attendre: false });
+      objectifAtteint = window.GoldAI.compteMaitre.progression(trades, reglages, cleAujourdhui(), tl).atteint;
     } catch { objectifAtteint = false; }
   }
 
@@ -165,7 +172,7 @@
   async function gainDejaFaitAujourdhui() {
     if (chargement) await chargement;
     if (!etat || jourCalcule !== cleAujourdhui()) await recalculer();
-    return N.aUnTradeGagnant(tradesDuJour);
+    return N.aUnTradeGagnant(tradesMaitre);
   }
 
   function annonceProche(maintenant = Date.now()) {
@@ -201,7 +208,8 @@
   }
 
   function viderCache() {
-    regles = null; limitesJour = []; etat = null; jourCalcule = null; tradesDuJour = []; objectifAtteint = false;
+    regles = null; limitesJour = []; etat = null; jourCalcule = null; tradesDuJour = []; tradesMaitre = []; objectifAtteint = false;
+    window.GoldAI.compteMaitre?.oublier();
     clearInterval(minuterie);
     const zone = $("garde-fou");
     if (zone) { zone.hidden = true; zone.innerHTML = ""; }

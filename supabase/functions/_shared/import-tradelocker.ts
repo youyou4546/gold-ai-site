@@ -20,7 +20,11 @@ const FENETRE_OUVERTURE_MS = 7 * 86400000; // une position ouverte jusqu'à 7 jo
 const MARGE_SYNCHRO_MS = 2 * 3600000;
 const ECART_SIGNAL_MS = 2 * 60000; // positions ouvertes à moins de 2 min d'écart = même signal
 
-type Ordre = { positionId: string; side: string; qty: number; prix: number; temps: number; instrumentId: number };
+type Ordre = { positionId: string; side: string; qty: number; prix: number; temps: number; instrumentId: number; frais: number };
+
+// Frais d'un ordre (commission / swap), si l'historique TradeLocker en contient une colonne.
+const COLONNES_FRAIS = ["commission", "commissions", "fee", "fees", "swap", "swaps"];
+const fraisDe = (o: Record<string, unknown>) => COLONNES_FRAIS.reduce((s, k) => s + Math.abs(nb(o[k]) || 0), 0);
 
 async function fuseauUtilisateur(compteId: string) {
   const { data } = await db.from("parametres_trading").select("parametres_calculateur").eq("compte_id", compteId).maybeSingle();
@@ -60,7 +64,7 @@ async function importerCompte(c: Connexion, jeton: string, a: Record<string, unk
     const o = enObjet(cols.ordersHistoryConfig || [], v);
     const qty = nb(o.filledQty) || nb(o.qty) || 0, prix = nb(o.avgPrice) || 0;
     if (String(o.status).toLowerCase() !== "filled" || !o.positionId || !(qty > 0) || !(prix > 0)) continue;
-    const ordre = { positionId: String(o.positionId), side: String(o.side).toLowerCase(), qty, prix, temps: nb(o.lastModified) || nb(o.createdDate) || 0, instrumentId: Number(o.tradableInstrumentId) };
+    const ordre = { positionId: String(o.positionId), side: String(o.side).toLowerCase(), qty, prix, temps: nb(o.lastModified) || nb(o.createdDate) || 0, instrumentId: Number(o.tradableInstrumentId), frais: fraisDe(o) };
     parPosition.set(ordre.positionId, [...(parPosition.get(ordre.positionId) || []), ordre]);
   }
 
@@ -107,6 +111,7 @@ async function importerCompte(c: Connexion, jeton: string, a: Record<string, unk
       return { p, resultat: arrondi(p.sorties.reduce((s, o) => s + (o.prix - entree) * o.qty * det.lotSize * direction, 0)) };
     }).sort((x, y) => x.p.fermeLe - y.p.fermeLe);
     const resultat = arrondi(parPos.reduce((s, x) => s + x.resultat, 0));
+    const frais = arrondi(g.reduce((s, p) => s + [...p.entrees, ...p.sorties].reduce((t, o) => t + o.frais, 0), 0));
     const lots = arrondi(g.reduce((s, p) => s + p.lots, 0));
     const entree = moyenne(g.flatMap((p) => p.entrees)), sortie = moyenne(g.flatMap((p) => p.sorties));
 
@@ -123,7 +128,8 @@ async function importerCompte(c: Connexion, jeton: string, a: Record<string, unk
       compte_tl: `${env}|${id}`, compte_tl_nom: `${String(a.name || "Compte")} #${accNum}`,
       ouvert_le: new Date(debutSignal).toISOString(), sens: g[0].sens,
       prix_entree: arrondi(entree, 5), prix_sortie: arrondi(sortie, 5),
-      note: `Importé de TradeLocker · ${String(a.name || "Compte")} #${accNum} · ${g[0].sens === "buy" ? "Achat" : "Vente"} ${lots} lot${detail} · profit calculé (sans commissions ni swap)${autreDevise}`,
+      ...(frais > 0 ? { frais } : {}),
+      note: `Importé de TradeLocker · ${String(a.name || "Compte")} #${accNum} · ${g[0].sens === "buy" ? "Achat" : "Vente"} ${lots} lot${detail} · ${frais > 0 ? `frais TradeLocker : ${frais}` : "profit calculé (sans commissions ni swap)"}${autreDevise}`,
     }).select("id").single();
     if (error) { await db.from("trades_importes_tl").delete().in("cle", cles); throw error; }
     await db.from("trades_importes_tl").update({ trade_id: trade.id }).in("cle", cles);

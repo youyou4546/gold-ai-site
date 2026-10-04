@@ -171,6 +171,7 @@
           </table>
         </div>
         ${r.modeLot === "objectif" ? ligneEssTous(ctx, r.portions.find((p) => p.type === "tp")?.gainAuTp || 0, r.perteTotaleSl, r.gainTotalSiTousTps) : ""}
+        ${ligneSource(ctx, reglages)}
       </div>
 
       ${afficherTotal(r)}
@@ -202,11 +203,15 @@
       const profitJour = Math.round(duCompte.filter((t) => t.date === aujourdhui).reduce((s, t) => s + Number(t.resultat) - (Number(t.frais) || 0), 0) * 100) / 100;
       const st = (reglages.statutsComptes || {})[compte] || {};
       const depuis = st.statut === "finance" ? st.depuis : null;
+      // TradeLocker en direct (compte maître) : solde, résultat du jour, fiche de l'instrument.
+      // Indisponible (maintenance…) → Journal et réglages manuels.
+      const tl = compte ? await window.GoldAI.compteMaitre?.lire(compte, signalCourant?.instrument || "XAUUSD") : null;
       // Objectif : le même que la barre du haut (Profil › Général › 🎯 Objectif de profit),
       // compte maître seulement, sur sa période (jour / semaine / mois).
-      const p = N.progressionObjectif(trades, { ...(reglages.objectif || {}), compteId: "", compteTl: compte }, aujourdhui);
+      const p = window.GoldAI.compteMaitre.progression(trades, reglages, aujourdhui, tl);
       return {
-        compte, aujourdhui, profitJour, seuil: reglages.seuilEss,
+        compte, aujourdhui, profitJour: tl && Number.isFinite(Number(tl.jourNet)) ? Number(tl.jourNet) : profitJour, seuil: reglages.seuilEss,
+        tl, sourceObjectif: p.source, erreurTl: tl ? null : window.GoldAI.compteMaitre.derniereErreur(),
         objectif: p.montant, periode: p.periode || "jour", realise: p.realise,
         objectifRestant: Math.max(0, Math.round((p.montant - p.realise) * 100) / 100),
         tradesCompte: duCompte.filter((t) => !depuis || t.date >= depuis),
@@ -218,6 +223,32 @@
   // Switch ESS (Journal › ESS) : la journée ne dépasse pas l'objectif quotidien, pour que
   // toutes les journées gagnantes se ressemblent (c'est ce qui fait passer l'ESS).
   // Renvoie le gain maximal de CE trade (objectif − déjà fait aujourd'hui), ou null.
+  // Solde (risque par trade) et fiche de l'instrument pris dans TradeLocker quand il répond ;
+  // chaque valeur absente garde le réglage manuel (Profil › Général).
+  function reglagesAvecTradeLocker(reglages, ctx) {
+    const tl = ctx?.tl;
+    if (!tl) return reglages;
+    const sym = signalCourant?.instrument;
+    const fiche = tl.instrument || {};
+    const specTl = Object.fromEntries(["tailleContrat", "tailleTick", "valeurTick", "pasLot", "lotMin", "lotMax"]
+      .filter((k) => Number(fiche[k]) > 0).map((k) => [k, Number(fiche[k])]));
+    if (fiche.deviseProfit) specTl.deviseProfit = fiche.deviseProfit;
+    return {
+      ...reglages,
+      solde: Number(tl.solde) > 0 ? Number(tl.solde) : reglages.solde,
+      instruments: sym && Object.keys(specTl).length ? { ...(reglages.instruments || {}), [sym]: { ...(reglages.instruments?.[sym] || {}), ...specTl } } : reglages.instruments,
+    };
+  }
+
+  // Ligne d'information : d'où viennent le solde et le résultat du jour.
+  function ligneSource(ctx, reglages) {
+    if (!ctx) return "";
+    const m = (v) => montant(v, reglages.devise || "USD");
+    return ctx.tl
+      ? `<p class="texte-attenue petit">TradeLocker (${esc(ctx.nomCompte)}) : solde ${m(ctx.tl.solde)} · résultat du jour ${m(ctx.tl.jourNet ?? 0)}${ctx.tl.instrument ? " · lots du courtier" : ""}.</p>`
+      : `<p class="texte-attenue petit">TradeLocker indisponible${ctx.erreurTl ? ` (${esc(ctx.erreurTl)})` : ""} : solde et lots de Profil › Général, résultat du jour du Journal.</p>`;
+  }
+
   function plafondEss(reglages, ctx) {
     if (!reglages.essDansCalcul) return null;
     return ctx.objectifRestant;
@@ -230,73 +261,6 @@
         <h3 class="titre-bloc">🎯 Objectif ${LIBELLE_PERIODE[ctx.periode] || "du jour"} atteint</h3>
         <p>Déjà <strong class="positif">${montant(r.profitJour, "USD")}</strong> sur ${montant(r.objectif, "USD")} (${esc(ctx.nomCompte)}) : pas de lot proposé.</p>
       </div>${boutonRetour}`;
-  }
-
-  // Résultat « lots par TP » (une position par TP), présenté comme l'ancien calcul :
-  // tableau des objectifs + ligne SL, une ligne ESS, encadré Total.
-  function afficherLotsParTp(r, reglages, ctx) {
-    const d = r.devise;
-    const lot = (x) => `${nombre(x, r.decimalesLot)}`;
-    const lignes = r.lignes.map((l) => `
-      <tr>
-        <th scope="row">TP${l.numero}</th>
-        <td>${prixAffiche(l.prix)}</td>
-        <td><strong>${lot(l.lot)}</strong>${l.sousMin ? `<br><span class="texte-attenue">sous le min.</span>` : l.limiteEss ? `<br><span class="texte-attenue">limite ESS</span>` : l.plafonne ? `<br><span class="texte-attenue">plafond</span>` : ""}</td>
-        <td class="positif">${l.gain > 0 ? `▲ ${montant(l.gain, d)}` : "—"}</td>
-      </tr>`).join("");
-
-    const ligneEss = ligneEssTous(ctx, r.gainTp1, r.risqueAvantTp1, r.cumulTotal);
-    const avertissements = r.avertissements.filter((a) => !a.startsWith("Plafond") && !a.startsWith("TP runner"));
-
-    return `
-      <div class="grille-stats-perf">
-        ${carteChiffre("Objectif restant", montant(r.objectifRestant, d))}
-        ${carteChiffre("Lot utilisé", `${lot(r.lotTotal)} lot`, "", "carte-mise-en-avant")}
-      </div>
-
-      <div class="carte">
-        <h3 class="titre-bloc">Répartition des objectifs</h3>
-        <div class="tableau-defilant">
-          <table class="tableau-portions compact">
-            <thead><tr><th scope="col">Obj.</th><th scope="col">Prix</th><th scope="col">Lot</th><th scope="col">Résultat</th></tr></thead>
-            <tbody>${lignes}
-              <tr class="ligne-sl">
-                <th scope="row">SL</th>
-                <td>${prixAffiche(signalCourant.sl)}</td>
-                <td><strong>${lot(r.lotTotal)}</strong></td>
-                <td class="negatif">▼ ${montant(r.risqueAvantTp1, d)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        ${ligneEss}
-        <button type="button" class="bouton secondaire bouton-petit" id="calc-copier-lots">📋 Copier les lots</button>
-        <p class="texte-attenue petit" id="calc-copie-message" aria-live="polite"></p>
-      </div>
-
-      <div class="carte encadre-total-calcul">
-        <h3 class="titre-bloc">Total</h3>
-        <div class="ligne-total-calcul">
-          <span>Risque total si le SL est touché</span>
-          <strong class="negatif">▼ ${montant(r.risqueAvantTp1, d)}</strong>
-        </div>
-        <div class="ligne-total-calcul">
-          <span>Gain total si tous les TP sont touchés</span>
-          <strong class="positif">▲ ${montant(r.cumulTotal, d)}</strong>
-        </div>
-        ${r.slEntreeApresTp1 ? `<p class="texte-attenue petit">Après TP1 : SL à l'entrée, plus de risque.</p>` : ""}
-      </div>
-
-      ${avertissements.length ? `<div class="carte">${avertissements.map((a) => `<div class="alerte-donnees">${esc(a)}</div>`).join("")}</div>` : ""}
-
-      ${boutonRetour}`;
-  }
-
-  // Texte copié par « Copier les lots » : une ligne par TP.
-  function texteLots(r, signal) {
-    return [`${signal.instrument} ${signal.sens} ${signal.entree} — SL ${signal.sl}`]
-      .concat(r.lignes.map((l) => `TP${l.numero} ${l.prix} : ${nombre(l.lot, r.decimalesLot)} lot`))
-      .concat([`Total : ${nombre(r.lotTotal, r.decimalesLot)} lot`]).join("\n");
   }
 
   function afficherBlocage(r, reglages, spec) {
@@ -360,13 +324,6 @@
     const spec = calcul?.reglages?.instruments?.[calcul?.signal?.instrument];
     const perteParLot = r.lotTotal > 0 ? r.perteTotaleSl / r.lotTotal : 0;
     const lotReduit = (reste) => {
-      if (r.modeLot === "parTp") {
-        if (!(reste > 0)) return "";
-        const red = N.reduireLotsParTp(r, reste);
-        return red.possible
-          ? ` Lots réduits proposés : <strong>${red.lots.map((x, i) => `TP${r.lignes[i].numero} ${nombre(x, r.decimalesLot)}`).join(" · ")}</strong> (total ${nombre(red.lotTotal, r.decimalesLot)} lot, perte au SL ≈ ${montant(red.risque, r.devise)}).`
-          : " Aucun lot possible : même le lot minimum dépasserait la limite.";
-      }
       if (!spec || !(perteParLot > 0) || !(reste > 0)) return "";
       const pas = Number(spec.pasLot);
       let lot = Math.floor(reste / perteParLot / pas + 1e-9) * pas;
@@ -451,7 +408,7 @@
     zoneResultat.innerHTML = `<p class="etat-vide">Calcul…</p>`;
     const reglagesBase = await window.GoldAI.reglagesCalculateur.charger();
     // Répartition au prorata forcée : elle remplace les deux groupes (4 TP et 3 TP).
-    const reglages = repartitionForcee ? { ...reglagesBase, repartition: repartitionForcee, repartition3: null } : reglagesBase;
+    let reglages = repartitionForcee ? { ...reglagesBase, repartition: repartitionForcee, repartition3: null } : reglagesBase;
     const spec = reglages.instruments?.[signalCourant.instrument];
 
     // Taux de conversion : seulement si la devise des gains diffère de celle du compte.
@@ -468,6 +425,7 @@
     // La part TP1 de la répartition rapporte l'objectif restant, le lot total est partagé selon
     // la répartition. Switch ESS (Journal › ESS) ON : les lots sont coupés à partir du TP2 pour
     // que la journée ne batte pas la plus grosse journée gagnante.
+    reglages = reglagesAvecTradeLocker(reglages, ctx);
     let r;
     if (!ctx) r = N.calculerPosition(signalCourant, reglages, tauxUtilise);
     else {
@@ -478,7 +436,7 @@
       if (r.objectifAtteint) Object.assign(r, { objectif: ctx.objectif, profitJour: ctx.realise });
     }
     dernierCalcul = r.ok ? { r, reglages, signal: { ...signalCourant } } : null;
-    zoneResultat.innerHTML = r.ok ? (r.modeLot === "parTp" ? afficherLotsParTp(r, reglages, ctx) : afficherResultat(r, reglages, spec, ctx))
+    zoneResultat.innerHTML = r.ok ? afficherResultat(r, reglages, spec, ctx)
       : r.objectifAtteint ? afficherObjectifAtteint(r, ctx) : afficherBlocage(r, reglages, spec);
     memoriserCalcul();
     if (r.ok) verifierMarges(r);
@@ -576,11 +534,6 @@
       } else if (t.id === "aller-general") {
         window.GoldAI.app.allerA("profil");
         document.getElementById("bouton-ouvrir-parametres").click();
-      } else if (t.id === "calc-copier-lots" && dernierCalcul?.r?.modeLot === "parTp") {
-        const texte = texteLots(dernierCalcul.r, dernierCalcul.signal);
-        const msg = document.getElementById("calc-copie-message");
-        try { await navigator.clipboard.writeText(texte); msg.textContent = "✓ Lots copiés"; }
-        catch { msg.textContent = texte; } // presse-papiers refusé : le texte est affiché pour le copier à la main
       } else if (t.id === "calc-prorata") {
         const reglages = await window.GoldAI.reglagesCalculateur.charger();
         const nb = signalCourant.tps.length + (signalCourant.tpOuverts ? 1 : 0);

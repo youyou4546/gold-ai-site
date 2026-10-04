@@ -40,6 +40,7 @@
   }
 
   let dejaCharge = false;
+  let valeursEnregistrees = {}; // anciens réglages sans champ à l'écran (solde, risque, répartition) : renvoyés tels quels
 
   // « Arrêter après le premier trade gagnant » : enregistré avec les paramètres
   // du calculateur (même stockage par utilisateur que l'objectif de profit),
@@ -68,6 +69,7 @@
     const { data, error } = await client().rpc("obtenir_mes_parametres", { p_token: token() });
     if (gererErreur(error)) return;
 
+    valeursEnregistrees = data || {};
     CHAMPS.forEach((cle) => {
       const valeur = data && data[cle] !== null && data[cle] !== undefined ? data[cle] : VALEURS_PAR_DEFAUT[cle];
       const champ = document.getElementById(idChamp(cle));
@@ -79,6 +81,7 @@
     const valeurs = {};
     CHAMPS.forEach((cle) => {
       const champ = document.getElementById(idChamp(cle));
+      if (!champ) { valeurs[cle] = valeursEnregistrees[cle] ?? null; return; }
       const brut = champ.value.trim();
       if (cle === "max_trades_jour" || cle === "nombre_pertes_arret") {
         valeurs[cle] = brut === "" ? null : parseInt(brut, 10);

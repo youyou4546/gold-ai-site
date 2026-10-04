@@ -479,34 +479,6 @@
         <details class="volet-analyse">
         <summary class="entete-volet"><span>⚖️ Règles de trading</span></summary>
         <div class="carte">
-          <div class="hidden" aria-hidden="true">
-          <div class="champ">
-            <label for="param-solde-compte">Solde du compte ($)</label>
-            <input type="number" id="param-solde-compte" inputmode="decimal" placeholder="ex: 100000" />
-          </div>
-
-          <div class="champ">
-            <label for="param-pourcentage-risque">Risque par trade (%)</label>
-            <input type="number" id="param-pourcentage-risque" inputmode="decimal" step="0.05" />
-          </div>
-
-          <label class="label-groupe">Répartition des lots (%)</label>
-          <div class="ligne-champs">
-            <div class="champ">
-              <label for="param-repartition-tp1">TP1</label>
-              <input type="number" id="param-repartition-tp1" inputmode="decimal" />
-            </div>
-            <div class="champ">
-              <label for="param-repartition-tp2">TP2</label>
-              <input type="number" id="param-repartition-tp2" inputmode="decimal" />
-            </div>
-            <div class="champ">
-              <label for="param-repartition-runner">Runner</label>
-              <input type="number" id="param-repartition-runner" inputmode="decimal" />
-            </div>
-          </div>
-          </div>
-
           <div class="champ">
             <label for="param-max-trades-jour">Nombre max de trades par jour</label>
             <input type="number" id="param-max-trades-jour" inputmode="numeric" placeholder="ex: 3" />
@@ -538,13 +510,6 @@
 
       <!-- Vue Mes comptes (limites de perte des prop firms) : son carré a été remplacé par « Mes comptes TradeLocker » le 2026-09-28.
            Pour la remettre, rajouter dans grille-tuiles-profil un bouton id="bouton-ouvrir-comptes". -->
-      <div id="profil-comptes" class="hidden">
-        <button type="button" class="bouton-retour" id="bouton-retour-comptes"><span aria-hidden="true">←</span> Retour</button>
-
-        <button class="bouton" id="bouton-ajouter-compte-trading" style="margin-bottom:14px;">+ Ajouter un compte</button>
-
-        <div id="liste-comptes-trading"></div>
-      </div>
     </section>
 
   </main>
@@ -610,55 +575,6 @@
   </div>
 
   <!-- Modale : ajouter/modifier un compte de trading -->
-  <div class="fond-modale" id="modale-compte-trading">
-    <div class="modale">
-      <h3 id="modale-compte-trading-titre">Ajouter un compte</h3>
-
-      <div class="champ">
-        <label for="champ-nom-compte-trading">Nom du compte</label>
-        <input type="text" id="champ-nom-compte-trading" placeholder="ex: FTMO 100k" />
-      </div>
-
-      <div class="ligne-champs">
-        <div class="champ">
-          <label for="champ-taille-compte-trading">Taille du compte ($)</label>
-          <input type="number" id="champ-taille-compte-trading" inputmode="decimal" placeholder="ex: 100000" />
-        </div>
-        <div class="champ">
-          <label for="champ-solde-compte-trading">Solde actuel ($)</label>
-          <input type="number" id="champ-solde-compte-trading" inputmode="decimal" placeholder="calculé si un seul compte" />
-        </div>
-      </div>
-
-      <div class="ligne-champs">
-        <div class="champ">
-          <label for="champ-statut-compte-trading">Statut</label>
-          <select id="champ-statut-compte-trading">
-            <option value="challenge">Challenge</option>
-            <option value="finance">Financé</option>
-          </select>
-        </div>
-        <div class="champ">
-          <label for="champ-date-compte-trading">Date d'activation</label>
-          <input type="date" id="champ-date-compte-trading" />
-        </div>
-      </div>
-
-      <div class="ligne-champs">
-        <div class="champ">
-          <label for="champ-dll-compte-trading">Daily Loss Limit (%)</label>
-          <input type="number" id="champ-dll-compte-trading" inputmode="decimal" value="5" />
-        </div>
-        <div class="champ" style="margin-bottom:0;">
-          <label for="champ-maxdd-compte-trading">Max Drawdown (%)</label>
-          <input type="number" id="champ-maxdd-compte-trading" inputmode="decimal" value="10" />
-        </div>
-      </div>
-
-      <button class="bouton" id="bouton-sauvegarder-compte-trading" style="margin-top:14px;">Sauvegarder</button>
-      <button class="bouton secondaire" id="bouton-fermer-modale-compte-trading" style="margin-top:10px;">Fermer</button>
-    </div>
-  </div>
 
   <nav class="barre-onglets">
     <button class="onglet actif" data-section="marche">
@@ -696,6 +612,7 @@
 <script src="js/auth.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/noyau.js"></script>
+<script src="js/compte-maitre.js"></script>
 <script src="js/donnees.js"></script>
 <script src="js/cotations.js"></script>
 <script src="js/marche.js"></script>
@@ -706,7 +623,6 @@
 <script src="js/parametres-calculateur.js"></script>
 <script src="js/calculateur.js"></script>
 <script src="js/analyse-graphique.js"></script>
-<script src="js/comptes-trading.js"></script>
 <script src="js/journal.js"></script>
 <script src="js/journal-fiche.js"></script>
 <script src="js/garde-fou.js"></script>
@@ -722,7 +638,6 @@
 <script src="js/page-ess.js"></script>
 <script src="js/analyse-ia.js"></script>
 <script src="js/parametres.js"></script>
-<script src="js/profil-comptes.js"></script>
 <script src="js/profil-mon-compte.js"></script>
 <script src="js/app.js"></script>
 </body>

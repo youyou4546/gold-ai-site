@@ -14,7 +14,7 @@
 // LECTURE SEULE : aucune route d'ordre n'est appelée ici.
 // Routes TradeLocker : les mêmes que la bibliothèque officielle « tradelocker » (Python).
 
-import { chiffrer, colonnes, comptesDuLogin, type Connexion, db, ErreurUtilisateur, expiration, enObjet, instruments, nb, seConnecter, tl } from "../_shared/tradelocker.ts";
+import { chiffrer, colonnes, comptesDuLogin, type Connexion, db, ErreurUtilisateur, expiration, enObjet, instruments, nb, seConnecter, specDepuisFiche, tl } from "../_shared/tradelocker.ts";
 import { importerTout, reimporter, tradesSupprimes } from "../_shared/import-tradelocker.ts";
 
 const CORS = {
@@ -71,12 +71,50 @@ async function lireConnexion(c: Connexion) {
   }
 }
 
+// Compte maître ("env|id") : état du compte (/state) et fiche de l'instrument demandé.
+async function lireMaitre(compteId: string, cle: string, symbole: string, brut: boolean) {
+  const [env, idTexte] = cle.split("|");
+  if (!env || !idTexte) throw new ErreurUtilisateur("Compte maître inconnu.");
+  const { data } = await db.from("comptes_tradelocker").select("*").eq("compte_id", compteId).eq("environnement", env);
+  for (const c of (data || []) as Connexion[]) {
+    const { jeton, comptes } = await comptesDuLogin(c);
+    const a = comptes.find((x) => String(x.id) === idTexte);
+    if (!a) continue;
+    const id = Number(a.id), accNum = Number(a.accNum);
+    const cols = await colonnes(env, jeton, accNum);
+    const etatJson = await tl(env, `/trade/accounts/${id}/state`, jeton, { accNum });
+    const etat = enObjet(cols.accountDetailsConfig || [], ((etatJson.d as Record<string, unknown>)?.accountDetailsData as unknown[]) || []);
+    let instrument: Record<string, unknown> | null = null;
+    if (symbole) {
+      const liste = [...(await instruments(env, jeton, id, accNum)).values()];
+      const voulu = symbole.toUpperCase().replace(/[^A-Z0-9]/g, "");
+      const inst = liste.find((i) => i.name.toUpperCase().replace(/[^A-Z0-9]/g, "") === voulu)
+        || liste.find((i) => i.name.toUpperCase().replace(/[^A-Z0-9]/g, "").startsWith(voulu));
+      if (inst) {
+        const route = inst.routes?.find((r) => r.type === "INFO")?.id;
+        const d = (await tl(env, `/trade/instruments/${inst.tradableInstrumentId}`, jeton, { accNum, params: { ...(route ? { routeId: route } : {}), locale: "en" } })).d as Record<string, unknown>;
+        instrument = { nom: inst.name, ...specDepuisFiche(d || {}), ...(brut ? { fiche: d } : {}) };
+      }
+    }
+    return {
+      cle, devise: String(a.currency || "USD"),
+      solde: nb(etat.balance) ?? nb(a.accountBalance), equite: nb(etat.projectedBalance),
+      jourNet: nb(etat.todayNet), jourBrut: nb(etat.todayGross), jourFrais: nb(etat.todayFees), ouvertNet: nb(etat.openNetPnL),
+      instrument,
+      ...(brut ? { etat, colonnesHistorique: cols.ordersHistoryConfig, colonnesPositions: cols.positionsConfig } : {}),
+    };
+  }
+  throw new ErreurUtilisateur("Compte maître introuvable dans tes connexions TradeLocker.");
+}
+
 // ------------------------------------------------------------------ Point d'entrée
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  let diagnostic = false;
   try {
     const corps = await req.json().catch(() => ({}));
+    diagnostic = corps.action === "maitre" && !!corps.brut;
     const token = String(corps.token || "");
     if (!/^[0-9a-f-]{36}$/i.test(token)) return repondre({ erreur: "SESSION_INVALIDE" }, 401);
     const { data: session } = await db.from("sessions").select("compte_id").eq("token", token).maybeSingle();
@@ -111,6 +149,9 @@ Deno.serve(async (req) => {
       }
       return repondre({ comptes });
     }
+
+    // Compte maître (calculateur) : solde, résultat du jour, fiche d'un instrument.
+    if (corps.action === "maitre") return repondre(await lireMaitre(compteId, String(corps.cle || ""), String(corps.symbole || ""), !!corps.brut));
 
     // Trades importés puis supprimés du Journal, et leur réimport à la demande.
     if (corps.action === "supprimes") return repondre({ trades: await tradesSupprimes(compteId) });
@@ -148,6 +189,6 @@ Deno.serve(async (req) => {
     if (e instanceof ErreurUtilisateur) return repondre({ erreur: e.message }, 400);
     console.error(e);
     const absente = /comptes_tradelocker/.test(String((e as { message?: string }).message || ""));
-    return repondre({ erreur: absente ? "PATCH_ABSENT" : "Erreur du serveur. Réessaie dans un moment." }, 500);
+    return repondre({ erreur: absente ? "PATCH_ABSENT" : "Erreur du serveur. Réessaie dans un moment.", ...(diagnostic ? { detail: String((e as Error)?.message || e).slice(0, 400) } : {}) }, 500);
   }
 });

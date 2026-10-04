@@ -63,9 +63,11 @@ async function tlUneFois(env: string, chemin: string, jeton: string | null,
   if (accNum !== undefined) entetes.accNum = String(accNum);
   const qs = params ? "?" + new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)])) : "";
   const r = await fetch(base(env) + chemin + qs, { method: methode, headers: entetes, body: corps ? JSON.stringify(corps) : undefined, signal: AbortSignal.timeout(15000) });
+  // TradeLocker en maintenance : ses adresses redirigent vers demo-/live-maintenance.tradelocker.com.
+  if (/maintenance/i.test(r.url)) throw new ErreurUtilisateur("TradeLocker est en maintenance pour l'instant : réessaie plus tard.");
   const texte = await r.text();
   let json: Record<string, unknown> = {};
-  try { json = JSON.parse(texte); } catch { /* réponse non JSON */ }
+  try { json = JSON.parse(texte); } catch { json = { reponseNonJson: `${r.status} ${r.headers.get("content-type") || ""} ${texte.slice(0, 150)}` }; }
   if (!r.ok) {
     const e = new Error(`TradeLocker ${r.status} ${chemin} ${texte.slice(0, 200)}`) as Error & { status?: number };
     e.status = r.status;
@@ -81,10 +83,11 @@ export function expiration(jeton: string) {
 export async function seConnecter(env: string, email: string, motDePasse: string, serveur: string) {
   try {
     const r = await tl(env, "/auth/jwt/token", null, { methode: "POST", corps: { email, password: motDePasse, server: serveur } });
-    if (!r.accessToken) throw new Error("pas de jeton");
+    if (!r.accessToken) throw new Error(`pas de jeton (réponse : ${JSON.stringify(r).replace(/"(accessToken|refreshToken)":"[^"]*"/g, '"$1":"…"').slice(0, 300)})`);
     return String(r.accessToken);
   } catch (e) {
     const s = (e as { status?: number }).status;
+    if (e instanceof ErreurUtilisateur) throw e;
     if (s && s >= 400 && s < 500) throw new ErreurUtilisateur("TradeLocker refuse ces identifiants : vérifie l'email, le mot de passe, le serveur et Démo / Réel.");
     throw e;
   }
@@ -150,6 +153,28 @@ export async function detailsInstrument(env: string, jeton: string, compteId: nu
     detailsCache.set(k, { lotSize: Number(d?.lotSize) || 0, devise: String(d?.quotingCurrency || "") });
   }
   return detailsCache.get(k)!;
+}
+
+// Fiche d'un instrument (/trade/instruments/{id}) → réglages du calculateur. Les champs de
+// TradeLocker peuvent être un nombre ou une liste par tranches ([{ leftRangeLimit, tickSize }]) :
+// on prend la première tranche. Champ absent → null (le calculateur garde le réglage manuel).
+export function specDepuisFiche(d: Record<string, unknown>) {
+  const valeur = (v: unknown, ...cles: string[]): number | null => {
+    if (Array.isArray(v)) v = v[0];
+    if (v && typeof v === "object") { for (const k of cles) if ((v as Record<string, unknown>)[k] !== undefined) return nb((v as Record<string, unknown>)[k]); return null; }
+    return nb(v);
+  };
+  const champ = (...noms: string[]) => { for (const n of noms) if (d[n] !== undefined && d[n] !== null) return d[n]; return undefined; };
+  const tailleContrat = valeur(champ("lotSize", "contractSize"));
+  const tailleTick = valeur(champ("tickSize"), "tickSize", "value");
+  return {
+    tailleContrat, tailleTick,
+    valeurTick: tailleContrat && tailleTick ? Math.round(tailleContrat * tailleTick * 1e8) / 1e8 : null, // dans la devise du prix
+    pasLot: valeur(champ("lotStep", "qtyStep", "minStep")),
+    lotMin: valeur(champ("minLot", "minQty", "minimalLot", "minOrderSize")),
+    lotMax: valeur(champ("maxLot", "maxQty", "maximalLot", "maxOrderSize")),
+    deviseProfit: String(champ("quotingCurrency") || "") || null,
+  };
 }
 
 export const nb = (v: unknown) => (v === null || v === undefined || v === "" || Number.isNaN(Number(v)) ? null : Number(v));

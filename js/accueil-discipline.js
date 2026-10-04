@@ -88,8 +88,10 @@
     const parJour = await window.GoldAI.journal.chargerTousLesTrades();
     const trades = Object.values(parJour).flat();
     const aujourdhui = window.GoldAI.gardeFou?.cleAujourdhui?.() || U.cleJour(Date.now());
-    // Seulement les trades du journal liés au compte maître (Profil › Mes comptes TradeLocker).
-    const p = N.progressionObjectif(trades, { ...(reglages.objectif || {}), compteId: "", compteTl: reglages.compteMaitre }, aujourdhui);
+    // Compte maître seulement (Profil › Mes comptes TradeLocker) : résultat du jour de TradeLocker
+    // quand il est connu (sinon le Journal) ; la lecture TradeLocker se fait en arrière-plan.
+    const tl = await window.GoldAI.compteMaitre?.lire(reglages.compteMaitre, "XAUUSD", { attendre: false });
+    const p = window.GoldAI.compteMaitre.progression(trades, reglages, aujourdhui, tl);
     window.GoldAI.dernierObjectif = p; // repris par le briefing vocal (js/briefing.js)
     const nomCompte = reglages.surnomsComptes?.[reglages.compteMaitre]
       || trades.find((t) => t.compteTl === reglages.compteMaitre)?.compteTlNom || "compte maître";
@@ -167,6 +169,7 @@
   window.addEventListener("goldai:garde-fou", afficherObjectif);
   window.addEventListener("goldai:trades", afficherObjectif);
   window.addEventListener("goldai:reglages-calculateur", afficherObjectif);
+  window.addEventListener("goldai:compte-maitre", afficherObjectif); // résultat du jour TradeLocker arrivé
   window.addEventListener("goldai:comptes", afficherObjectif);
   window.addEventListener("goldai:donnees", () => { prochaine = null; if (surAccueil()) afficherCompteARebours(); });
 

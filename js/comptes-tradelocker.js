@@ -333,7 +333,7 @@
   // ---------------------------------------------------------------- Cycle de vie
 
   function ouvrir() {
-    ["profil-accueil", "profil-parametres", "profil-comptes", "profil-mon-compte"].forEach((id) => $(id)?.classList.add("hidden"));
+    ["profil-accueil", "profil-parametres", "profil-mon-compte"].forEach((id) => $(id)?.classList.add("hidden"));
     $("profil-tradelocker").classList.remove("hidden");
     message("");
     enEdition = null;

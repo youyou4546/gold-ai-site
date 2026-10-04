@@ -328,14 +328,12 @@
 
     const { esc } = window.GoldAI.utils;
     conteneur.innerHTML = "";
-    const comptes = await window.GoldAI.comptesTrading.chargerComptes();
     tradesJour.forEach((trade) => {
       const item = document.createElement("div");
       item.className = "trade-item";
-      const compte = comptes.find((c) => c.id === trade.compteTradingId);
       const details = [
         trade.instrument,
-        compte?.nom,
+        trade.compteTl ? surnoms[trade.compteTl] || trade.compteTlNom : "",
         trade.rr !== null && trade.rr !== undefined ? `RR ${trade.rr}` : "",
         trade.frais ? `frais ${formaterDollars(-trade.frais)}` : "",
         trade.nbImages ? `📷 ${trade.nbImages}` : "",
