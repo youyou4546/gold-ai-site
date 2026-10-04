@@ -202,8 +202,13 @@
       const profitJour = Math.round(duCompte.filter((t) => t.date === aujourdhui).reduce((s, t) => s + Number(t.resultat) - (Number(t.frais) || 0), 0) * 100) / 100;
       const st = (reglages.statutsComptes || {})[compte] || {};
       const depuis = st.statut === "finance" ? st.depuis : null;
+      // Objectif : le même que la barre du haut (Profil › Général › 🎯 Objectif de profit),
+      // compte maître seulement, sur sa période (jour / semaine / mois).
+      const p = N.progressionObjectif(trades, { ...(reglages.objectif || {}), compteId: "", compteTl: compte }, aujourdhui);
       return {
         compte, aujourdhui, profitJour, seuil: reglages.seuilEss,
+        objectif: p.montant, periode: p.periode || "jour", realise: p.realise,
+        objectifRestant: Math.max(0, Math.round((p.montant - p.realise) * 100) / 100),
         tradesCompte: duCompte.filter((t) => !depuis || t.date >= depuis),
         nomCompte: compte ? (reglages.surnomsComptes?.[compte] || trades.find((t) => t.compteTl === compte)?.compteTlNom || "compte maître") : "tous les comptes",
       };
@@ -213,15 +218,16 @@
   // Switch ESS (Journal › ESS) : la journée ne dépasse pas l'objectif quotidien, pour que
   // toutes les journées gagnantes se ressemblent (c'est ce qui fait passer l'ESS).
   // Renvoie le gain maximal de CE trade (objectif − déjà fait aujourd'hui), ou null.
-  function plafondEss(reglages, ctx, rl) {
+  function plafondEss(reglages, ctx) {
     if (!reglages.essDansCalcul) return null;
-    return Math.max(0, Math.round((rl.objectif - ctx.profitJour) * 100) / 100);
+    return ctx.objectifRestant;
   }
 
+  const LIBELLE_PERIODE = { jour: "du jour", semaine: "de la semaine", mois: "du mois" };
   function afficherObjectifAtteint(r, ctx) {
     return `
       <div class="carte encadre-total-calcul">
-        <h3 class="titre-bloc">🎯 Objectif du jour atteint</h3>
+        <h3 class="titre-bloc">🎯 Objectif ${LIBELLE_PERIODE[ctx.periode] || "du jour"} atteint</h3>
         <p>Déjà <strong class="positif">${montant(r.profitJour, "USD")}</strong> sur ${montant(r.objectif, "USD")} (${esc(ctx.nomCompte)}) : pas de lot proposé.</p>
       </div>${boutonRetour}`;
   }
@@ -462,15 +468,14 @@
     // La part TP1 de la répartition rapporte l'objectif restant, le lot total est partagé selon
     // la répartition. Switch ESS (Journal › ESS) ON : les lots sont coupés à partir du TP2 pour
     // que la journée ne batte pas la plus grosse journée gagnante.
-    const rl = ctx ? N.reglagesLotsPourCompte(reglages, ctx.compte) : null;
     let r;
     if (!ctx) r = N.calculerPosition(signalCourant, reglages, tauxUtilise);
     else {
       r = N.calculerPosition(signalCourant, reglages, tauxUtilise, {
-        objectifRestant: Math.max(0, Math.round((rl.objectif - ctx.profitJour) * 100) / 100),
-        plafondEss: plafondEss(reglages, ctx, rl),
+        objectifRestant: ctx.objectifRestant,
+        plafondEss: plafondEss(reglages, ctx),
       });
-      if (r.objectifAtteint) Object.assign(r, { objectif: rl.objectif, profitJour: ctx.profitJour });
+      if (r.objectifAtteint) Object.assign(r, { objectif: ctx.objectif, profitJour: ctx.realise });
     }
     dernierCalcul = r.ok ? { r, reglages, signal: { ...signalCourant } } : null;
     zoneResultat.innerHTML = r.ok ? (r.modeLot === "parTp" ? afficherLotsParTp(r, reglages, ctx) : afficherResultat(r, reglages, spec, ctx))

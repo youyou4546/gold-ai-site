@@ -218,12 +218,6 @@
         <span id="total-repartition3" class="total-rep"></span>
       </div>`)}
 
-      ${volet("🧮 Lots par TP", `
-      <div class="champ">
-        <label for="lots-compte">Compte</label>
-        <select id="lots-compte"><option value="_defaut">Tous les comptes (par défaut)</option></select>
-      </div>
-      <div id="zone-lots-compte">${champsLots(compteLots)}</div>`)}
 
       ${volet("🔧 Instruments", `
       <div id="liste-instruments">${Object.entries(r.instruments || {}).map(([s, spec]) => carteInstrument(s, spec)).join("") || ""}</div>
