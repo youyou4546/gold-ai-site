@@ -220,9 +220,6 @@
     } catch { return null; }
   }
 
-  // Switch ESS (Journal › ESS) : la journée ne dépasse pas l'objectif quotidien, pour que
-  // toutes les journées gagnantes se ressemblent (c'est ce qui fait passer l'ESS).
-  // Renvoie le gain maximal de CE trade (objectif − déjà fait aujourd'hui), ou null.
   // Solde (risque par trade) et fiche de l'instrument pris dans TradeLocker quand il répond ;
   // chaque valeur absente garde le réglage manuel (Profil › Général).
   function reglagesAvecTradeLocker(reglages, ctx) {
@@ -244,14 +241,25 @@
   function ligneSource(ctx, reglages) {
     if (!ctx) return "";
     const m = (v) => montant(v, reglages.devise || "USD");
-    return ctx.tl
+    const plafond = plafondJourEss(reglages, ctx);
+    const ess = plafond === null ? "" : `<p class="texte-attenue petit">ESS activé : journée plafonnée à ${m(plafond)} (ta plus grosse journée ou ton objectif, le plus haut).</p>`;
+    return ess + (ctx.tl
       ? `<p class="texte-attenue petit">TradeLocker (${esc(ctx.nomCompte)}) : solde ${m(ctx.tl.solde)} · résultat du jour ${m(ctx.tl.jourNet ?? 0)}${ctx.tl.instrument ? " · lots du courtier" : ""}.</p>`
-      : `<p class="texte-attenue petit">TradeLocker indisponible${ctx.erreurTl ? ` (${esc(ctx.erreurTl)})` : ""} : solde et lots de Profil › Général, résultat du jour du Journal.</p>`;
+      : `<p class="texte-attenue petit">TradeLocker indisponible${ctx.erreurTl ? ` (${esc(ctx.erreurTl)})` : ""} : solde et lots de Profil › Général, résultat du jour du Journal.</p>`);
   }
 
-  function plafondEss(reglages, ctx) {
+  // Switch ESS (Journal › ESS) : la journée ne doit pas battre la plus grosse journée gagnante
+  // des AUTRES jours (ça ferait monter l'ESS). Jusqu'à ce record, chaque $ gagné fait au
+  // contraire BAISSER l'ESS : on laisse donc courir jusqu'au plus haut entre ce record et
+  // l'objectif. Renvoie le plafond de la journée (absolu), ou null si la switch est coupée.
+  function plafondJourEss(reglages, ctx) {
     if (!reglages.essDansCalcul) return null;
-    return ctx.objectifRestant;
+    const record = N.essDuTrade({ trades: ctx.tradesCompte, aujourdhui: ctx.aujourdhui, seuil: ctx.seuil, gainTp1: 0, risque: 0 }).recordGain;
+    return Math.round(Math.max(ctx.objectif, record) * 100) / 100;
+  }
+  function plafondEss(reglages, ctx) {
+    const plafond = plafondJourEss(reglages, ctx);
+    return plafond === null ? null : Math.max(0, Math.round((plafond - ctx.profitJour) * 100) / 100);
   }
 
   const LIBELLE_PERIODE = { jour: "du jour", semaine: "de la semaine", mois: "du mois" };

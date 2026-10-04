@@ -382,7 +382,7 @@
       if (coupes.size) {
         unites = unitesPortions.reduce((s, u) => s + u, 0);
         lotTotal = arrondir(unites * pas, decimalesLot);
-        avertissements.push(`ESS : ${[...coupes].map((i) => (portionsDef[i].type === "tp" ? `TP${portionsDef[i].numero}` : "TP runner")).join(", ")} coupé(s) pour que ta journée ne dépasse pas ton objectif quotidien.`);
+        avertissements.push(`ESS : ${[...coupes].map((i) => (portionsDef[i].type === "tp" ? `TP${portionsDef[i].numero}` : "TP runner")).join(", ")} coupé(s) : ta journée dépasserait ta plus grosse journée gagnante (ou ton objectif s'il est plus haut), ce qui ferait monter l'ESS.`);
       }
     }
 
