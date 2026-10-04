@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     onglets.forEach((o) => o.classList.toggle("actif", o.dataset.section === cible));
+    // Rectangle du haut (objectif / garde-fou) : caché dans Profil et Journal.
+    document.getElementById("barre-haut")?.classList.toggle("cachee-onglet", cible === "profil" || cible === "journal");
     sections.forEach((s) => s.classList.toggle("actif", s.id === `section-${cible}`));
 
     // Charge les données à la demande, seulement au premier affichage de l'onglet.

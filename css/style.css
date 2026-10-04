@@ -1713,6 +1713,7 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .barre-haut:not(:has(> :not([hidden]):not(.fermer-barre-haut))) { display: none; }
 /* Masqué avec la croix : revient à chaque ouverture de l'app (js/app.js). */
 .barre-haut.masquee { display: none; }
+.barre-haut.cachee-onglet { display: none; } /* onglets Profil et Journal */
 .fermer-barre-haut {
   position: absolute; top: 4px; right: 4px; width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
