@@ -119,13 +119,7 @@
     const num = (id, lib, val, ph) => `<div class="champ"><label for="${id}">${lib}</label><input type="number" id="${id}" class="champ-lots" inputmode="decimal" step="any" min="0" value="${val ?? ""}" placeholder="${ph}" /></div>`;
     return `
       ${cle !== "_defaut" ? `<p class="aide" id="lots-note">${noteLots(cle)}</p>` : ""}
-      <div class="ligne-champs">
-        ${num("lots-objectif", "Objectif quotidien ($)", v.objectif, "250")}
-        ${num("lots-plafond", "Plafond de gain du jour ($)", v.plafond, "400")}
-      </div>
-      <div class="ligne-champs">
-        ${[0, 1, 2].map((i) => num(`lots-bonus-${i}`, `Bonus TP${i + 2} ($)`, v.bonus[i] ?? v.bonus[v.bonus.length - 1], "50")).join("")}
-      </div>
+      ${num("lots-objectif", "Objectif quotidien ($)", v.objectif, "250")}
       <label class="case-a-cocher"><input type="checkbox" id="lots-sl-entree" class="champ-lots" ${v.slEntreeApresTp1 ? "checked" : ""}/> SL au point d'entrée après TP1</label>`;
   }
 
@@ -135,9 +129,8 @@
     lotsEdition = { ...(lotsEdition || {}) };
     const nouveau = !lotsEdition[compteLots];
     lotsEdition[compteLots] = {
+      ...(lotsEdition[compteLots] || {}), // bonus / plafond (champs retirés) : anciennes valeurs gardées telles quelles
       objectif: val("lots-objectif") ?? window.GoldAI.noyau.LOTS_PAR_TP_DEFAUT.objectif,
-      plafond: val("lots-plafond"),
-      bonus: [0, 1, 2].map((i) => val(`lots-bonus-${i}`) ?? 0),
       slEntreeApresTp1: document.getElementById("lots-sl-entree").checked,
     };
     const note = document.getElementById("lots-note");
@@ -300,7 +293,6 @@
     Object.entries(r.lotsParTp || {}).forEach(([cle, l]) => {
       const nom = cle === "_defaut" ? "par défaut" : "de ce compte";
       if (!(l.objectif > 0)) erreurs.push(`Lots par TP (${nom}) : l'objectif quotidien doit être supérieur à 0.`);
-      if (l.plafond !== null && l.plafond > 0 && l.plafond < l.objectif) erreurs.push(`Lots par TP (${nom}) : le plafond de gain du jour est plus petit que l'objectif.`);
     });
     if (r.repartition3.length) {
       const total3 = r.repartition3.reduce((s, x) => s + x, 0);
