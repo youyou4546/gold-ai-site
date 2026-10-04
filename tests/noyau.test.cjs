@@ -621,6 +621,28 @@ test("lots par TP : exemple de référence (0,50 / 0,05 / 0,03 / 0,02 ; risque 3
   assert.deepEqual(N.reduireLotsParTp(r, 280).lots, [0.5, 0.05, 0.01, 0]);
 });
 
+test("répartition + coupe ESS : lots coupés à partir du TP2", () => {
+  const signal = N.lireSignal(["XAUUSD SELL", "Entry 4335", "SL 4340", "TP1 4330", "TP2 4325", "TP3 4320", "TP4 4315"].join("\n"));
+  const reglages = { ...REGLAGES_TEST, repartition: [65, 20, 5, 10] };
+  // Sans coupe : 0,49 / 0,15 / 0,04 / 0,08 (TP1 = 245 $ pour un objectif de 250 $)
+  const libre = N.calculerPosition(signal, reglages, null, { objectifRestant: 250 });
+  assert.deepEqual(libre.portions.map((p) => p.lot), [0.49, 0.15, 0.04, 0.08]);
+  // Plus grosse journée 300 $ : TP1 245, TP2 coupé à 0,05 (50 $ → 295), TP3 et TP4 à 0
+  const r = N.calculerPosition(signal, reglages, null, { objectifRestant: 250, plafondEss: 300 });
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.deepEqual(r.portions.map((p) => p.lot), [0.49, 0.05, 0, 0]);
+  assert.deepEqual(r.portions.map((p) => p.limiteEss), [false, true, true, true]);
+  assert.equal(r.lotTotal, 0.54);
+  assert.equal(Math.round(r.perteTotaleSl * 100) / 100, 270);   // risque recalculé sur 0,54 lot
+  assert.equal(Math.round(r.gainTotalSiTousTps * 100) / 100, 295);
+  // Plus grosse journée plus petite que l'objectif : seul le TP1 reste
+  assert.deepEqual(N.calculerPosition(signal, reglages, null, { objectifRestant: 250, plafondEss: 40 }).portions.map((p) => p.lot), [0.49, 0, 0, 0]);
+  // Runner coupé quand la coupe joue
+  const avecRunner = N.calculerPosition(N.lireSignal("XAUUSD SELL\nEntry 4335\nSL 4340\nTP1 4330\nTP2 4325\nTP3 4320\nTP4"), reglages, null, { objectifRestant: 250, plafondEss: 300 });
+  assert.equal(avecRunner.portions[3].lot, 0);
+  assert.ok(avecRunner.portions[3].limiteEss);
+});
+
 test("lots par TP : switch ESS (ne pas battre la plus grosse journée gagnante)", () => {
   const signal = N.lireSignal(["XAUUSD SELL", "Entry 4335", "SL 4340", "TP1 4330", "TP2 4325", "TP3 4320", "TP4 4315"].join("\n"));
   const rl = N.reglagesLotsPourCompte({}, null);

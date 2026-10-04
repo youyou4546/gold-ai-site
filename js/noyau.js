@@ -191,6 +191,10 @@
     return (reglages?.repartition || []).map(Number);
   }
 
+  // options.plafondEss (switch ESS) : gain maximal de CE trade pour que la journée ne batte
+  // pas la plus grosse journée gagnante. Les lots sont calculés selon la répartition, puis
+  // COUPÉS à partir du TP2 (TP2, TP3… puis le runner) dès que ce gain serait dépassé ;
+  // le TP1 n'est jamais coupé. null = pas de coupe.
   // options.objectifRestant (en $, devise du compte) : si fourni, le lot n'est plus
   // choisi selon le risque mais pour que la PART TP1 de la répartition rapporte
   // l'objectif restant du jour au TP1 (arrondi vers le bas). 0 → objectif atteint, pas de lot.
@@ -199,6 +203,7 @@
     const avertissements = [];
     const aConfigurer = [];
     const objectifRestant = Number.isFinite(Number(options?.objectifRestant)) && options?.objectifRestant !== null ? Math.max(0, Number(options.objectifRestant)) : null;
+    const plafondEss = options?.plafondEss === null || options?.plafondEss === undefined ? null : Number(options.plafondEss);
     const modeObjectif = objectifRestant !== null;
 
     const spec = reglages?.instruments?.[signal.instrument];
@@ -344,6 +349,33 @@
       avertissements.push("Répartition ajustée pour respecter le lot minimum : les pourcentages réels diffèrent un peu de ceux configurés.");
     }
 
+    // --- Coupe ESS : à partir du TP2, la journée ne doit pas battre la plus grosse journée gagnante ---
+    const lotTotalAvantCoupe = lotTotal;
+    const coupes = new Set();
+    if (plafondEss !== null) {
+      let cumulGain = 0, plafondAtteint = false;
+      portionsDef.forEach((p, i) => {
+        if (p.type === "tp") {
+          const gainParUnite = (Math.abs(p.prix - signal.entree) / spec.tailleTick) * valeurTickCompte * pas;
+          if (i > 0 && cumulGain + unitesPortions[i] * gainParUnite > plafondEss + EPS) {
+            let u = Math.max(0, Math.floor((plafondEss - cumulGain) / gainParUnite + EPS));
+            if (u > 0 && u < unitesMin) u = 0;
+            if (u < unitesPortions[i]) { unitesPortions[i] = u; coupes.add(i); }
+          }
+          cumulGain += unitesPortions[i] * gainParUnite;
+          if (cumulGain >= plafondEss - EPS) plafondAtteint = true;
+        } else if (p.type === "ouvert" && (plafondAtteint || coupes.size) && unitesPortions[i] > 0) {
+          unitesPortions[i] = 0; // runner : gain sans limite → coupé dès que le plafond ESS est en jeu
+          coupes.add(i);
+        }
+      });
+      if (coupes.size) {
+        unites = unitesPortions.reduce((s, u) => s + u, 0);
+        lotTotal = arrondir(unites * pas, decimalesLot);
+        avertissements.push(`ESS : ${[...coupes].map((i) => (portionsDef[i].type === "tp" ? `TP${portionsDef[i].numero}` : "TP runner")).join(", ")} coupé(s) pour que ta journée ne batte pas ta plus grosse journée gagnante.`);
+      }
+    }
+
     const lotsPortions = unitesPortions.map((u) => arrondir(u * pas, decimalesLot));
     const perteParPortion = lotsPortions.map((lot) => lot * pertePourUnLot);
     const perteTotale = lotTotal * pertePourUnLot;
@@ -362,7 +394,8 @@
         type: p.type,
         prix: p.prix,
         pctConfigure: p.pct,
-        pctReel: lotTotal > 0 ? (lot / lotTotal) * 100 : 0,
+        pctReel: lotTotalAvantCoupe > 0 ? (lot / lotTotalAvantCoupe) * 100 : 0,
+        limiteEss: coupes.has(i),
         lot,
         gainAuTp: gain,                          // gain de CETTE portion uniquement
         gainCumuleSiCloturee: p.type === "tp" ? cumul : null, // portions clôturées jusqu'ici

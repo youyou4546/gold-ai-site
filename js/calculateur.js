@@ -143,9 +143,9 @@
       <tr>
         <th scope="row">${esc(p.objectif)}</th>
         <td>${p.prix === null ? "<span class=\"texte-attenue\">sans prix</span>" : prixAffiche(p.prix)}</td>
-        <td>${nombre(p.pctConfigure, 0)} %${Math.abs(p.pctReel - p.pctConfigure) >= 0.5 ? `<br><span class="texte-attenue">réel ${nombre(p.pctReel, 1)} %</span>` : ""}</td>
-        <td><strong>${nombre(p.lot, 2)}</strong></td>
-        <td class="positif">${p.type === "ouvert" ? "<span class=\"texte-attenue\">laisse courir</span>" : p.gainAuTp === null ? "<span class=\"texte-attenue\">non calculable</span>" : `▲ ${montant(p.gainAuTp, d)}`}</td>
+        <td>${nombre(p.pctConfigure, 0)} %${!p.limiteEss && Math.abs(p.pctReel - p.pctConfigure) >= 0.5 ? `<br><span class="texte-attenue">réel ${nombre(p.pctReel, 1)} %</span>` : ""}</td>
+        <td><strong>${nombre(p.lot, 2)}</strong>${p.limiteEss ? `<br><span class="texte-attenue">coupé ESS</span>` : ""}</td>
+        <td class="positif">${p.type === "ouvert" ? (p.limiteEss ? "—" : "<span class=\"texte-attenue\">laisse courir</span>") : p.gainAuTp === null ? "<span class=\"texte-attenue\">non calculable</span>" : p.limiteEss && !(p.lot > 0) ? "—" : `▲ ${montant(p.gainAuTp, d)}`}</td>
       </tr>`).join("");
 
     return `
@@ -461,15 +461,17 @@
     // Lots par TP (réglages « Lots par TP » du compte maître) ; sans Journal lisible :
     // ancien calcul selon le risque et la répartition.
     const ctx = await contexteObjectif(reglages);
-    // Switch ESS (Journal › ESS) ON : lots par TP (objectif au TP1 + bonus, sans battre la plus
-    // grosse journée). OFF : la part TP1 de la répartition rapporte l'objectif restant, le lot
-    // total est partagé selon la répartition (pas de limite de bonus).
+    // La part TP1 de la répartition rapporte l'objectif restant, le lot total est partagé selon
+    // la répartition. Switch ESS (Journal › ESS) ON : les lots sont coupés à partir du TP2 pour
+    // que la journée ne batte pas la plus grosse journée gagnante.
     const rl = ctx ? N.reglagesLotsPourCompte(reglages, ctx.compte) : null;
     let r;
     if (!ctx) r = N.calculerPosition(signalCourant, reglages, tauxUtilise);
-    else if (reglages.essDansCalcul) r = N.calculerLotsParTp(signalCourant, reglages, rl, { profitJour: ctx.profitJour, tauxConversion: tauxUtilise, plafondEss: plafondEss(reglages, ctx) });
     else {
-      r = N.calculerPosition(signalCourant, reglages, tauxUtilise, { objectifRestant: Math.max(0, Math.round((rl.objectif - ctx.profitJour) * 100) / 100) });
+      r = N.calculerPosition(signalCourant, reglages, tauxUtilise, {
+        objectifRestant: Math.max(0, Math.round((rl.objectif - ctx.profitJour) * 100) / 100),
+        plafondEss: plafondEss(reglages, ctx),
+      });
       if (r.objectifAtteint) Object.assign(r, { objectif: rl.objectif, profitJour: ctx.profitJour });
     }
     dernierCalcul = r.ok ? { r, reglages, signal: { ...signalCourant } } : null;
