@@ -88,13 +88,19 @@
 
   // ------------------------------------------------------------------ Formulaire
 
-  function ligneRepartition(pct, i) {
+  // Deux groupes de répartition : "" = signal avec 4 TP (ou plus, groupe principal),
+  // "3" = signal avec seulement 3 TP (facultatif : vide = groupe principal utilisé).
+  function ligneRepartition(pct, i, groupe = "") {
     return `<div class="ligne-repartition">
-      <label for="rep-${i}">TP${i + 1}</label>
-      <input type="number" id="rep-${i}" class="champ-rep" inputmode="decimal" step="any" min="0" value="${pct ?? ""}" />
+      <label for="rep${groupe}-${i}">TP${i + 1}</label>
+      <input type="number" id="rep${groupe}-${i}" class="champ-rep" inputmode="decimal" step="any" min="0" value="${pct ?? ""}" />
       <span class="suffixe">%</span>
-      <button type="button" class="bouton-icone" data-suppr-rep="${i}" aria-label="Retirer la portion TP${i + 1}">✕</button>
+      <button type="button" class="bouton-icone" data-suppr-rep="${i}" data-groupe="${groupe}" aria-label="Retirer la portion TP${i + 1}">✕</button>
     </div>`;
+  }
+
+  function lignesRepartition(valeurs, groupe) {
+    return (valeurs?.length ? valeurs : [null]).map((pct, i) => ligneRepartition(pct, i, groupe)).join("");
   }
 
   // Un menu par TP : où placer le SL du runner une fois ce TP touché.
@@ -154,14 +160,22 @@
         <input type="number" id="calc-risque" inputmode="decimal" step="any" min="0" value="${r.risqueValeur ?? ""}" placeholder="${r.risqueMode === "montant" ? "ex : 300" : "ex : 0.3"}" />
       </div>
 
-      <label class="label-groupe">Répartition de la position entre les TP</label>
-      <div id="liste-repartition">${(r.repartition.length ? r.repartition : [null]).map(ligneRepartition).join("")}</div>
+      <label class="label-groupe">Répartition — signal avec 4 TP (ou plus)</label>
+      <div id="liste-repartition">${lignesRepartition(r.repartition, "")}</div>
       <div class="ligne-actions">
-        <button type="button" class="bouton secondaire bouton-petit" id="ajouter-rep">+ Ajouter une portion</button>
+        <button type="button" class="bouton secondaire bouton-petit" id="ajouter-rep" data-groupe="">+ Ajouter une portion</button>
         <span id="total-repartition" class="total-rep"></span>
       </div>
 
-      <p class="aide">Un TP sans chiffre dans le signal = <strong>TP runner</strong> : il prend la portion qui suit les TP chiffrés (ex. TP1, TP2, TP3 + runner → 4 portions).</p>
+      <label class="label-groupe">Répartition — signal avec seulement 3 TP</label>
+      <div id="liste-repartition3">${lignesRepartition(r.repartition3?.length ? r.repartition3 : [null, null, null], "3")}</div>
+      <div class="ligne-actions">
+        <button type="button" class="bouton secondaire bouton-petit" id="ajouter-rep3" data-groupe="3">+ Ajouter une portion</button>
+        <span id="total-repartition3" class="total-rep"></span>
+      </div>
+      <p class="aide">Laissé vide : le groupe « 4 TP » sert aussi pour les signaux à 3 TP.</p>
+
+      <p class="aide">Un TP sans chiffre dans le signal = <strong>TP runner</strong> : il compte comme un TP et prend la portion qui suit les TP chiffrés (ex. TP1, TP2, TP3 + runner → 4 TP).</p>
 
       <label class="label-groupe">SL du TP runner</label>
       <p class="aide">Où remonter le SL du TP runner après chaque TP touché. Par défaut, il reste un cran derrière le dernier TP touché.</p>
@@ -182,17 +196,21 @@
     majTotalRepartition();
   }
 
-  function lireRepartition() {
-    return [...document.querySelectorAll("#liste-repartition .champ-rep")].map((c) => c.value.trim() === "" ? null : Number(c.value));
+  function lireRepartition(groupe = "") {
+    return [...document.querySelectorAll(`#liste-repartition${groupe} .champ-rep`)].map((c) => c.value.trim() === "" ? null : Number(c.value));
   }
 
   function majTotalRepartition() {
-    const total = lireRepartition().reduce((s, x) => s + (x || 0), 0);
-    const zone = document.getElementById("total-repartition");
-    if (!zone) return;
-    const ok = Math.abs(total - 100) < 1e-6;
-    zone.className = `total-rep ${ok ? "ok" : "ko"}`;
-    zone.textContent = `Total : ${Math.round(total * 100) / 100} % ${ok ? "✓" : "(doit faire 100 %)"}`;
+    ["", "3"].forEach((groupe) => {
+      const valeurs = lireRepartition(groupe);
+      const zone = document.getElementById(`total-repartition${groupe}`);
+      if (!zone) return;
+      if (groupe === "3" && valeurs.every((x) => x === null)) { zone.className = "total-rep"; zone.textContent = "Non utilisé"; return; }
+      const total = valeurs.reduce((s, x) => s + (x || 0), 0);
+      const ok = Math.abs(total - 100) < 1e-6;
+      zone.className = `total-rep ${ok ? "ok" : "ko"}`;
+      zone.textContent = `Total : ${Math.round(total * 100) / 100} % ${ok ? "✓" : "(doit faire 100 %)"}`;
+    });
   }
 
   function lireFormulaire() {
@@ -205,6 +223,7 @@
       risqueMode: document.querySelector("input[name=calc-risque-mode]:checked").value,
       risqueValeur: val("calc-risque"),
       repartition: lireRepartition().filter((x) => x !== null),
+      repartition3: lireRepartition("3").filter((x) => x !== null),
       slRunner: [...document.querySelectorAll(".champ-sl-runner")].map((c) => c.value),
       instruments: {},
       fuseau: document.getElementById("calc-fuseau").value,
@@ -223,6 +242,11 @@
     const total = r.repartition.reduce((s, x) => s + x, 0);
     if (!r.repartition.length || r.repartition.some((x) => !(x > 0))) erreurs.push("Chaque portion de la répartition doit être supérieure à 0 %.");
     else if (Math.abs(total - 100) > 1e-6) erreurs.push(`La répartition doit totaliser 100 % (actuellement ${Math.round(total * 100) / 100} %).`);
+    if (r.repartition3.length) {
+      const total3 = r.repartition3.reduce((s, x) => s + x, 0);
+      if (r.repartition3.some((x) => !(x > 0))) erreurs.push("Répartition « 3 TP » : chaque portion doit être supérieure à 0 %.");
+      else if (Math.abs(total3 - 100) > 1e-6) erreurs.push(`La répartition « 3 TP » doit totaliser 100 % (actuellement ${Math.round(total3 * 100) / 100} %), ou être laissée vide.`);
+    }
 
     document.querySelectorAll("#liste-instruments .carte-instrument").forEach((carte) => {
       const sym = carte.querySelector(".champ-symbole").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -302,16 +326,18 @@
     });
     zone.addEventListener("click", async (e) => {
       const t = e.target;
-      if (t.id === "ajouter-rep") {
-        const liste = document.getElementById("liste-repartition");
+      if (t.id === "ajouter-rep" || t.id === "ajouter-rep3") {
+        const groupe = t.dataset.groupe || "";
+        const liste = document.getElementById(`liste-repartition${groupe}`);
         const n = liste.querySelectorAll(".ligne-repartition").length;
         if (n >= 8) return;
-        liste.insertAdjacentHTML("beforeend", ligneRepartition(null, n));
+        liste.insertAdjacentHTML("beforeend", ligneRepartition(null, n, groupe));
         majTotalRepartition();
       } else if (t.dataset.supprRep !== undefined) {
-        const valeurs = lireRepartition();
+        const groupe = t.dataset.groupe || "";
+        const valeurs = lireRepartition(groupe);
         valeurs.splice(Number(t.dataset.supprRep), 1);
-        document.getElementById("liste-repartition").innerHTML = (valeurs.length ? valeurs : [null]).map(ligneRepartition).join("");
+        document.getElementById(`liste-repartition${groupe}`).innerHTML = lignesRepartition(valeurs, groupe);
         majTotalRepartition();
       } else if (t.id === "ajouter-instrument") {
         document.getElementById("liste-instruments").insertAdjacentHTML("beforeend", carteInstrument(document.querySelector("#liste-instruments .carte-instrument") ? "" : "XAUUSD", null));
@@ -322,7 +348,7 @@
         enregistrerFormulaire(false);
       }
       // Portion ajoutée / retirée : enregistrée automatiquement aussi.
-      if (t.id === "ajouter-rep" || t.dataset.supprRep !== undefined || t.hasAttribute("data-suppr-instrument")) planifierAuto();
+      if (t.id === "ajouter-rep" || t.id === "ajouter-rep3" || t.dataset.supprRep !== undefined || t.hasAttribute("data-suppr-instrument")) planifierAuto();
     });
     // Enregistrement automatique à chaque changement (plus besoin du bouton du bas,
     // qu'on pouvait oublier : la répartition des TP changée n'était alors pas gardée).

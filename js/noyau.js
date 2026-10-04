@@ -180,6 +180,16 @@
    * tauxConversion : combien d'unités de la devise du compte vaut 1 unité de
    *                  deviseProfit (null si pas besoin / inconnu).
    */
+  // Répartition à utiliser pour ce signal : le groupe « 3 TP » (Général) si le
+  // signal n'a que 3 TP (le TP runner compte comme un TP) et que ce groupe est
+  // rempli ; sinon le groupe principal (4 TP ou plus).
+  function repartitionPourSignal(signal, reglages) {
+    const nbTpsSignal = (signal?.tps?.length || 0) + (signal?.tpOuverts > 0 ? 1 : 0);
+    const r3 = reglages?.repartition3;
+    if (nbTpsSignal === 3 && Array.isArray(r3) && r3.length) return r3.map(Number);
+    return (reglages?.repartition || []).map(Number);
+  }
+
   function calculerPosition(signal, reglages, tauxConversion) {
     const erreurs = [];
     const avertissements = [];
@@ -192,7 +202,7 @@
     if (!(reglages?.solde > 0) && reglages?.risqueMode !== "montant") aConfigurer.push("Solde du compte.");
     if (!(reglages?.risqueValeur > 0)) aConfigurer.push("Risque par trade.");
     if (!reglages?.devise) aConfigurer.push("Devise du compte.");
-    const repartition = (reglages?.repartition || []).map(Number);
+    const repartition = repartitionPourSignal(signal, reglages);
     const sommeRep = repartition.reduce((s, x) => s + x, 0);
     if (repartition.length === 0) aConfigurer.push("Répartition entre les TP.");
     else if (Math.abs(sommeRep - 100) > 1e-6) aConfigurer.push(`Répartition des TP : le total fait ${arrondir(sommeRep, 4)} % au lieu de 100 %.`);
@@ -1278,7 +1288,7 @@
 
   const api = {
     lireSignal, nombresDans, versNombre, detecterInstrument,
-    calculerPosition, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
+    calculerPosition, repartitionPourSignal, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
     ema, atr, calculerTendance, separerBougies,
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
     scorePriorite, analyserImpact, biaisAnnonceOr, sessionsMarche, SESSIONS_MARCHE, estDiscours, phaseDiscours, lecteurYoutube, chaineOfficielle, evaluerGardeFou, regrouperSignaux, aUnTradeGagnant, etatChallenge,

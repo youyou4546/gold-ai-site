@@ -506,6 +506,24 @@ test("TP sans chiffre = TP runner, qui reçoit toujours son lot", () => {
   assert.equal(r.contientTpOuvert, true);
 });
 
+test("répartition : groupe « 3 TP » pour un signal à 3 TP, groupe principal sinon", () => {
+  const reglages = { ...REGLAGES_TEST, repartition: [50, 25, 15, 10], repartition3: [60, 30, 10] };
+  const signal = (...tps) => N.lireSignal(["XAUUSD SELL 4335", "SL 4345", ...tps].join("\n"));
+  // 3 TP chiffrés → groupe 3 TP
+  let r = N.calculerPosition(signal("TP1 4329", "TP2 4320", "TP3 4310"), reglages, null);
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.deepEqual(r.portions.map((p) => p.pctConfigure), [60, 30, 10]);
+  // 2 TP chiffrés + runner = 3 TP → groupe 3 TP aussi
+  r = N.calculerPosition(signal("TP1 4329", "TP2 4320", "TP3"), reglages, null);
+  assert.deepEqual(r.portions.map((p) => p.pctConfigure), [60, 30, 10]);
+  // TP4 présent → groupe principal
+  r = N.calculerPosition(signal("TP1 4329", "TP2 4320", "TP3 4310", "TP4"), reglages, null);
+  assert.deepEqual(r.portions.map((p) => p.pctConfigure), [50, 25, 15, 10]);
+  // Groupe 3 TP vide → groupe principal (ancien comportement : choix au prorata proposé)
+  r = N.calculerPosition(signal("TP1 4329", "TP2 4320", "TP3 4310"), { ...reglages, repartition3: [] }, null);
+  assert.equal(r.choixRepartition, true);
+});
+
 test("garde-fou : perte max par jour, compte par compte", () => {
   const trades = [{ resultat: -150, compteTl: "demo|1" }];
   let g = N.evaluerGardeFou({ trades, regles: {}, limitesComptes: [{ nom: "TOPONE #1", limite: 200, perte: 150 }, { nom: "TOPONE #2", limite: 200, perte: 0 }] });

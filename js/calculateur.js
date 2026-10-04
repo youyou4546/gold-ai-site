@@ -306,7 +306,8 @@
 
     zoneResultat.innerHTML = `<p class="etat-vide">Calcul…</p>`;
     const reglagesBase = await window.GoldAI.reglagesCalculateur.charger();
-    const reglages = repartitionForcee ? { ...reglagesBase, repartition: repartitionForcee } : reglagesBase;
+    // Répartition au prorata forcée : elle remplace les deux groupes (4 TP et 3 TP).
+    const reglages = repartitionForcee ? { ...reglagesBase, repartition: repartitionForcee, repartition3: null } : reglagesBase;
     const spec = reglages.instruments?.[signalCourant.instrument];
 
     // Taux de conversion : seulement si la devise des gains diffère de celle du compte.
@@ -403,7 +404,7 @@
       } else if (t.id === "calc-prorata") {
         const reglages = await window.GoldAI.reglagesCalculateur.charger();
         const nb = signalCourant.tps.length + (signalCourant.tpOuverts ? 1 : 0);
-        const base = reglages.repartition.slice(0, nb);
+        const base = N.repartitionPourSignal(signalCourant, reglages).slice(0, nb);
         const somme = base.reduce((s, x) => s + x, 0);
         repartitionForcee = base.map((x) => (x / somme) * 100);
         calculer({ depuisTexte: false });
