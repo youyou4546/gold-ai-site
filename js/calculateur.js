@@ -510,6 +510,7 @@
   async function restaurer() {
     if (!window.GoldAI.auth?.getToken?.() || avertissementGain) return;
     if (signalCourant) {
+      if (aRecalculer) { aRecalculer = false; await calculer({ depuisTexte: false, confirme: true }); return; }
       if (dernierCalcul) window.GoldAI.discipline?.afficher();
       return;
     }
@@ -602,9 +603,15 @@
     });
   });
 
-  window.addEventListener("goldai:reglages-calculateur", () => {
-    if (signalCourant && document.getElementById("section-calculateur")?.classList.contains("actif")) calculer({ depuisTexte: false });
-  });
+  // Réglages, règles, comptes ou trades changés : le calcul affiché est refait tout de suite
+  // si l'onglet Calcul est ouvert, sinon dès qu'on y revient (restaurer).
+  let aRecalculer = false;
+  const actualiserCalcul = () => {
+    if (!signalCourant || avertissementGain) return;
+    if (document.getElementById("section-calculateur")?.classList.contains("actif")) calculer({ depuisTexte: false, confirme: true });
+    else aRecalculer = true;
+  };
+  ["goldai:reglages-calculateur", "goldai:regles", "goldai:comptes", "goldai:trades"].forEach((ev) => window.addEventListener(ev, actualiserCalcul));
 
   window.GoldAI = window.GoldAI || {};
   window.GoldAI.calculateur = { calculer, verifierMarges, restaurer,
