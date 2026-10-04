@@ -440,8 +440,10 @@
       <div id="profil-parametres" class="hidden">
         <button type="button" class="bouton-retour" id="bouton-retour-parametres"><span aria-hidden="true">←</span> Retour</button>
 
+        <!-- Chaque réglage est une boîte qui s'ouvre au toucher (comme les volets d'Analyse). -->
+        <details class="volet-analyse">
+        <summary class="entete-volet"><span>🎯 Objectif de profit</span></summary>
         <div class="carte" id="carte-objectif">
-          <h3 class="titre-bloc">🎯 Objectif de profit</h3>
           <div class="ligne-champs">
             <div class="champ">
               <label for="objectif-montant">Montant ($)</label>
@@ -458,23 +460,25 @@
           </div>
           <p class="message-succes" id="message-objectif"></p>
         </div>
+        </details>
 
+        <details class="volet-analyse">
+        <summary class="entete-volet"><span>📊 ESS (Equity Stability Score)</span></summary>
         <div class="carte" id="carte-ess">
-          <h3 class="titre-bloc">📊 ESS (Equity Stability Score)</h3>
           <div class="champ">
             <label for="seuil-ess">Seuil ESS maximum (%)</label>
             <input type="number" id="seuil-ess" min="1" max="100" step="any" inputmode="decimal" placeholder="20" />
           </div>
           <p class="message-succes" id="message-ess"></p>
         </div>
+        </details>
 
-        <div class="carte">
-          <h3 class="titre-bloc">Paramètres du calculateur</h3>
-          <div id="zone-parametres-calculateur"></div>
-        </div>
+        <!-- Paramètres du calculateur : ses boîtes sont créées par js/parametres-calculateur.js -->
+        <div id="zone-parametres-calculateur"></div>
 
+        <details class="volet-analyse">
+        <summary class="entete-volet"><span>⚖️ Règles de trading</span></summary>
         <div class="carte">
-          <h3 class="titre-bloc">Règles de trading</h3>
           <div class="hidden" aria-hidden="true">
           <div class="champ">
             <label for="param-solde-compte">Solde du compte ($)</label>
@@ -529,6 +533,7 @@
 
           <button class="bouton" id="bouton-sauvegarder-parametres">Enregistrer les règles de trading</button>
         </div>
+        </details>
       </div>
 
       <!-- Vue Mes comptes (limites de perte des prop firms) : son carré a été remplacé par « Mes comptes TradeLocker » le 2026-09-28.

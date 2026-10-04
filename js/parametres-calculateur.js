@@ -175,12 +175,20 @@
     </div>`;
   }
 
+  // Boîte qui s'ouvre au toucher (même présentation que les volets d'Analyse).
+  const volet = (titre, contenu) => `
+      <details class="volet-analyse">
+        <summary class="entete-volet"><span>${titre}</span></summary>
+        <div class="carte">${contenu}</div>
+      </details>`;
+
   function afficherFormulaire(r) {
     const zone = document.getElementById("zone-parametres-calculateur");
     if (!zone) return;
     lotsEdition = JSON.parse(JSON.stringify(r.lotsParTp || {}));
     zone.innerHTML = `
       ${stockage === "appareil" ? `<div class="alerte-donnees">Sauvegarde en ligne indisponible (patch Supabase non installé) : ces réglages sont gardés sur cet appareil seulement.</div>` : ""}
+      ${volet("💰 Compte et risque", `
       <div class="ligne-champs">
         <div class="champ">
           <label for="calc-solde">Solde du compte</label>
@@ -200,8 +208,9 @@
       <div class="champ">
         <label for="calc-risque">Valeur du risque <span id="unite-risque">${r.risqueMode === "montant" ? `(${esc(r.devise)})` : "(%)"}</span></label>
         <input type="number" id="calc-risque" inputmode="decimal" step="any" min="0" value="${r.risqueValeur ?? ""}" placeholder="${r.risqueMode === "montant" ? "ex : 300" : "ex : 0.3"}" />
-      </div>
+      </div>`)}
 
+      ${volet("📐 Répartition des TP", `
       <label class="label-groupe">Répartition — signal avec 4 TP (ou plus)</label>
       <div id="liste-repartition">${lignesRepartition(r.repartition, "")}</div>
       <div class="ligne-actions">
@@ -214,28 +223,28 @@
       <div class="ligne-actions">
         <button type="button" class="bouton secondaire bouton-petit" id="ajouter-rep3" data-groupe="3">+ Ajouter une portion</button>
         <span id="total-repartition3" class="total-rep"></span>
-      </div>
+      </div>`)}
 
-
-      <label class="label-groupe">Lots par TP (calculateur)</label>
+      ${volet("🧮 Lots par TP", `
       <div class="champ">
         <label for="lots-compte">Compte</label>
         <select id="lots-compte"><option value="_defaut">Tous les comptes (par défaut)</option></select>
       </div>
-      <div id="zone-lots-compte">${champsLots(compteLots)}</div>
+      <div id="zone-lots-compte">${champsLots(compteLots)}</div>`)}
 
-      <label class="label-groupe">Instruments</label>
+      ${volet("🔧 Instruments", `
       <div id="liste-instruments">${Object.entries(r.instruments || {}).map(([s, spec]) => carteInstrument(s, spec)).join("") || ""}</div>
-      <button type="button" class="bouton secondaire bouton-petit" id="ajouter-instrument">+ Ajouter un instrument</button>
+      <button type="button" class="bouton secondaire bouton-petit" id="ajouter-instrument">+ Ajouter un instrument</button>`)}
 
-      <div class="champ" style="margin-top:16px;">
+      ${volet("🕐 Fuseau horaire", `
+      <div class="champ">
         <label for="calc-fuseau">Fuseau horaire d'affichage</label>
         <select id="calc-fuseau">${FUSEAUX.map((f) => `<option ${((r.fuseau || window.GoldAI.utils.FUSEAU_DEFAUT) === f) ? "selected" : ""}>${f}</option>`).join("")}</select>
-      </div>
+      </div>`)}
 
       <p class="avertissement-erreur" id="erreur-parametres-calculateur"></p>
       <p class="message-succes" id="message-parametres-calculateur"></p>
-      <button class="bouton" id="bouton-sauvegarder-calculateur">Enregistrer les paramètres du calculateur</button>`;
+      <button class="bouton hidden" id="bouton-sauvegarder-calculateur">Enregistrer les paramètres du calculateur</button>`; // caché : tout s'enregistre automatiquement
     majTotalRepartition();
     remplirComptesLots();
   }

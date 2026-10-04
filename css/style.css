@@ -2025,3 +2025,6 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .ligne-switch-ess #message-switch-ess:empty { display: none; }
 
 #lots-note:empty { display: none; }
+
+/* Profil › Général : la zone du message « Enregistré » ne prend de place que lorsqu'elle s'affiche. */
+#zone-parametres-calculateur > .message-succes:not(.succes-visible) { display: none; }
