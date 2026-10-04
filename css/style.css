@@ -1971,3 +1971,17 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .blocage-calculateur.debloque { text-align: left; padding: 10px 14px; margin-bottom: 12px; }
 .rappel-debloque { margin: 0; font-weight: 600; color: var(--rouge); }
 .blocage-calculateur #garde-fou-forcer { margin-top: 6px; }
+
+/* Analyse : 3 volets repliables (IA, Briefing, Suivre le prix). Le titre ressemble à une
+   carte ; touché, il se déplie et son contenu apparaît juste en dessous. */
+.volet-analyse { margin-bottom: 12px; }
+.volet-analyse > .entete-volet { list-style: none; display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 12px 16px; background: var(--fond-carte); border: 1px solid var(--bordure); border-radius: var(--rayon); cursor: pointer; font-weight: 700; font-size: 15px; -webkit-tap-highlight-color: transparent; }
+.volet-analyse > .entete-volet::-webkit-details-marker { display: none; }
+.volet-analyse > .entete-volet > span:first-child { flex: 1; }
+.volet-analyse > .entete-volet::after { content: "▾"; color: var(--texte-attenue); font-size: 14px; transition: transform 0.2s; }
+.volet-analyse[open] > .entete-volet { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent; }
+.volet-analyse[open] > .entete-volet::after { transform: rotate(180deg); }
+.volet-analyse > .carte { margin: 0; border-top: none; border-top-left-radius: 0; border-top-right-radius: 0; }
+.volet-analyse > #liste-alertes { margin-top: 12px; }
+.volet-analyse > .entete-volet .prix-alertes, .volet-analyse > .entete-volet #briefing-maj { font-weight: 400; }
+.volet-analyse.bloc-suivre-prix, .volet-analyse .carte-briefing { margin-top: 0; }

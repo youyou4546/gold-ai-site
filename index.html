@@ -131,8 +131,10 @@
 
       <!-- Analyse de capture de graphique par l'IA (js/analyse-ia.js) : Claude Sonnet 5.5, payant,
            5 par personne et 10 au total par jour (fonction Supabase analyse-graphique) -->
+      <!-- Les 3 parties d'Analyse sont des volets : on touche le titre, le contenu se déplie en dessous. -->
+      <details class="volet-analyse" id="volet-analyse-ia">
+      <summary class="entete-volet"><span>🤖 Analyse de graphique par l'IA</span></summary>
       <div class="carte" id="carte-analyse-ia">
-        <h3 class="titre-bloc">🤖 Analyse de graphique par l'IA</h3>
         <p class="compteur-ia" id="compteur-ia">Chargement des compteurs…</p>
         <input type="file" id="ia-fichier" accept="image/*" class="hidden" />
         <button type="button" class="zone-upload" id="ia-choisir">📷 Choisir une capture</button>
@@ -149,13 +151,12 @@
           <div id="ia-liste-historique"></div>
         </details>
       </div>
+      </details>
 
       <!-- Briefing du jour lu à voix haute (js/briefing.js) — voix gratuite du téléphone -->
+      <details class="volet-analyse" id="volet-briefing">
+      <summary class="entete-volet"><span>🎙️ Briefing du jour</span><span class="texte-attenue petit" id="briefing-maj"></span></summary>
       <div class="carte carte-briefing">
-        <div class="entete-briefing">
-          <strong>🎙️ Briefing du jour</strong>
-          <span class="texte-attenue petit" id="briefing-maj"></span>
-        </div>
         <p class="texte-attenue petit">L'or, le dollar, les annonces du jour, les actualités et ta journée, lus à voix haute.</p>
         <div class="boutons-briefing">
           <button type="button" class="bouton" id="briefing-play">▶️ Écouter le briefing</button>
@@ -167,14 +168,12 @@
         </details>
         <p class="texte-attenue petit" id="briefing-voix"></p>
       </div>
+      </details>
 
       <!-- Suivre le prix : alertes de prix / zone sur l'or (js/alertes-prix.js), tout en bas d'Analyse -->
-      <div id="journal-alertes" class="bloc-suivre-prix">
+      <details id="journal-alertes" class="volet-analyse bloc-suivre-prix">
+        <summary class="entete-volet"><span>🎯 Suivre le prix</span><span class="prix-alertes" id="alertes-prix-actuel">—</span></summary>
         <div class="carte">
-          <div class="entete-alertes">
-            <strong>🎯 Suivre le prix</strong>
-            <span class="prix-alertes" id="alertes-prix-actuel">—</span>
-          </div>
           <div class="segmente" role="group" aria-label="Type d'alerte">
             <button type="button" data-type="prix" aria-pressed="true">Un prix</button>
             <button type="button" data-type="zone" aria-pressed="false">Une zone</button>
@@ -204,7 +203,7 @@
         </div>
 
         <div id="liste-alertes"></div>
-      </div>
+      </details>
     </section>
 
     <!-- ============ SECTION 4 : JOURNAL DE TRADING ============ -->

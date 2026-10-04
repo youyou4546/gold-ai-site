@@ -5,10 +5,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const sections = document.querySelectorAll("main .section");
 
   function allerA(cible) {
-    // « alertes » = Analyse › Suivre le prix, tout en bas (ouvert depuis une notification d'alerte).
+    // « alertes » = Analyse › volet Suivre le prix, déplié (ouvert depuis une notification d'alerte).
     if (cible === "alertes") {
       allerA("analyse");
-      document.getElementById("journal-alertes")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      const volet = document.getElementById("journal-alertes");
+      if (volet) volet.open = true;
+      volet?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
     onglets.forEach((o) => o.classList.toggle("actif", o.dataset.section === cible));
