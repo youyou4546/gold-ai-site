@@ -285,6 +285,7 @@
       seuilEss: cache?.seuilEss,                 // seuil ESS (Profil › Général), conservé tel quel
       liensDirect: cache?.liensDirect,           // liens YouTube des discours (Annonces / Marché), conservés tels quels
       lotsParTp: lotsEdition ?? cache?.lotsParTp, // « Lots par TP » par compte (ce formulaire)
+      essDansCalcul: cache?.essDansCalcul,        // switch ESS (Journal › ESS), conservée telle quelle
     };
     if (r.risqueMode === "pourcentage" && !(r.solde > 0)) erreurs.push("Indique le solde du compte (nécessaire pour un risque en %).");
     if (!(r.risqueValeur > 0)) erreurs.push("Indique la valeur du risque.");

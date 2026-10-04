@@ -239,6 +239,17 @@
       <div id="journal-ess" class="hidden">
         <button type="button" class="bouton-retour" id="bouton-retour-ess"><span aria-hidden="true">←</span> Retour</button>
         <h3 class="titre-bloc">⚖️ ESS</h3>
+        <div class="carte ligne-switch-ess">
+          <label class="switch-ess" for="switch-ess-calcul">
+            <span>
+              <strong>ESS dans le calculateur</strong>
+              <span class="texte-attenue petit">Activé : TP2 à TP4 sont réduits pour que ta journée ne batte pas ta plus grosse journée gagnante.</span>
+            </span>
+            <input type="checkbox" id="switch-ess-calcul" role="switch" />
+            <span class="curseur-switch" aria-hidden="true"></span>
+          </label>
+          <p class="texte-attenue petit" id="message-switch-ess" aria-live="polite"></p>
+        </div>
         <div class="champ choix-compte-journal hidden" id="choix-compte-ess"></div>
         <div id="contenu-ess"></div>
       </div>

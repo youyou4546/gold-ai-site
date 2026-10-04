@@ -203,6 +203,16 @@
     } catch { return null; }
   }
 
+  // Switch ESS (Journal › ESS) : la journée ne doit pas battre la plus grosse journée
+  // gagnante des AUTRES jours. Sans autre jour de trading : pas de limite.
+  function plafondEss(reglages, ctx) {
+    if (!reglages.essDansCalcul) return null;
+    const autres = ctx.tradesCompte.filter((t) => t.date !== ctx.aujourdhui);
+    if (!autres.length) return null;
+    const e = N.essDuTrade({ trades: ctx.tradesCompte, aujourdhui: ctx.aujourdhui, seuil: ctx.seuil, gainTp1: 0, risque: 0 });
+    return Math.round((e.recordGain - ctx.profitJour) * 100) / 100;
+  }
+
   function afficherObjectifAtteint(r, ctx) {
     return `
       <div class="carte encadre-total-calcul">
@@ -220,7 +230,7 @@
       <tr>
         <th scope="row">TP${l.numero}</th>
         <td>${prixAffiche(l.prix)}</td>
-        <td><strong>${lot(l.lot)}</strong>${l.sousMin ? `<br><span class="texte-attenue">sous le min.</span>` : l.plafonne ? `<br><span class="texte-attenue">plafond</span>` : ""}</td>
+        <td><strong>${lot(l.lot)}</strong>${l.sousMin ? `<br><span class="texte-attenue">sous le min.</span>` : l.limiteEss ? `<br><span class="texte-attenue">limite ESS</span>` : l.plafonne ? `<br><span class="texte-attenue">plafond</span>` : ""}</td>
         <td class="positif">${l.gain > 0 ? `▲ ${montant(l.gain, d)}` : "—"}</td>
       </tr>`).join("");
 
@@ -449,7 +459,7 @@
     // ancien calcul selon le risque et la répartition.
     const ctx = await contexteObjectif(reglages);
     const r = ctx
-      ? N.calculerLotsParTp(signalCourant, reglages, N.reglagesLotsPourCompte(reglages, ctx.compte), { profitJour: ctx.profitJour, tauxConversion: tauxUtilise })
+      ? N.calculerLotsParTp(signalCourant, reglages, N.reglagesLotsPourCompte(reglages, ctx.compte), { profitJour: ctx.profitJour, tauxConversion: tauxUtilise, plafondEss: plafondEss(reglages, ctx) })
       : N.calculerPosition(signalCourant, reglages, tauxUtilise);
     dernierCalcul = r.ok ? { r, reglages, signal: { ...signalCourant } } : null;
     zoneResultat.innerHTML = r.ok ? (r.modeLot === "parTp" ? afficherLotsParTp(r, reglages, ctx) : afficherResultat(r, reglages, spec))

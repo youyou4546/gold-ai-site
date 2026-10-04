@@ -621,6 +621,22 @@ test("lots par TP : exemple de référence (0,50 / 0,05 / 0,03 / 0,02 ; risque 3
   assert.deepEqual(N.reduireLotsParTp(r, 280).lots, [0.5, 0.05, 0.01, 0]);
 });
 
+test("lots par TP : switch ESS (ne pas battre la plus grosse journée gagnante)", () => {
+  const signal = N.lireSignal(["XAUUSD SELL", "Entry 4335", "SL 4340", "TP1 4330", "TP2 4325", "TP3 4320", "TP4 4315"].join("\n"));
+  const rl = N.reglagesLotsPourCompte({}, null);
+  // Record 300 $ : TP1 250 + TP2 50 = 300 → TP3 et TP4 à 0
+  let r = N.calculerLotsParTp(signal, REGLAGES_TEST, rl, { plafondEss: 300 });
+  assert.deepEqual(r.lignes.map((l) => l.lot), [0.5, 0.05, 0, 0]);
+  assert.ok(r.lignes[2].limiteEss && !r.lignes[2].sousMin);
+  assert.ok(r.avertissements.some((a) => a.startsWith("ESS :")));
+  // Record 320 $ : TP3 réduit à 20 $ (0,01 lot)
+  assert.deepEqual(N.calculerLotsParTp(signal, REGLAGES_TEST, rl, { plafondEss: 320 }).lignes.map((l) => l.lot), [0.5, 0.05, 0.01, 0]);
+  // Record plus petit que l'objectif : le TP1 reste pour l'objectif, TP2-4 à 0
+  assert.deepEqual(N.calculerLotsParTp(signal, REGLAGES_TEST, rl, { plafondEss: 100 }).lignes.map((l) => l.lot), [0.5, 0, 0, 0]);
+  // Switch coupée (null) : lots normaux
+  assert.deepEqual(N.calculerLotsParTp(signal, REGLAGES_TEST, rl, { plafondEss: null }).lignes.map((l) => l.lot), [0.5, 0.05, 0.03, 0.02]);
+});
+
 test("ESS d'un trade : records par journée, ESS projeté TP1 / SL", () => {
   const trades = [
     { date: "2026-09-28", resultat: 40.86 },

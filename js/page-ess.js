@@ -81,12 +81,34 @@
       <p class="texte-attenue petit">ESS = (plus grande journée gagnante + plus grande journée perdante) ÷ bénéfice net total. ${note}</p>`;
   }
 
+  // Switch « ESS dans le calculateur » (réglage essDansCalcul, partagé entre appareils).
+  async function afficherSwitch() {
+    const c = $("switch-ess-calcul");
+    if (!c) return;
+    try { c.checked = !!(await window.GoldAI.reglagesCalculateur.charger()).essDansCalcul; } catch { /* réglages indisponibles */ }
+  }
+
+  async function changerSwitch(actif) {
+    const msg = $("message-switch-ess");
+    try {
+      const r = await window.GoldAI.reglagesCalculateur.charger({ forcer: true }); // dernière version du serveur
+      const res = await window.GoldAI.reglagesCalculateur.sauvegarder({ ...r, essDansCalcul: actif });
+      msg.textContent = res.local ? res.message : actif
+        ? "✓ Le calculateur limite TP2 à TP4 pour ne pas battre ta plus grosse journée gagnante."
+        : "✓ Le calculateur ne tient plus compte de l'ESS.";
+    } catch {
+      msg.textContent = "Enregistrement impossible pour l'instant : vérifie ta connexion.";
+      $("switch-ess-calcul").checked = !actif;
+    }
+  }
+
   let enCours = null;
   async function afficher() {
     if (!$("contenu-ess") || !window.GoldAI.auth?.getToken()) return;
     const tache = (async () => {
       J().afficherSelecteurCompte("choix-compte-ess");
       const [, reglages] = await Promise.all([J().chargerTousLesTrades(), window.GoldAI.reglagesCalculateur.charger()]);
+      $("switch-ess-calcul").checked = !!reglages?.essDansCalcul;
       dessiner(J().filtrerParCompte(J().obtenirTradesBruts()), reglages || {});
     })();
     enCours = tache;
@@ -95,10 +117,13 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     $("choix-compte-ess")?.addEventListener("change", (e) => J().changerFiltreCompte(e.target.value));
+    $("switch-ess-calcul")?.addEventListener("change", (e) => changerSwitch(e.target.checked));
     $("bouton-ouvrir-ess")?.addEventListener("click", () => {
       $("journal-accueil").classList.add("hidden");
       $("journal-ess").classList.remove("hidden");
       $("contenu-ess").innerHTML = `<p class="etat-vide">Chargement…</p>`;
+      $("message-switch-ess").textContent = "";
+      afficherSwitch();
       J().lireFiltreMemorise(); // au clic seulement (pas à chaque affichage : sinon boucle avec l'événement du filtre)
       afficher();
     });

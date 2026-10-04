@@ -1111,7 +1111,10 @@
    * calculateur (instruments, devise, solde) ; rl : reglagesLotsPourCompte(...) ;
    * profitJour : résultat déjà fait aujourd'hui sur le compte (devise du compte).
    */
-  function calculerLotsParTp(signal, reglages, rl, { profitJour = 0, tauxConversion = null } = {}) {
+  // plafondEss (switch ESS du Journal) : gain maximal de CE trade pour que la journée ne
+  // batte pas la plus grosse journée gagnante ; ne limite que TP2, TP3, TP4… (le TP1 reste
+  // calculé pour l'objectif). null = pas de limite ESS.
+  function calculerLotsParTp(signal, reglages, rl, { profitJour = 0, tauxConversion = null, plafondEss = null } = {}) {
     const erreurs = [], avertissements = [], aConfigurer = [];
     const r2 = (x) => Math.round(x * 100) / 100;
     const spec = reglages?.instruments?.[signal.instrument];
@@ -1164,7 +1167,7 @@
       const distance = Math.abs(tp.prix - signal.entree);
       const gainParLot = distance * valeurParPoint;
       const cible = i === 0 ? objectifRestant : (rl.bonus[i - 1] ?? rl.bonus[rl.bonus.length - 1] ?? 0);
-      const l = { numero: tp.numero, prix: tp.prix, distance, cible, lot: 0, gain: 0, cumul: 0, sousMin: false, plafonne: false, lotMaxAtteint: false };
+      const l = { numero: tp.numero, prix: tp.prix, distance, cible, lot: 0, gain: 0, cumul: 0, sousMin: false, plafonne: false, limiteEss: false, lotMaxAtteint: false };
       if (!(gainParLot > 0)) { l.cumul = r2(cumul); return l; }
       let unites = Math.floor(cible / gainParLot / pas + EPS);                 // arrondi vers le BAS
       if (unites > unitesMax) { unites = unitesMax; l.lotMaxAtteint = true; }
@@ -1173,8 +1176,12 @@
         unites = Math.max(0, Math.floor(resteAuPlafond / gainParLot / pas + EPS));
         l.plafonne = true;
       }
+      if (i > 0 && plafondEss !== null && unites * pas * gainParLot > plafondEss - cumul + EPS) {
+        unites = Math.max(0, Math.floor((plafondEss - cumul) / gainParLot / pas + EPS));
+        l.limiteEss = true;
+      }
       if (unites > 0 && unites < unitesMin) { unites = 0; l.sousMin = true; }
-      else if (unites === 0 && cible > 0 && !l.plafonne) l.sousMin = true;
+      else if (unites === 0 && cible > 0 && !l.plafonne && !l.limiteEss) l.sousMin = true;
       l.lot = versLot(unites);
       l.gain = r2(unites * pas * gainParLot);
       cumul += l.gain;
@@ -1187,6 +1194,7 @@
     if (t1.sousMin) avertissements.push(`TP1 : l'objectif restant (${objectifRestant}) demande moins que le lot minimum (${spec.lotMin}) : lot à 0.`);
     lignes.slice(1).forEach((l) => { if (l.sousMin) avertissements.push(`TP${l.numero} : lot sous le minimum (${spec.lotMin}) pour un bonus de ${l.cible} → mis à 0.`); });
     if (lignes.some((l) => l.plafonne)) avertissements.push(`Plafond de gain du jour (${plafond}) : lot réduit ou mis à 0 sur ${lignes.filter((l) => l.plafonne).map((l) => `TP${l.numero}`).join(", ")}.`);
+    if (lignes.some((l) => l.limiteEss)) avertissements.push(`ESS : ${lignes.filter((l) => l.limiteEss).map((l) => `TP${l.numero}`).join(", ")} limité(s) pour ne pas battre ta plus grosse journée gagnante.`);
     if (signal.tpOuverts > 0) avertissements.push("TP runner (sans prix) : pas de lot calculé pour lui.");
 
     const lotTotal = versLot(lignes.reduce((s, l) => s + Math.round(l.lot / pas), 0));
