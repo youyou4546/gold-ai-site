@@ -103,16 +103,6 @@
     return (valeurs?.length ? valeurs : [null]).map((pct, i) => ligneRepartition(pct, i, groupe)).join("");
   }
 
-  // Un menu par TP : où placer le SL du runner une fois ce TP touché.
-  function ligneSlRunner(regle, k) {
-    const options = [["garder", "Ne pas bouger"], ["entree", "Entrée (breakeven)"]]
-      .concat(Array.from({ length: k }, (_, i) => [`tp${i + 1}`, `Niveau du TP${i + 1}`]));
-    return `<div class="champ">
-      <label for="sl-runner-${k}">Après TP${k + 1} touché</label>
-      <select id="sl-runner-${k}" class="champ-sl-runner">${options.map(([v, lib]) => `<option value="${v}" ${v === regle ? "selected" : ""}>${lib}</option>`).join("")}</select>
-    </div>`;
-  }
-
   function carteInstrument(sym, spec) {
     return `<div class="carte-instrument" data-instrument="${esc(sym)}">
       <div class="entete-instrument">
@@ -177,10 +167,6 @@
 
       <p class="aide">Un TP sans chiffre dans le signal = <strong>TP runner</strong> : il compte comme un TP et prend la portion qui suit les TP chiffrés (ex. TP1, TP2, TP3 + runner → 4 TP).</p>
 
-      <label class="label-groupe">SL du TP runner</label>
-      <p class="aide">Où remonter le SL du TP runner après chaque TP touché. Par défaut, il reste un cran derrière le dernier TP touché.</p>
-      <div class="grille-sl-runner">${(r.slRunner?.length ? r.slRunner : window.GoldAI.noyau.reglesSlRunnerParDefaut()).map(ligneSlRunner).join("")}</div>
-
       <label class="label-groupe">Instruments</label>
       <div id="liste-instruments">${Object.entries(r.instruments || {}).map(([s, spec]) => carteInstrument(s, spec)).join("") || ""}</div>
       <button type="button" class="bouton secondaire bouton-petit" id="ajouter-instrument">+ Ajouter un instrument</button>
@@ -224,7 +210,7 @@
       risqueValeur: val("calc-risque"),
       repartition: lireRepartition().filter((x) => x !== null),
       repartition3: lireRepartition("3").filter((x) => x !== null),
-      slRunner: [...document.querySelectorAll(".champ-sl-runner")].map((c) => c.value),
+      slRunner: cache?.slRunner, // plus réglable dans Général (retiré à la demande) : réglage existant conservé
       instruments: {},
       fuseau: document.getElementById("calc-fuseau").value,
       objectif: cache?.objectif, // réglé à part (carte « Objectif de profit »), conservé tel quel

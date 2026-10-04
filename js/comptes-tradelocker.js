@@ -91,12 +91,14 @@
     afficherNoms();
   }
 
-  // ESS (Equity Stability Score) d'un compte financé, calculé avec les trades
-  // du journal liés à ce compte (depuis la date de passage en Financé si indiquée).
+  // ESS (Equity Stability Score) de chaque compte (Financé ou Évaluation), calculé avec
+  // les trades du journal liés à ce compte (pour un Financé : depuis la date de passage
+  // en Financé si indiquée ; pour une Évaluation : tous ses trades).
   function blocEss(cle) {
     const st = statuts[cle] || {};
+    const depuis = st.statut === "finance" ? st.depuis : null;
     const trades = (window.GoldAI.journal.obtenirTradesBruts() || [])
-      .filter((t) => t.compteTl === cle && (!st.depuis || t.date >= st.depuis));
+      .filter((t) => t.compteTl === cle && (!depuis || t.date >= depuis));
     const e = window.GoldAI.noyau.calculerEss(trades, seuilEss);
     const m = (v, signe = false) => U.montant(v, "USD", { signe });
     const pct = (v) => `${(Math.round(v * 100) / 100).toLocaleString("fr-FR")} %`;
@@ -105,7 +107,7 @@
     const rappel = `<p class="texte-attenue petit">ℹ️ Score calculé avec les trades entrés dans le journal, pas une donnée officielle NOVA : il peut différer s'il manque des trades. Même avec un ESS conforme, les autres règles de paiement doivent aussi être respectées (montant minimum de retrait, pas de brèche du compte, etc.).</p>`;
     if (!e.nbJours) {
       return `<div class="bloc-ess"><div class="entete-ess"><span>ESS</span><strong>—</strong></div>
-        <p class="petit">Aucun trade de ce compte dans le journal${st.depuis ? " depuis le passage en Financé" : ""}.</p>${rappel}</div>`;
+        <p class="petit">Aucun trade de ce compte dans le journal${depuis ? " depuis le passage en Financé" : ""}.</p>${rappel}</div>`;
     }
     const details = `<div class="details-ess">
         <span>Plus grand jour gagnant <strong>${m(e.maxGain, true)}</strong></span>
@@ -165,7 +167,7 @@
             </select></label>
           ${finance ? `<label>Financé depuis le <input type="date" data-depuis="${esc(c.cle)}" value="${esc(st.depuis || "")}"></label>` : ""}
         </div>
-        ${finance ? blocEss(c.cle) : ""}
+        ${blocEss(c.cle)}
       </li>`;
     }).join("");
     $("liste-noms-tradelocker").querySelector("[data-renommer-form] input")?.focus();
@@ -336,7 +338,7 @@
     message("");
     enEdition = null;
     chargerSurnoms().then(() => { afficher(); afficherNoms(); });
-    // Trades du journal : nécessaires au calcul de l'ESS des comptes financés.
+    // Trades du journal : nécessaires au calcul de l'ESS de chaque compte.
     window.GoldAI.journal.chargerTousLesTrades().then(afficherNoms);
     supprimes = []; afficherSupprimes();
     chargerSupprimes();
