@@ -191,17 +191,22 @@
     return (reglages?.repartition || []).map(Number);
   }
 
-  function calculerPosition(signal, reglages, tauxConversion) {
+  // options.objectifRestant (en $, devise du compte) : si fourni, le lot n'est plus
+  // choisi selon le risque mais pour que la PART TP1 de la répartition rapporte
+  // l'objectif restant du jour au TP1 (arrondi vers le bas). 0 → objectif atteint, pas de lot.
+  function calculerPosition(signal, reglages, tauxConversion, options = {}) {
     const erreurs = [];
     const avertissements = [];
     const aConfigurer = [];
+    const objectifRestant = Number.isFinite(Number(options?.objectifRestant)) && options?.objectifRestant !== null ? Math.max(0, Number(options.objectifRestant)) : null;
+    const modeObjectif = objectifRestant !== null;
 
     const spec = reglages?.instruments?.[signal.instrument];
     if (!signal.instrument) erreurs.push("Instrument non précisé.");
     else if (!spec) aConfigurer.push(`Spécifications de ${signal.instrument} (Profil › Général › Paramètres du calculateur).`);
 
-    if (!(reglages?.solde > 0) && reglages?.risqueMode !== "montant") aConfigurer.push("Solde du compte.");
-    if (!(reglages?.risqueValeur > 0)) aConfigurer.push("Risque par trade.");
+    if (!modeObjectif && !(reglages?.solde > 0) && reglages?.risqueMode !== "montant") aConfigurer.push("Solde du compte.");
+    if (!modeObjectif && !(reglages?.risqueValeur > 0)) aConfigurer.push("Risque par trade.");
     if (!reglages?.devise) aConfigurer.push("Devise du compte.");
     const repartition = repartitionPourSignal(signal, reglages);
     const sommeRep = repartition.reduce((s, x) => s + x, 0);
@@ -239,6 +244,7 @@
     const distances = signal.tps.map((t) => Math.abs(t.prix - signal.entree));
     if (distances.some((d, i) => i > 0 && d < distances[i - 1])) avertissements.push("Les TP ne sont pas rangés du plus proche au plus éloigné : vérifie leur ordre.");
     if (erreurs.length) return { ok: false, erreurs, aConfigurer, avertissements };
+    if (modeObjectif && objectifRestant <= 0) return { ok: false, objectifAtteint: true, erreurs: [], aConfigurer: [], avertissements };
 
     // --- Conversion de devise ---
     let taux = 1;
@@ -249,15 +255,24 @@
       taux = tauxConversion;
     }
 
-    // --- Risque demandé ---
-    const risqueDemande = reglages.risqueMode === "montant"
-      ? Number(reglages.risqueValeur)
-      : (Number(reglages.solde) * Number(reglages.risqueValeur)) / 100;
-
     const valeurTickCompte = spec.valeurTick * taux;          // par lot, devise du compte
     const ticksSl = Math.abs(signal.entree - signal.sl) / spec.tailleTick;
     const pertePourUnLot = ticksSl * valeurTickCompte;
-    const lotBrut = risqueDemande / pertePourUnLot;
+
+    // --- Lot brut : selon l'objectif restant (part TP1) ou selon le risque demandé ---
+    let risqueDemande, lotBrut;
+    if (modeObjectif) {
+      const gainPourUnLotTp1 = (Math.abs(signal.tps[0].prix - signal.entree) / spec.tailleTick) * valeurTickCompte;
+      const partTp1 = (repartition[0] || 0) / 100;
+      if (!(gainPourUnLotTp1 > 0) || !(partTp1 > 0)) return { ok: false, avertissements, aConfigurer: [], erreurs: ["TP1 trop proche de l'entrée : impossible de calculer un lot pour l'objectif."] };
+      lotBrut = objectifRestant / (gainPourUnLotTp1 * partTp1);
+      risqueDemande = lotBrut * pertePourUnLot;
+    } else {
+      risqueDemande = reglages.risqueMode === "montant"
+        ? Number(reglages.risqueValeur)
+        : (Number(reglages.solde) * Number(reglages.risqueValeur)) / 100;
+      lotBrut = risqueDemande / pertePourUnLot;
+    }
 
     // --- Lot total : arrondi VERS LE BAS au pas du courtier (jamais au-dessus du risque) ---
     const pas = Number(spec.pasLot);
@@ -297,7 +312,11 @@
       const risqueMinimal = lotMinTotal * pertePourUnLot;
       return {
         ok: false, avertissements, aConfigurer: [],
-        erreurs: [lotBrut < spec.lotMin
+        erreurs: [modeObjectif
+          ? (lotBrut < spec.lotMin
+            ? `Objectif restant trop petit : il faudrait ${lotBrut.toFixed(4)} lot, sous le lot minimum (${spec.lotMin}).`
+            : `Objectif restant trop petit pour ${nbPortions} portions d'au moins ${spec.lotMin} lot : il faudrait au minimum ${lotMinTotal} lot au total.`)
+          : lotBrut < spec.lotMin
           ? `Impossible : pour ne pas dépasser ${risqueDemande.toFixed(2)} ${reglages.devise} de risque, il faudrait ${lotBrut.toFixed(4)} lot, sous le lot minimum (${spec.lotMin}).`
           : `Impossible de répartir ${lotTotal} lot en ${nbPortions} portions d'au moins ${spec.lotMin} lot : il faudrait au minimum ${lotMinTotal} lot, soit ${risqueMinimal.toFixed(2)} ${reglages.devise} de risque (plus que les ${risqueDemande.toFixed(2)} demandés). Réduis le nombre de portions ou augmente le risque.`],
         details: { risqueDemande, lotBrut, lotTotal, pertePourUnLot },
@@ -367,6 +386,8 @@
     return {
       ok: true, erreurs: [], aConfigurer: [], avertissements,
       devise: reglages.devise,
+      modeLot: modeObjectif ? "objectif" : "risque",
+      objectifRestant,
       risqueDemande,
       lotBrut,
       lotTotal,
@@ -1069,6 +1090,35 @@
     return { ...res, ess, eligible, marge: eligible ? r2(total - requis) : 0, manque: eligible ? 0 : r2(requis - total) };
   }
 
+  /**
+   * ESS d'un trade du calculateur (records calculés PAR JOURNÉE) :
+   * trades = journal du compte (déjà filtré), aujourdhui = "AAAA-MM-JJ",
+   * gainTp1 / risque en $ (positifs). Renvoie l'ESS actuel, l'ESS si TP1 touché et
+   * si SL touché (trade ajouté au résultat d'aujourd'hui), le résultat du jour, et
+   * si la journée battrait le record de gain ou de perte des AUTRES jours.
+   */
+  function essDuTrade({ trades, aujourdhui, seuil, gainTp1, risque }) {
+    const r2 = (x) => Math.round(x * 100) / 100;
+    const liste = trades || [];
+    const net = (t) => Number(t.resultat) - (Number(t.frais) || 0);
+    const profitJour = r2(liste.filter((t) => t.date === aujourdhui).reduce((s, t) => s + net(t), 0));
+    const autresJours = {};
+    liste.filter((t) => t.date !== aujourdhui).forEach((t) => { autresJours[t.date] = (autresJours[t.date] || 0) + net(t); });
+    const nets = Object.values(autresJours).map(r2);
+    const recordGain = Math.max(0, ...nets);
+    const recordPerte = Math.abs(Math.min(0, ...nets));
+    const jourSiTp1 = r2(profitJour + (Number(gainTp1) || 0));
+    const jourSiSl = r2(profitJour - (Number(risque) || 0));
+    return {
+      profitJour, recordGain, recordPerte, jourSiTp1, jourSiSl,
+      battraitGain: jourSiTp1 > recordGain,
+      battraitPerte: jourSiSl < 0 && -jourSiSl > recordPerte,
+      actuel: calculerEss(liste, seuil),
+      siTp1: calculerEss([...liste, { date: aujourdhui, resultat: Number(gainTp1) || 0 }], seuil),
+      siSl: calculerEss([...liste, { date: aujourdhui, resultat: -(Number(risque) || 0) }], seuil),
+    };
+  }
+
   // =====================================================================
   // 11. ANALYSE DE MES TRADES (onglet Analyse)
   // =====================================================================
@@ -1289,7 +1339,7 @@
 
   const api = {
     lireSignal, nombresDans, versNombre, detecterInstrument,
-    calculerPosition, repartitionPourSignal, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
+    calculerPosition, repartitionPourSignal, essDuTrade, repartirUnites, planSlRunner, reglesSlRunnerParDefaut, NB_PALIERS_SL_RUNNER,
     ema, atr, calculerTendance, separerBougies,
     fusionnerCalendriers, ecartResultatPrevision, valeurNumerique,
     scorePriorite, analyserImpact, biaisAnnonceOr, sessionsMarche, SESSIONS_MARCHE, estDiscours, phaseDiscours, lecteurYoutube, chaineOfficielle, evaluerGardeFou, regrouperSignaux, aUnTradeGagnant, etatChallenge,

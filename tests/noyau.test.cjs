@@ -534,6 +534,73 @@ test("signal : « Open », « Enter », « Now », « Market », « Price », «
   }
 });
 
+test("ESS : exemple de référence (40,86 / −19,74 / 20,96 → 289,12 %, requis 303, manque 282,04)", () => {
+  const trades = [
+    { date: "2026-09-28", resultat: 40.86 },
+    { date: "2026-09-29", resultat: -19.74 },
+    { date: "2026-09-30", resultat: -0.16 },
+  ];
+  const e = N.calculerEss(trades, 20);
+  assert.equal(e.total, 20.96);
+  assert.equal(Math.round(e.ess * 100) / 100, 289.12);
+  assert.equal(e.requis, 303);
+  assert.equal(e.manque, 282.04);
+  assert.equal(e.eligible, false);
+  // Bénéfice net ≤ 0 → pas d'ESS (tiret à l'écran)
+  assert.equal(N.calculerEss([{ date: "2026-09-28", resultat: -5 }], 20).ess, null);
+  // Aucun jour de trading
+  assert.equal(N.calculerEss([], 20).nbJours, 0);
+});
+
+test("calculateur : lot pour l'objectif du jour (part TP1)", () => {
+  const signal = N.lireSignal(["XAUUSD SELL", "Entry 4335", "SL 4345", "TP1 4329", "TP2 4320"].join("\n"));
+  const reglages = { ...REGLAGES_TEST, repartition: [50, 50] };
+  // TP1 à 6 $ de l'entrée : 1 lot = 600 $ au TP1 → part TP1 (50 %) = 300 $ par lot.
+  // Objectif restant 150 $ → 0,5 lot au total, 0,25 au TP1 (= 150 $).
+  const r = N.calculerPosition(signal, reglages, null, { objectifRestant: 150 });
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.equal(r.modeLot, "objectif");
+  assert.equal(r.lotTotal, 0.5);
+  assert.equal(Math.round(r.portions[0].gainAuTp * 100) / 100, 150);
+  assert.equal(Math.round(r.perteTotaleSl * 100) / 100, 500); // 0,5 lot × 10 $ × 100
+  // Arrondi vers le bas : 155 $ → 0,51 lot max sans dépasser ; TP1 = 0,25 ou 0,26
+  assert.ok(N.calculerPosition(signal, reglages, null, { objectifRestant: 155 }).lotTotal <= 155 / 300 + 1e-9);
+  // Objectif atteint → pas de lot
+  const atteint = N.calculerPosition(signal, reglages, null, { objectifRestant: 0 });
+  assert.equal(atteint.ok, false);
+  assert.equal(atteint.objectifAtteint, true);
+  // Objectif minuscule → sous le lot minimum
+  const petit = N.calculerPosition(signal, reglages, null, { objectifRestant: 0.5 });
+  assert.equal(petit.ok, false);
+  assert.ok(petit.erreurs[0].includes("lot minimum"));
+  // SL manquant → erreur claire
+  const sansSl = N.calculerPosition({ ...signal, sl: null }, reglages, null, { objectifRestant: 150 });
+  assert.ok(sansSl.erreurs.includes("Stop-loss manquant."));
+});
+
+test("ESS d'un trade : records par journée, ESS projeté TP1 / SL", () => {
+  const trades = [
+    { date: "2026-09-28", resultat: 40.86 },
+    { date: "2026-09-29", resultat: -19.74 },
+    { date: "2026-10-05", resultat: 10 },   // aujourd'hui, déjà fait
+  ];
+  const e = N.essDuTrade({ trades, aujourdhui: "2026-10-05", seuil: 20, gainTp1: 35, risque: 40 });
+  assert.equal(e.profitJour, 10);
+  assert.equal(e.recordGain, 40.86);
+  assert.equal(e.recordPerte, 19.74);
+  assert.equal(e.jourSiTp1, 45);       // 10 + 35 > 40,86 → record battu
+  assert.equal(e.battraitGain, true);
+  assert.equal(e.jourSiSl, -30);       // 10 − 40 = −30 → pire que −19,74
+  assert.equal(e.battraitPerte, true);
+  // ESS si TP1 : jours 40,86 / −19,74 / 45 → (45 + 19,74) / 66,12
+  assert.equal(Math.round(e.siTp1.ess * 100) / 100, Math.round(((45 + 19.74) / 66.12) * 10000) / 100);
+  // ESS si SL : total 40,86 − 19,74 − 30 < 0 → pas d'ESS
+  assert.equal(e.siSl.ess, null);
+  const calme = N.essDuTrade({ trades, aujourdhui: "2026-10-05", seuil: 20, gainTp1: 5, risque: 5 });
+  assert.equal(calme.battraitGain, false);
+  assert.equal(calme.battraitPerte, false);
+});
+
 test("garde-fou : perte max par jour, compte par compte", () => {
   const trades = [{ resultat: -150, compteTl: "demo|1" }];
   let g = N.evaluerGardeFou({ trades, regles: {}, limitesComptes: [{ nom: "TOPONE #1", limite: 200, perte: 150 }, { nom: "TOPONE #2", limite: 200, perte: 0 }] });
