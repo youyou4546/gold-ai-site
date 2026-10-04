@@ -94,8 +94,8 @@
       const r = await window.GoldAI.reglagesCalculateur.charger({ forcer: true }); // dernière version du serveur
       const res = await window.GoldAI.reglagesCalculateur.sauvegarder({ ...r, essDansCalcul: actif });
       msg.textContent = res.local ? res.message : actif
-        ? "✓ Le calculateur limite TP2 à TP4 pour ne pas battre ta plus grosse journée gagnante."
-        : "✓ Le calculateur ne tient plus compte de l'ESS.";
+        ? "✓ Calculateur : TP1 = objectif, TP2 à TP4 = bonus, sans battre ta plus grosse journée gagnante."
+        : "✓ Calculateur : lots selon ta répartition, sans limite de bonus.";
     } catch {
       msg.textContent = "Enregistrement impossible pour l'instant : vérifie ta connexion.";
       $("switch-ess-calcul").checked = !actif;

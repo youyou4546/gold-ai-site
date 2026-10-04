@@ -131,7 +131,13 @@
       </div>`;
   }
 
-  function afficherResultat(r, reglages, spec) {
+  function ligneEssTous(ctx, gainTp1, risque, gainTous) {
+    if (!ctx) return "";
+    const t = N.essDuTrade({ trades: ctx.tradesCompte, aujourdhui: ctx.aujourdhui, seuil: ctx.seuil, gainTp1, risque, gainTous }).siTous;
+    return `<p class="petit">ESS requis : ≤ ${nombre(t.seuil, 0)} % · si tous les TP sont touchés : <strong class="${t.calculable ? (t.eligible ? "positif" : "negatif") : ""}">${t.calculable ? `${nombre(t.ess, 2)} % ${t.eligible ? "✅" : "❌"}` : "—"}</strong></p>`;
+  }
+
+  function afficherResultat(r, reglages, spec, ctx = null) {
     const d = r.devise;
     const lignes = r.portions.map((p) => `
       <tr>
@@ -144,7 +150,7 @@
 
     return `
       <div class="grille-stats-perf">
-        ${carteChiffre("Risque demandé", montant(r.risqueDemande, d))}
+        ${r.modeLot === "objectif" ? carteChiffre("Objectif restant", montant(r.objectifRestant, d)) : carteChiffre("Risque demandé", montant(r.risqueDemande, d))}
         ${carteChiffre("Lot utilisé", `${nombre(r.lotTotal, 2)} lot`, "", "carte-mise-en-avant")}
       </div>
 
@@ -164,6 +170,7 @@
             </tbody>
           </table>
         </div>
+        ${r.modeLot === "objectif" ? ligneEssTous(ctx, r.portions.find((p) => p.type === "tp")?.gainAuTp || 0, r.perteTotaleSl, r.gainTotalSiTousTps) : ""}
       </div>
 
       ${afficherTotal(r)}
@@ -234,11 +241,7 @@
         <td class="positif">${l.gain > 0 ? `▲ ${montant(l.gain, d)}` : "—"}</td>
       </tr>`).join("");
 
-    // ESS requis (seuil) et ESS si tous les TP sont touchés (records par journée).
-    const e = N.essDuTrade({ trades: ctx.tradesCompte, aujourdhui: ctx.aujourdhui, seuil: ctx.seuil,
-      gainTp1: r.gainTp1, risque: r.risqueAvantTp1, gainTous: r.cumulTotal });
-    const t = e.siTous;
-    const ligneEss = `<p class="petit">ESS requis : ≤ ${nombre(t.seuil, 0)} % · si tous les TP sont touchés : <strong class="${t.calculable ? (t.eligible ? "positif" : "negatif") : ""}">${t.calculable ? `${nombre(t.ess, 2)} % ${t.eligible ? "✅" : "❌"}` : "—"}</strong></p>`;
+    const ligneEss = ligneEssTous(ctx, r.gainTp1, r.risqueAvantTp1, r.cumulTotal);
     const avertissements = r.avertissements.filter((a) => !a.startsWith("Plafond") && !a.startsWith("TP runner"));
 
     return `
@@ -458,11 +461,19 @@
     // Lots par TP (réglages « Lots par TP » du compte maître) ; sans Journal lisible :
     // ancien calcul selon le risque et la répartition.
     const ctx = await contexteObjectif(reglages);
-    const r = ctx
-      ? N.calculerLotsParTp(signalCourant, reglages, N.reglagesLotsPourCompte(reglages, ctx.compte), { profitJour: ctx.profitJour, tauxConversion: tauxUtilise, plafondEss: plafondEss(reglages, ctx) })
-      : N.calculerPosition(signalCourant, reglages, tauxUtilise);
+    // Switch ESS (Journal › ESS) ON : lots par TP (objectif au TP1 + bonus, sans battre la plus
+    // grosse journée). OFF : la part TP1 de la répartition rapporte l'objectif restant, le lot
+    // total est partagé selon la répartition (pas de limite de bonus).
+    const rl = ctx ? N.reglagesLotsPourCompte(reglages, ctx.compte) : null;
+    let r;
+    if (!ctx) r = N.calculerPosition(signalCourant, reglages, tauxUtilise);
+    else if (reglages.essDansCalcul) r = N.calculerLotsParTp(signalCourant, reglages, rl, { profitJour: ctx.profitJour, tauxConversion: tauxUtilise, plafondEss: plafondEss(reglages, ctx) });
+    else {
+      r = N.calculerPosition(signalCourant, reglages, tauxUtilise, { objectifRestant: Math.max(0, Math.round((rl.objectif - ctx.profitJour) * 100) / 100) });
+      if (r.objectifAtteint) Object.assign(r, { objectif: rl.objectif, profitJour: ctx.profitJour });
+    }
     dernierCalcul = r.ok ? { r, reglages, signal: { ...signalCourant } } : null;
-    zoneResultat.innerHTML = r.ok ? (r.modeLot === "parTp" ? afficherLotsParTp(r, reglages, ctx) : afficherResultat(r, reglages, spec))
+    zoneResultat.innerHTML = r.ok ? (r.modeLot === "parTp" ? afficherLotsParTp(r, reglages, ctx) : afficherResultat(r, reglages, spec, ctx))
       : r.objectifAtteint ? afficherObjectifAtteint(r, ctx) : afficherBlocage(r, reglages, spec);
     memoriserCalcul();
     if (r.ok) verifierMarges(r);
