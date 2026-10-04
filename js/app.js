@@ -64,6 +64,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.data?.type === "aller" && window.GoldAI.auth?.getToken()) allerA(e.data.section);
   });
 
+  // Téléphone : en ouvrant le clavier (ou après un défilement automatique), le
+  // navigateur fait parfois glisser TOUTE la page vers le haut et ne la remet pas en
+  // place → la barre d'onglets du bas disparaît sous l'écran. On la recale dès que
+  // le clavier se ferme ou que la page a glissé (jamais pendant la saisie).
+  const saisieEnCours = () => /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "");
+  const recaler = () => {
+    if (saisieEnCours()) return;
+    if (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop) {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  };
+  window.addEventListener("scroll", recaler, { passive: true });
+  document.addEventListener("focusout", () => setTimeout(recaler, 150));
+  window.visualViewport?.addEventListener("resize", () => setTimeout(recaler, 150));
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) recaler(); });
+
   window.GoldAI = window.GoldAI || {};
   window.GoldAI.app = { allerA };
 });

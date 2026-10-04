@@ -36,6 +36,9 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   /* Empêche le "rebond" de défilement de ressembler à une page web sur iOS */
   overscroll-behavior-y: none;
+  /* Seul <main> défile : la page entière ne doit jamais glisser (sinon la barre
+     d'onglets du bas sort de l'écran, voir app.js › recaler). */
+  overflow: hidden;
 }
 
 body {
