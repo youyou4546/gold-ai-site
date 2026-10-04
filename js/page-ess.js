@@ -94,7 +94,7 @@
       const r = await window.GoldAI.reglagesCalculateur.charger({ forcer: true }); // dernière version du serveur
       const res = await window.GoldAI.reglagesCalculateur.sauvegarder({ ...r, essDansCalcul: actif });
       msg.textContent = res.local ? res.message : actif
-        ? "✓ Calculateur : lots coupés à partir du TP2 pour ne pas battre ta plus grosse journée gagnante."
+        ? "✓ Calculateur : lots coupés à partir du TP2 pour ne pas dépasser ton objectif quotidien."
         : "✓ Calculateur : lots selon ta répartition, sans coupe.";
     } catch {
       msg.textContent = "Enregistrement impossible pour l'instant : vérifie ta connexion.";

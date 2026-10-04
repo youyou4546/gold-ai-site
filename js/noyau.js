@@ -191,8 +191,8 @@
     return (reglages?.repartition || []).map(Number);
   }
 
-  // options.plafondEss (switch ESS) : gain maximal de CE trade pour que la journée ne batte
-  // pas la plus grosse journée gagnante. Les lots sont calculés selon la répartition, puis
+  // options.plafondEss (switch ESS) : gain maximal de CE trade pour que la journée ne dépasse
+  // pas l'objectif quotidien (journées régulières → ESS réussi). Les lots sont calculés selon la répartition, puis
   // COUPÉS à partir du TP2 (TP2, TP3… puis le runner) dès que ce gain serait dépassé ;
   // le TP1 n'est jamais coupé. null = pas de coupe.
   // options.objectifRestant (en $, devise du compte) : si fourni, le lot n'est plus
@@ -372,7 +372,7 @@
       if (coupes.size) {
         unites = unitesPortions.reduce((s, u) => s + u, 0);
         lotTotal = arrondir(unites * pas, decimalesLot);
-        avertissements.push(`ESS : ${[...coupes].map((i) => (portionsDef[i].type === "tp" ? `TP${portionsDef[i].numero}` : "TP runner")).join(", ")} coupé(s) pour que ta journée ne batte pas ta plus grosse journée gagnante.`);
+        avertissements.push(`ESS : ${[...coupes].map((i) => (portionsDef[i].type === "tp" ? `TP${portionsDef[i].numero}` : "TP runner")).join(", ")} coupé(s) pour que ta journée ne dépasse pas ton objectif quotidien.`);
       }
     }
 

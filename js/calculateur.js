@@ -210,14 +210,12 @@
     } catch { return null; }
   }
 
-  // Switch ESS (Journal › ESS) : la journée ne doit pas battre la plus grosse journée
-  // gagnante des AUTRES jours. Sans autre jour de trading : pas de limite.
-  function plafondEss(reglages, ctx) {
+  // Switch ESS (Journal › ESS) : la journée ne dépasse pas l'objectif quotidien, pour que
+  // toutes les journées gagnantes se ressemblent (c'est ce qui fait passer l'ESS).
+  // Renvoie le gain maximal de CE trade (objectif − déjà fait aujourd'hui), ou null.
+  function plafondEss(reglages, ctx, rl) {
     if (!reglages.essDansCalcul) return null;
-    const autres = ctx.tradesCompte.filter((t) => t.date !== ctx.aujourdhui);
-    if (!autres.length) return null;
-    const e = N.essDuTrade({ trades: ctx.tradesCompte, aujourdhui: ctx.aujourdhui, seuil: ctx.seuil, gainTp1: 0, risque: 0 });
-    return Math.round((e.recordGain - ctx.profitJour) * 100) / 100;
+    return Math.max(0, Math.round((rl.objectif - ctx.profitJour) * 100) / 100);
   }
 
   function afficherObjectifAtteint(r, ctx) {
@@ -470,7 +468,7 @@
     else {
       r = N.calculerPosition(signalCourant, reglages, tauxUtilise, {
         objectifRestant: Math.max(0, Math.round((rl.objectif - ctx.profitJour) * 100) / 100),
-        plafondEss: plafondEss(reglages, ctx),
+        plafondEss: plafondEss(reglages, ctx, rl),
       });
       if (r.objectifAtteint) Object.assign(r, { objectif: rl.objectif, profitJour: ctx.profitJour });
     }
