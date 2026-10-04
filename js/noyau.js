@@ -53,7 +53,8 @@
 
   const MOTIF_ACHAT = /\b(buy|achat|acheter|achete|achète|long)\b/i;
   const MOTIF_VENTE = /\b(sell|vente|vendre|vends|short)\b/i;
-  const MOTIF_ENTREE = /(point\s*d.?\s*entr[ée]e|entr[ée]e|entry|prix\s*d.?\s*entr[ée]e|open\s*price|@)/i;
+  // Entrée : « Entry », « Open », « Enter », « Now », « Market », « Price », « CMP », « @ », « Entrée »…
+  const MOTIF_ENTREE = /(point\s*d.?\s*entr[ée]e|prix\s*d.?\s*entr[ée]e|entr[ée]e|entrer|@)|\b(entry|entries|enter(?:ing)?|open(?:ed)?(?:\s*price)?|now|market|cmp|price)\b/i;
   const MOTIF_SL = /\b(sl|s\/l|stop[\s-]*loss|stop)\b/i;
   const MOTIF_TP = /\b(?:tp|take[\s-]*profit|objectif|target)\s*(\d{1,2}(?![\d.,]))?\s*[:=\-–>]*\s*/i;
   const MOTIF_TP_OUVERT = /\b(ouvert|open|runner|libre|illimit[ée])\b/i;

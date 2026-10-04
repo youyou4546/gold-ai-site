@@ -524,6 +524,16 @@ test("répartition : groupe « 3 TP » pour un signal à 3 TP, groupe principal 
   assert.equal(r.choixRepartition, true);
 });
 
+test("signal : « Open », « Enter », « Now », « Market », « Price », « CMP » = prix d'entrée", () => {
+  const lignes = ["Open 4335", "OPEN: 4335", "Open price 4335", "Enter 4335", "Entry @ 4335", "Now 4335", "Market 4335", "Price 4335", "CMP 4335", "Entrée : 4335", "@4335"];
+  for (const ligne of lignes) {
+    const s = N.lireSignal(["XAUUSD SELL", ligne, "SL 4345", "TP1 4329", "TP2 4320", "TP3 4310", "TP4 open"].join("\n"));
+    assert.equal(s.entree, 4335, ligne);
+    assert.equal(s.tps.length, 3, ligne);
+    assert.equal(s.tpOuverts, 1, ligne); // « TP4 open » reste un TP runner, pas une entrée
+  }
+});
+
 test("garde-fou : perte max par jour, compte par compte", () => {
   const trades = [{ resultat: -150, compteTl: "demo|1" }];
   let g = N.evaluerGardeFou({ trades, regles: {}, limitesComptes: [{ nom: "TOPONE #1", limite: 200, perte: 150 }, { nom: "TOPONE #2", limite: 200, perte: 0 }] });

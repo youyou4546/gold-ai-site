@@ -81,6 +81,8 @@
     if (zone) zone.textContent = message || texte;
     const b = $("bouton-notifications");
     if (b) { b.classList.toggle("hidden", !bouton); b.textContent = bouton || ""; b.classList.toggle("secondaire", e === "actif"); }
+    // Carte du Profil : retirée une fois activé (désactivation : réglages du téléphone).
+    $("carte-notifications")?.classList.toggle("hidden", e === "actif" && !message);
     // Proposition discrète dans Annonces, tant que ce n'est pas activé.
     $("proposition-notifications")?.classList.toggle("hidden", !(e === "inactif" || e === "installer"));
   }
