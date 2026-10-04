@@ -17,6 +17,7 @@
   // Règle « arrêt après le premier trade gagnant » (Profil › Général) :
   let calculConfirme = false;     // « Continuer quand même » choisi pour le signal en cours
   let avertissementGain = null;   // { depuisTexte } tant que l'avertissement attend une réponse
+  let texteCalcule = null;        // signal collé déjà calculé : reste dans le champ, effacé au prochain toucher
 
   // Le dernier calcul reste affiché (même après avoir changé d'onglet, fermé ou
   // rechargé l'app) jusqu'au bouton « Retour » en bas du calculateur : il est
@@ -24,7 +25,7 @@
   const cleMemoire = () => `goldai_dernier_calcul_${window.GoldAI.auth?.getNom?.() || "anonyme"}`;
   function memoriserCalcul() {
     try {
-      localStorage.setItem(cleMemoire(), JSON.stringify({ signal: signalCourant, lecture: lectureCourante, repartitionForcee, taux }));
+      localStorage.setItem(cleMemoire(), JSON.stringify({ signal: signalCourant, lecture: lectureCourante, repartitionForcee, taux, texte: texteCalcule }));
     } catch { /* stockage indisponible : le calcul reste affiché tant que l'app est ouverte */ }
   }
   function lireCalculMemorise() {
@@ -266,6 +267,8 @@
     if (confirme) calculConfirme = true;
     else if (depuisTexte) calculConfirme = false;
     if (avertissementGain && !confirme && !depuisTexte) return; // on attend la réponse
+    // « Calculer » retouché sans changer le signal resté dans le champ : le calcul affiché reste.
+    if (depuisTexte && !confirme && signalCourant && texteCalcule !== null && document.getElementById("champ-signal").value === texteCalcule) return;
     avertissementGain = null;
     if (!calculConfirme && (await doitAvertirApresGain())) {
       if (depuisTexte && !document.getElementById("champ-signal").value.trim()) {
@@ -288,11 +291,10 @@
         return;
       }
       lectureCourante = N.lireSignal(texte);
-      // Le champ est vidé tout de suite, prêt pour le trade suivant (le
-      // signal lu reste en mémoire pour le résultat et les corrections).
-      const champSignal = document.getElementById("champ-signal");
-      champSignal.value = "";
-      champSignal.blur();
+      // Le signal collé reste visible dans le champ ; il s'efface quand on
+      // touche de nouveau le champ (pour coller le trade suivant).
+      texteCalcule = texte;
+      document.getElementById("champ-signal").blur();
       signalCourant = { instrument: lectureCourante.instrument, sens: lectureCourante.sens, entree: lectureCourante.entree, sl: lectureCourante.sl, tps: lectureCourante.tps, tpOuverts: lectureCourante.tpOuverts };
       repartitionForcee = null;
       // Le signal interprété reste construit (le calcul le relit) mais n'est
@@ -338,6 +340,9 @@
     repartitionForcee = null;
     taux = null;
     dernierCalcul = null;
+    texteCalcule = null;
+    const champSignal = document.getElementById("champ-signal");
+    if (champSignal) champSignal.value = "";
     calculConfirme = false;
     avertissementGain = null;
     const zoneSignal = document.getElementById("zone-signal-interprete");
@@ -362,6 +367,9 @@
     signalCourant = m.signal;
     repartitionForcee = m.repartitionForcee || null;
     taux = m.taux || null;
+    texteCalcule = m.texte ?? null;
+    const champSignal = document.getElementById("champ-signal");
+    if (champSignal && texteCalcule !== null && !champSignal.value) champSignal.value = texteCalcule;
     const zoneSignal = document.getElementById("zone-signal-interprete");
     zoneSignal.innerHTML = afficherSignalEditable(signalCourant, lectureCourante);
     zoneSignal.classList.toggle("hidden", !(lectureCourante.ambiguites.length || lectureCourante.aPreciser.length));
@@ -374,6 +382,15 @@
     if (!section) return;
 
     document.getElementById("bouton-calculer").addEventListener("click", () => calculer({ depuisTexte: true }));
+    // Toucher le champ qui montre encore le signal déjà calculé : il se vide
+    // pour le trade suivant (le résultat affiché, lui, reste jusqu'à « Retour »).
+    document.getElementById("champ-signal").addEventListener("focus", (e) => {
+      if (texteCalcule !== null && e.target.value === texteCalcule) {
+        e.target.value = "";
+        texteCalcule = null;
+        memoriserCalcul();
+      }
+    });
 
     section.addEventListener("click", async (e) => {
       const t = e.target;
