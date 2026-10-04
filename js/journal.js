@@ -218,6 +218,7 @@
     document.getElementById("journal-calendrier")?.classList.add("hidden");
     document.getElementById("journal-performance")?.classList.add("hidden");
     document.getElementById("journal-analyse")?.classList.add("hidden");
+    document.getElementById("journal-ess")?.classList.add("hidden");
     document.getElementById("journal-accueil")?.classList.remove("hidden");
   }
 

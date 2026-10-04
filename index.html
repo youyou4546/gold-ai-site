@@ -229,6 +229,18 @@
           <span class="icone-tuile">📈</span>
           <span>Analyse de mes trades</span>
         </button>
+        <button class="tuile-journal" id="bouton-ouvrir-ess">
+          <span class="icone-tuile">⚖️</span>
+          <span>ESS</span>
+        </button>
+      </div>
+
+      <!-- Vue ESS (js/page-ess.js) : passe / ne passe pas + tableau des résultats, ouverte par sa tuile -->
+      <div id="journal-ess" class="hidden">
+        <button type="button" class="bouton-retour" id="bouton-retour-ess"><span aria-hidden="true">←</span> Retour</button>
+        <h3 class="titre-bloc">⚖️ ESS</h3>
+        <div class="champ choix-compte-journal hidden" id="choix-compte-ess"></div>
+        <div id="contenu-ess"></div>
       </div>
 
       <!-- Vue Analyse de mes trades (js/analyse-trades.js), ouverte par sa tuile -->
@@ -693,6 +705,7 @@
 <script src="js/challenge-comptes.js"></script>
 <script src="js/briefing.js"></script>
 <script src="js/analyse-trades.js"></script>
+<script src="js/page-ess.js"></script>
 <script src="js/analyse-ia.js"></script>
 <script src="js/parametres.js"></script>
 <script src="js/profil-comptes.js"></script>
