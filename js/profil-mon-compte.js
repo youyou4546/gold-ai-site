@@ -58,7 +58,9 @@
 
     const { data, error } = await client().rpc("obtenir_mon_profil", { p_token: token() });
     if (gererErreur(error)) return;
-    if (data) afficherAvatar(data.photo_data);
+    // obtenir_mon_profil renvoie une TABLE : Supabase donne une liste d'une ligne.
+    const profil = Array.isArray(data) ? data[0] : data;
+    if (profil) afficherAvatar(profil.photo_data);
   }
 
   // Appelé par auth.js à la déconnexion pour ne pas garder la photo de
