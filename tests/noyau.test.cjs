@@ -554,7 +554,7 @@ test("ESS : exemple de référence (40,86 / −19,74 / 20,96 → 289,12 %, requi
 
 test("calculateur : lot pour l'objectif du jour (part TP1)", () => {
   const signal = N.lireSignal(["XAUUSD SELL", "Entry 4335", "SL 4345", "TP1 4329", "TP2 4320"].join("\n"));
-  const reglages = { ...REGLAGES_TEST, repartition: [50, 50] };
+  const reglages = { ...REGLAGES_TEST, repartition: [50, 50], risqueValeur: 10 }; // risque large : on teste l'objectif
   // TP1 à 6 $ de l'entrée : 1 lot = 600 $ au TP1 → part TP1 (50 %) = 300 $ par lot.
   // Objectif restant 150 $ → 0,5 lot au total, 0,25 au TP1 (= 150 $).
   const r = N.calculerPosition(signal, reglages, null, { objectifRestant: 150 });
@@ -621,9 +621,27 @@ test("lots par TP : exemple de référence (0,50 / 0,05 / 0,03 / 0,02 ; risque 3
   assert.deepEqual(N.reduireLotsParTp(r, 280).lots, [0.5, 0.05, 0.01, 0]);
 });
 
+test("lot pour l'objectif : le risque par trade n'est jamais dépassé", () => {
+  const signal = N.lireSignal(["XAUUSD SELL", "Entry 4335", "SL 4340", "TP1 4330", "TP2 4325", "TP3 4320", "TP4 4315"].join("\n"));
+  // Risque 0,2 % de 100 000 $ = 200 $ ; SL à 5 $ → 100 $ de perte par 0,1 lot → 0,40 lot max
+  const reglages = { ...REGLAGES_TEST, repartition: [70, 20, 5, 5], risqueValeur: 0.2 };
+  const r = N.calculerPosition(signal, reglages, null, { objectifRestant: 300 });
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.equal(r.risqueLimite, true);
+  assert.equal(r.lotTotal, 0.4);
+  assert.ok(r.perteTotaleSl <= 200 + 1e-9);
+  assert.ok(r.avertissements.some((a) => a.startsWith("Risque par trade respecté")));
+  // Objectif petit : le risque n'est pas atteint, rien n'est réduit
+  const petit = N.calculerPosition(signal, reglages, null, { objectifRestant: 100 });
+  assert.equal(petit.risqueLimite, false);
+  assert.ok(petit.perteTotaleSl < 200);
+  // Risque en montant fixe
+  assert.equal(N.calculerPosition(signal, { ...reglages, risqueMode: "montant", risqueValeur: 150 }, null, { objectifRestant: 300 }).lotTotal, 0.3);
+});
+
 test("répartition + coupe ESS : lots coupés à partir du TP2", () => {
   const signal = N.lireSignal(["XAUUSD SELL", "Entry 4335", "SL 4340", "TP1 4330", "TP2 4325", "TP3 4320", "TP4 4315"].join("\n"));
-  const reglages = { ...REGLAGES_TEST, repartition: [65, 20, 5, 10] };
+  const reglages = { ...REGLAGES_TEST, repartition: [65, 20, 5, 10], risqueValeur: 10 }; // risque large : on teste la coupe
   // Sans coupe : 0,49 / 0,15 / 0,04 / 0,08 (TP1 = 245 $ pour un objectif de 250 $)
   const libre = N.calculerPosition(signal, reglages, null, { objectifRestant: 250 });
   assert.deepEqual(libre.portions.map((p) => p.lot), [0.49, 0.15, 0.04, 0.08]);

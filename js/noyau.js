@@ -265,12 +265,22 @@
     const pertePourUnLot = ticksSl * valeurTickCompte;
 
     // --- Lot brut : selon l'objectif restant (part TP1) ou selon le risque demandé ---
-    let risqueDemande, lotBrut;
+    let risqueDemande, lotBrut, risqueLimite = false;
     if (modeObjectif) {
       const gainPourUnLotTp1 = (Math.abs(signal.tps[0].prix - signal.entree) / spec.tailleTick) * valeurTickCompte;
       const partTp1 = (repartition[0] || 0) / 100;
       if (!(gainPourUnLotTp1 > 0) || !(partTp1 > 0)) return { ok: false, avertissements, aConfigurer: [], erreurs: ["TP1 trop proche de l'entrée : impossible de calculer un lot pour l'objectif."] };
       lotBrut = objectifRestant / (gainPourUnLotTp1 * partTp1);
+      // Risque par trade (Profil › Général › Compte et risque) : jamais dépassé. Si le lot de
+      // l'objectif risque plus, il est réduit au risque maximal (le TP1 rapportera moins).
+      const risqueMax = reglages.risqueValeur > 0
+        ? (reglages.risqueMode === "montant" ? Number(reglages.risqueValeur) : reglages.solde > 0 ? (Number(reglages.solde) * Number(reglages.risqueValeur)) / 100 : null)
+        : null;
+      if (risqueMax !== null && lotBrut * pertePourUnLot > risqueMax + EPS) {
+        avertissements.push(`Risque par trade respecté (${arrondir(risqueMax, 2)} ${reglages.devise} max) : le lot est réduit, le TP1 ne rapportera pas tout l'objectif restant (${arrondir(objectifRestant, 2)} ${reglages.devise}).`);
+        lotBrut = risqueMax / pertePourUnLot;
+        risqueLimite = true;
+      }
       risqueDemande = lotBrut * pertePourUnLot;
     } else {
       risqueDemande = reglages.risqueMode === "montant"
@@ -420,6 +430,7 @@
       ok: true, erreurs: [], aConfigurer: [], avertissements,
       devise: reglages.devise,
       modeLot: modeObjectif ? "objectif" : "risque",
+      risqueLimite,
       objectifRestant,
       risqueDemande,
       lotBrut,
