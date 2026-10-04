@@ -109,8 +109,8 @@
   function noteLots(cle) {
     if (cle === "_defaut") return "";
     return lotsEdition?.[cle]
-      ? `Ce compte a ses propres réglages. <button type="button" class="lien-retour" id="lots-revenir-defaut">Revenir aux réglages par défaut</button>`
-      : "Ce compte utilise les réglages par défaut : une modification lui crée ses propres réglages.";
+      ? `<button type="button" class="lien-retour" id="lots-revenir-defaut">Revenir aux réglages par défaut</button>`
+      : "";
   }
 
   function champsLots(cle) {
@@ -172,7 +172,6 @@
           <select data-spec="deviseProfit">${DEVISES.map((d) => `<option ${spec?.deviseProfit === d ? "selected" : ""}>${d}</option>`).join("")}</select>
         </div>
       </div>
-      <p class="aide">Vérifie ces valeurs dans les spécifications de contrat de TON courtier : elles diffèrent d'un courtier à l'autre (ex. XAUUSD à 100 onces ou non, tick de 0.01 ou 0.001).</p>
     </div>`;
   }
 
@@ -216,13 +215,9 @@
         <button type="button" class="bouton secondaire bouton-petit" id="ajouter-rep3" data-groupe="3">+ Ajouter une portion</button>
         <span id="total-repartition3" class="total-rep"></span>
       </div>
-      <p class="aide">Laissé vide : le groupe « 4 TP » sert aussi pour les signaux à 3 TP.</p>
 
-      <p class="aide">Un TP sans chiffre dans le signal = <strong>TP runner</strong> : il compte comme un TP et prend la portion qui suit les TP chiffrés (ex. TP1, TP2, TP3 + runner → 4 TP).</p>
-      <p class="aide">La répartition ne sert plus que si le Journal est illisible : le calculateur utilise « Lots par TP » ci-dessous.</p>
 
       <label class="label-groupe">Lots par TP (calculateur)</label>
-      <p class="aide">Une position par TP : le TP1 rapporte à lui seul l'objectif restant du jour, chaque TP suivant rapporte son bonus, sans dépasser le plafond du jour. Le calculateur utilise les réglages du compte maître ⭐.</p>
       <div class="champ">
         <label for="lots-compte">Compte</label>
         <select id="lots-compte"><option value="_defaut">Tous les comptes (par défaut)</option></select>

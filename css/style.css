@@ -2022,3 +2022,5 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .switch-ess input:checked + .curseur-switch::after { transform: translateX(20px); }
 .switch-ess input:focus-visible + .curseur-switch { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ligne-switch-ess #message-switch-ess:empty { display: none; }
+
+#lots-note:empty { display: none; }
