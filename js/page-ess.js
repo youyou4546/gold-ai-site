@@ -24,8 +24,7 @@
 
   function dessiner(trades, reglages) {
     const zone = $("contenu-ess");
-    const filtre = J().filtreActuel();
-    const st = (reglages.statutsComptes || {})[filtre] || {};
+    const st = (reglages.statutsComptes || {})[reglages.compteMaitre] || {};
     const depuis = st.statut === "finance" ? st.depuis : null;
     const retenus = trades.filter((t) => !depuis || t.date >= depuis);
     const e = N.calculerEss(retenus, reglages.seuilEss);
@@ -106,17 +105,28 @@
   async function afficher() {
     if (!$("contenu-ess") || !window.GoldAI.auth?.getToken()) return;
     const tache = (async () => {
-      J().afficherSelecteurCompte("choix-compte-ess");
+      // Toujours le compte maître (Profil › Mes comptes TradeLocker), comme le calculateur.
       const [, reglages] = await Promise.all([J().chargerTousLesTrades(), window.GoldAI.reglagesCalculateur.charger()]);
       $("switch-ess-calcul").checked = !!reglages?.essDansCalcul;
-      dessiner(J().filtrerParCompte(J().obtenirTradesBruts()), reglages || {});
+      const maitre = reglages?.compteMaitre;
+      const tous = J().obtenirTradesBruts();
+      const nom = maitre ? (reglages.surnomsComptes?.[maitre] || J().surnomDe?.(maitre) || tous.find((t) => t.compteTl === maitre)?.compteTlNom || "Compte maître") : null;
+      $("compte-ess").innerHTML = maitre
+        ? `Compte maître : <strong>${esc(nom)}</strong> ⭐`
+        : `<button type="button" class="lien-retour" id="lien-maitre-ess">Choisis un compte maître dans Mes comptes TradeLocker</button>`;
+      if (!maitre) { $("contenu-ess").innerHTML = ""; return; }
+      dessiner(tous.filter((t) => t.compteTl === maitre), reglages);
     })();
     enCours = tache;
     try { await tache; } finally { if (enCours === tache) enCours = null; }
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    $("choix-compte-ess")?.addEventListener("change", (e) => J().changerFiltreCompte(e.target.value));
+    $("compte-ess")?.addEventListener("click", (e) => {
+      if (e.target.id !== "lien-maitre-ess") return;
+      window.GoldAI.app.allerA("profil");
+      window.GoldAI.comptesTradelocker?.ouvrir?.();
+    });
     $("switch-ess-calcul")?.addEventListener("change", (e) => changerSwitch(e.target.checked));
     $("bouton-ouvrir-ess")?.addEventListener("click", () => {
       $("journal-accueil").classList.add("hidden");
@@ -124,7 +134,6 @@
       $("contenu-ess").innerHTML = `<p class="etat-vide">Chargement…</p>`;
       $("message-switch-ess").textContent = "";
       afficherSwitch();
-      J().lireFiltreMemorise(); // au clic seulement (pas à chaque affichage : sinon boucle avec l'événement du filtre)
       afficher();
     });
     $("bouton-retour-ess")?.addEventListener("click", () => {
@@ -132,7 +141,6 @@
       $("journal-accueil").classList.remove("hidden");
     });
   });
-  window.addEventListener("goldai:filtre-compte", () => { if (ouverte()) afficher(); });
   window.addEventListener("goldai:trades", () => { if (ouverte()) afficher(); });
   window.addEventListener("goldai:reglages-calculateur", () => { if (ouverte()) afficher(); });
 
