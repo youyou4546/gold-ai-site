@@ -2056,3 +2056,15 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
   nav.barre-onglets button.actif { background: var(--accent); color: var(--fond); box-shadow: var(--lueur-accent); }
   main { padding: 22px 32px 32px; }
 }
+
+/* Ordinateur : le calendrier du Journal tient dans la hauteur de l'écran (pas de défilement).
+   Les cases ne sont plus carrées : 6 rangées max se partagent la hauteur restante. */
+@media (min-width: 900px) {
+  #journal-calendrier .grille-calendrier { grid-auto-rows: minmax(52px, calc((100dvh - 370px) / 6)); gap: 6px; }
+  #journal-calendrier .case-jour { aspect-ratio: auto; }
+  #journal-calendrier .case-jour .numero-jour { font-size: 13px; }
+  #journal-calendrier .case-jour .resultat-jour { font-size: 14px; }
+  #journal-calendrier .case-jour.case-semaine .numero-jour { font-size: 11px; }
+  #journal-calendrier .entete-mois, #journal-calendrier .total-mois { margin-bottom: 10px; }
+  #journal-calendrier .choix-compte-bas { margin-top: 10px; }
+}
