@@ -16,6 +16,7 @@ import configparser
 import datetime as dt
 import sys
 from collections import defaultdict
+from zoneinfo import ZoneInfo
 
 import requests
 
@@ -31,6 +32,78 @@ def utc(ts):
 
 
 TERMINAL_PAR_DEFAUT = "C:/Program Files/MetaTrader 5/terminal64.exe"
+ECART_SIGNAL_S = 120  # positions ouvertes à ≤ 2 min d'écart (même instrument, même sens) = un seul signal
+NEW_YORK = ZoneInfo("America/New_York")
+
+
+def heure_serveur_vers_utc(ts):
+    """Les heures MT5 sont l'heure du SERVEUR codée comme de l'UTC. Convention des
+    courtiers forex (FundedNext compris) : serveur = New York + 7 h (UTC+2 l'hiver,
+    UTC+3 l'été américain)."""
+    approx = dt.datetime.fromtimestamp(ts, dt.timezone.utc)
+    decalage = approx.astimezone(NEW_YORK).utcoffset() + dt.timedelta(hours=7)
+    return (approx - decalage).replace(tzinfo=dt.timezone.utc)
+
+
+def trades_fermes(deals, positions_ouvertes, login, nom):
+    """Positions fermées regroupées en SIGNAUX (comme l'import TradeLocker) pour le Journal."""
+    pos = defaultdict(lambda: {"in": [], "out": []})
+    for d in deals:
+        if d.type not in TYPES_TRADES or not d.position_id:
+            continue
+        pos[d.position_id]["in" if d.entry == 0 else "out"].append(d)
+    ouvertes = {p.ticket for p in positions_ouvertes}
+    liste = []
+    for pid, x in pos.items():
+        if not x["in"] or not x["out"] or pid in ouvertes:
+            continue
+        vol_in = sum(d.volume for d in x["in"])
+        if sum(d.volume for d in x["out"]) + 1e-9 < vol_in:
+            continue  # encore partiellement ouverte
+        tous = x["in"] + x["out"]
+        couts = sum(d.commission + d.swap + getattr(d, "fee", 0.0) for d in tous)
+        liste.append({
+            "pid": pid, "symbole": x["in"][0].symbol, "sens": "buy" if x["in"][0].type == 0 else "sell",
+            "ouvert": min(d.time for d in x["in"]), "ferme": max(d.time for d in x["out"]),
+            "lots": vol_in, "profit": sum(d.profit for d in x["out"]), "couts": couts,
+            "entree": sum(d.price * d.volume for d in x["in"]) / vol_in,
+            "sortie": sum(d.price * d.volume for d in x["out"]) / max(1e-9, sum(d.volume for d in x["out"])),
+            "vol_out": sum(d.volume for d in x["out"]),
+        })
+    liste.sort(key=lambda p: p["ouvert"])
+    # Signaux : même instrument + sens, ouverts à ≤ 2 min du début du signal.
+    signaux = []
+    for p in liste:
+        g = next((g for g in signaux if g[0]["symbole"] == p["symbole"] and g[0]["sens"] == p["sens"]
+                  and 0 <= p["ouvert"] - g[0]["ouvert"] <= ECART_SIGNAL_S), None)
+        (g.append(p) if g else signaux.append([p]))
+    # Un signal dont une position est encore ouverte attend d'être complet.
+    ouvertes_info = [(o.symbol, "buy" if o.type == 0 else "sell", o.time) for o in positions_ouvertes]
+    r = lambda v, n=2: round(v, n)
+    trades = []
+    for g in signaux:
+        if any(s == g[0]["symbole"] and se == g[0]["sens"] and abs(t - g[0]["ouvert"]) <= ECART_SIGNAL_S for s, se, t in ouvertes_info):
+            continue
+        g.sort(key=lambda p: p["ferme"])
+        profit = sum(p["profit"] for p in g)
+        couts = sum(p["couts"] for p in g)
+        frais = r(max(0.0, -couts))
+        resultat = r(profit + max(0.0, couts))  # un swap POSITIF s'ajoute au résultat
+        lots = r(sum(p["lots"] for p in g))
+        entree = sum(p["entree"] * p["lots"] for p in g) / sum(p["lots"] for p in g)
+        sortie = sum(p["sortie"] * p["vol_out"] for p in g) / sum(p["vol_out"] for p in g)
+        detail = f" en {len(g)} positions (" + " · ".join(f"{i + 1} : {'+' if p['profit'] >= 0 else ''}{r(p['profit'])}" for i, p in enumerate(g)) + ")" if len(g) > 1 else ""
+        trades.append({
+            "ref": f"mt5|{login}|{g[0]['pid']}",
+            "ouvert_le": heure_serveur_vers_utc(g[0]["ouvert"]).isoformat(),
+            "ferme_le": heure_serveur_vers_utc(max(p["ferme"] for p in g)).isoformat(),
+            "instrument": g[0]["symbole"], "sens": g[0]["sens"],
+            "resultat": resultat, "frais": frais,
+            "prix_entree": r(entree, 5), "prix_sortie": r(sortie, 5),
+            "note": f"Importé de MT5 · {nom} #{login} · {'Achat' if g[0]['sens'] == 'buy' else 'Vente'} {lots} lot{detail}"
+                    + (f" · frais MT5 : {frais}" if frais else ""),
+        })
+    return trades
 
 
 def lire_compte(mt5, terminal, sec):
@@ -63,7 +136,9 @@ def lire_compte(mt5, terminal, sec):
         jour_ferme = round(par_jour.get(jour_serveur, 0.0), 2)
 
         depart = float(sec.get("depart") or 0) or round(a.balance - sum(par_jour.values()), 2)  # sinon : dépôt de départ
+        nom = sec.get("nom") or f"MT5 {a.login}"
         return {
+            "_trades": trades_fermes(deals, positions, a.login, nom),
             "login": a.login, "nom": sec.get("nom") or f"MT5 {a.login}", "serveur": a.server, "devise": a.currency,
             "solde": round(a.balance, 2), "equite": round(a.equity, 2),
             "depart": depart, "perteMax": float(sec.get("perte_max") or 0), "perteJour": float(sec.get("perte_jour") or 0),
@@ -130,7 +205,13 @@ def main():
     for c in comptes:
         try:
             contenu = lire_compte(mt5, c.get("terminal") or TERMINAL_PAR_DEFAUT, c)
+            trades = contenu.pop("_trades")
             _rpc("publier_compte_mt5", {"p_utilisateur": c["utilisateur"], "p_cle": f"mt5|{contenu['login']}", "p_contenu": contenu})
+            # Trades fermés → Journal (Calendrier, Performance, Analyse) ; seuls les nouveaux sont ajoutés.
+            n = _rpc("importer_trades_mt5", {"p_utilisateur": c["utilisateur"], "p_cle": f"mt5|{contenu['login']}",
+                                             "p_nom": f"{contenu['nom']} #{contenu['login']}", "p_trades": trades})
+            if n:
+                print(f"MT5 {contenu['nom']} : {n} trade(s) ajouté(s) au Journal")
             if c["id"]:
                 _rpc("signaler_connexion_mt5", {"p_id": c["id"], "p_erreur": None})
             print(f"MT5 {contenu['nom']} ({c['utilisateur']}) : solde {contenu['solde']} · publié")
