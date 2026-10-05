@@ -66,7 +66,6 @@
 <!-- ============ APPLICATION PRINCIPALE (visible une fois connecté) ============ -->
 <div id="app-principale" class="hidden">
 
-  <!-- Garde-fou du jour (rempli par js/garde-fou.js), toujours visible en haut -->
   <!-- Un seul rectangle en haut de toutes les pages : garde-fou du jour
        (js/garde-fou.js) + objectif de profit (js/accueil-discipline.js) -->
   <div class="barre-haut" id="barre-haut">
@@ -106,8 +105,6 @@
     <!-- ============ SECTION : CALCULATEUR ============ -->
     <section class="section" id="section-calculateur">
       <h2 class="titre-section">Calculateur</h2>
-      <!-- Trade en cours (js/trade-en-cours.js), après « J'entre » -->
-      <div class="carte carte-trade-en-cours hidden" id="carte-trade-en-cours"></div>
       <div class="alerte-annonce-calcul hidden" id="alerte-annonce-calcul" role="alert"></div>
       <div class="carte blocage-calculateur hidden" id="blocage-calculateur"></div>
       <div class="carte" id="carte-saisie-signal">
@@ -125,7 +122,7 @@
       <div id="zone-resultat-calcul"></div>
     </section>
 
-    <!-- ============ SECTION 3 : ANALYSE DE GRAPHIQUE (placeholder) ============ -->
+    <!-- ============ SECTION : ANALYSE ============ -->
     <section class="section" id="section-analyse">
       <h2 class="titre-section">Analyse</h2>
 
@@ -495,12 +492,6 @@
             </div>
           </div>
 
-          <label class="case-a-cocher case-regle">
-            <input type="checkbox" id="param-arret-premier-gain" checked />
-            <span><strong>Arrêter après le premier trade gagnant</strong><br>
-            Si un trade gagnant est déjà dans le journal aujourd'hui, le calculateur te demande confirmation avant chaque nouveau calcul.</span>
-          </label>
-
           <p class="message-succes" id="message-parametres"></p>
 
           <button class="bouton" id="bouton-sauvegarder-parametres">Enregistrer les règles de trading</button>
@@ -622,13 +613,11 @@
 <script src="js/impact.js"></script>
 <script src="js/parametres-calculateur.js"></script>
 <script src="js/calculateur.js"></script>
-<script src="js/analyse-graphique.js"></script>
 <script src="js/journal.js"></script>
 <script src="js/journal-fiche.js"></script>
 <script src="js/garde-fou.js"></script>
 <script src="js/notifications.js"></script>
 <script src="js/accueil-discipline.js"></script>
-<script src="js/trade-en-cours.js"></script>
 <script src="js/alertes-prix.js"></script>
 <script src="js/comptes-tradelocker.js"></script>
 <script src="js/journal-performance.js"></script>

@@ -34,6 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
       window.GoldAI?.alertesPrix?.ouvrir();
     }
     if (cible === "calculateur") {
+      // Trades TradeLocker importés tout seuls (au plus 1 fois par minute) : le garde-fou
+      // et le calculateur voient les trades du jour sans toucher « Actualiser les trades ».
+      window.GoldAI?.journal?.actualiserTrades?.({ auto: true });
       window.GoldAI?.gardeFou?.afficherAlerteAnnonce();
       window.GoldAI?.calculateur?.restaurer();
     }
@@ -57,7 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // lancement et chaque fois qu'on revient sur l'app).
   const barreHaut = document.getElementById("barre-haut");
   document.getElementById("fermer-barre-haut")?.addEventListener("click", () => barreHaut.classList.add("masquee"));
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) barreHaut?.classList.remove("masquee"); });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) return;
+    barreHaut?.classList.remove("masquee");
+    if (document.getElementById("section-calculateur")?.classList.contains("actif")) window.GoldAI?.journal?.actualiserTrades?.({ auto: true });
+  });
 
   // Toucher une notification d'annonce (app déjà ouverte) → page Annonces.
   navigator.serviceWorker?.addEventListener("message", (e) => {

@@ -42,25 +42,6 @@
   let dejaCharge = false;
   let valeursEnregistrees = {}; // anciens réglages sans champ à l'écran (solde, risque, répartition) : renvoyés tels quels
 
-  // « Arrêter après le premier trade gagnant » : enregistré avec les paramètres
-  // du calculateur (même stockage par utilisateur que l'objectif de profit),
-  // activé par défaut, sauvegardé dès que la case change.
-  async function remplirArretPremierGain() {
-    const r = await window.GoldAI.reglagesCalculateur.charger();
-    document.getElementById("param-arret-premier-gain").checked = r.arretPremierGain !== false;
-  }
-
-  async function enregistrerArretPremierGain() {
-    const r = await window.GoldAI.reglagesCalculateur.charger({ forcer: true });
-    const res = await window.GoldAI.reglagesCalculateur.sauvegarder({
-      ...r, arretPremierGain: document.getElementById("param-arret-premier-gain").checked,
-    });
-    const zoneMessage = document.getElementById("message-parametres");
-    zoneMessage.textContent = res.local ? res.message : "✓ Réglage enregistré";
-    zoneMessage.classList.add("succes-visible");
-    setTimeout(() => zoneMessage.classList.remove("succes-visible"), 2500);
-  }
-
   function viderCache() {
     dejaCharge = false;
   }
@@ -125,7 +106,6 @@
       document.getElementById("profil-accueil").classList.add("hidden");
       document.getElementById("profil-parametres").classList.remove("hidden");
       window.GoldAI.reglagesCalculateur?.ouvrir();
-      remplirArretPremierGain();
       if (!dejaCharge) {
         dejaCharge = true;
         await charger();
@@ -138,7 +118,6 @@
     });
 
     document.getElementById("bouton-sauvegarder-parametres")?.addEventListener("click", sauvegarder);
-    document.getElementById("param-arret-premier-gain")?.addEventListener("change", enregistrerArretPremierGain);
   });
 
   window.GoldAI = window.GoldAI || {};

@@ -14,9 +14,6 @@
   let repartitionForcee = null; // répartition au prorata choisie pour CE calcul uniquement
   let taux = null;              // { taux, horodatageMs, source, manuel }
   let dernierCalcul = null;     // { r, reglages, signal } du dernier calcul réussi
-  // Règle « arrêt après le premier trade gagnant » (Profil › Général) :
-  let calculConfirme = false;     // « Continuer quand même » choisi pour le signal en cours
-  let avertissementGain = null;   // { depuisTexte } tant que l'avertissement attend une réponse
   let texteCalcule = null;        // signal collé déjà calculé : reste dans le champ, effacé au prochain toucher
 
   // Le dernier calcul reste affiché (même après avoir changé d'onglet, fermé ou
@@ -237,15 +234,11 @@
     };
   }
 
-  // Ligne d'information : d'où viennent le solde et le résultat du jour.
+  // Ligne d'information sous le tableau : seulement quand la switch ESS limite la journée.
   function ligneSource(ctx, reglages) {
     if (!ctx) return "";
-    const m = (v) => montant(v, reglages.devise || "USD");
     const plafond = plafondJourEss(reglages, ctx);
-    const ess = plafond === null ? "" : `<p class="texte-attenue petit">ESS activé : journée plafonnée à ${m(plafond)} (ta plus grosse journée ou ton objectif, le plus haut).</p>`;
-    return ess + (ctx.tl
-      ? `<p class="texte-attenue petit">TradeLocker (${esc(ctx.nomCompte)}) : solde ${m(ctx.tl.solde)} · résultat du jour ${m(ctx.tl.jourNet ?? 0)}${ctx.tl.instrument ? " · lots du courtier" : ""}.</p>`
-      : `<p class="texte-attenue petit">TradeLocker indisponible${ctx.erreurTl ? ` (${esc(ctx.erreurTl)})` : ""} : solde et lots de Profil › Général, résultat du jour du Journal.</p>`);
+    return plafond === null ? "" : `<p class="texte-attenue petit">ESS activé : journée plafonnée à ${montant(plafond, reglages.devise || "USD")} (ta plus grosse journée ou ton objectif, le plus haut).</p>`;
   }
 
   // Switch ESS (Journal › ESS) : la journée ne doit pas battre la plus grosse journée gagnante
@@ -260,15 +253,6 @@
   function plafondEss(reglages, ctx) {
     const plafond = plafondJourEss(reglages, ctx);
     return plafond === null ? null : Math.max(0, Math.round((plafond - ctx.profitJour) * 100) / 100);
-  }
-
-  const LIBELLE_PERIODE = { jour: "du jour", semaine: "de la semaine", mois: "du mois" };
-  function afficherObjectifAtteint(r, ctx) {
-    return `
-      <div class="carte encadre-total-calcul">
-        <h3 class="titre-bloc">🎯 Objectif ${LIBELLE_PERIODE[ctx.periode] || "du jour"} atteint</h3>
-        <p>Déjà <strong class="positif">${montant(r.profitJour, "USD")}</strong> sur ${montant(r.objectif, "USD")} (${esc(ctx.nomCompte)}) : pas de lot proposé.</p>
-      </div>${boutonRetour}`;
   }
 
   function afficherBlocage(r, reglages, spec) {
@@ -290,33 +274,6 @@
     }
     if (r.avertissements.length) html += `<div class="carte">${r.avertissements.map((a) => `<div class="alerte-donnees">${esc(a)}</div>`).join("")}</div>`;
     return html + boutonRetour;
-  }
-
-  // Avertissement (pas un blocage) si un trade gagnant est déjà enregistré aujourd'hui
-  // et que l'option est activée (activée par défaut).
-  async function doitAvertirApresGain() {
-    const reglages = await window.GoldAI.reglagesCalculateur.charger();
-    if (reglages.arretPremierGain === false) return false;
-    return (await window.GoldAI.gardeFou?.gainDejaFaitAujourdhui?.()) || false;
-  }
-
-  function afficherAvertissementGain(depuisTexte) {
-    avertissementGain = { depuisTexte };
-    dernierCalcul = null;
-    const zoneSignal = document.getElementById("zone-signal-interprete");
-    zoneSignal.innerHTML = "";
-    zoneSignal.classList.add("hidden");
-    window.GoldAI.discipline?.masquer();
-    document.getElementById("zone-resultat-calcul").innerHTML = `
-      <div class="carte avertissement-gain" role="alertdialog" aria-labelledby="titre-avertissement-gain">
-        <div class="icone-blocage" aria-hidden="true">🏆</div>
-        <p id="titre-avertissement-gain"><strong>Tu as déjà un trade gagnant aujourd'hui. Es-tu sûr de vouloir continuer ?</strong></p>
-        <div class="boutons-confirmation">
-          <button type="button" class="bouton secondaire" id="gain-annuler">Annuler</button>
-          <button type="button" class="bouton" id="gain-continuer">Continuer quand même</button>
-        </div>
-      </div>`;
-    document.getElementById("gain-annuler").focus();
   }
 
   // Perte au SL comparée à la marge avant rupture de chaque compte TradeLocker
@@ -362,30 +319,18 @@
       <p class="texte-attenue petit">Calculé avec le solde TradeLocker, les trades du jour du journal et les règles de Journal › Performance (lot de ce calcul).</p></div>`);
   }
 
-  async function calculer({ depuisTexte, confirme = false }) {
+  async function calculer({ depuisTexte }) {
     const zoneSignal = document.getElementById("zone-signal-interprete");
     const zoneResultat = document.getElementById("zone-resultat-calcul");
 
+    // Trades TradeLocker en cours d'import (ouverture du Calcul) : on attend la fin pour
+    // que le garde-fou compte bien les trades déjà faits aujourd'hui.
+    await window.GoldAI.journal?.finActualisation?.();
     // Garde-fou : règle du jour atteinte → pas de calcul (« Journée terminée »).
     if (window.GoldAI.gardeFou && !(await window.GoldAI.gardeFou.calculAutorise())) return;
 
-    // Arrêt après le premier trade gagnant : chaque nouveau calcul redemande
-    // confirmation ; les corrections du même signal, non.
-    if (confirme) calculConfirme = true;
-    else if (depuisTexte) calculConfirme = false;
-    if (avertissementGain && !confirme && !depuisTexte) return; // on attend la réponse
     // « Calculer » retouché sans changer le signal resté dans le champ : le calcul affiché reste.
-    if (depuisTexte && !confirme && signalCourant && texteCalcule !== null && document.getElementById("champ-signal").value === texteCalcule) return;
-    avertissementGain = null;
-    if (!calculConfirme && (await doitAvertirApresGain())) {
-      if (depuisTexte && !document.getElementById("champ-signal").value.trim()) {
-        zoneSignal.innerHTML = "";
-        zoneResultat.innerHTML = `<p class="etat-vide">Colle d'abord un signal dans le champ ci-dessus.</p>`;
-        return;
-      }
-      afficherAvertissementGain(depuisTexte);
-      return;
-    }
+    if (depuisTexte && signalCourant && texteCalcule !== null && document.getElementById("champ-signal").value === texteCalcule) return;
     window.GoldAI.gardeFou?.afficherAlerteAnnonce();
 
     if (depuisTexte) {
@@ -427,8 +372,7 @@
       tauxUtilise = taux?.taux ?? null;
     }
 
-    // Lots par TP (réglages « Lots par TP » du compte maître) ; sans Journal lisible :
-    // ancien calcul selon le risque et la répartition.
+    // Contexte du compte maître (TradeLocker + Journal) : solde, fiche de l'instrument, ESS.
     const ctx = await contexteObjectif(reglages);
     // Lot selon le RISQUE PAR TRADE (Profil › Général › Compte et risque), sans tenir compte
     // de l'objectif restant (à la demande de l'utilisateur : il donnait des lots minuscules quand
@@ -438,8 +382,7 @@
     const r = N.calculerPosition(signalCourant, reglages, tauxUtilise,
       ctx ? { plafondEss: plafondEss(reglages, ctx) } : undefined);
     dernierCalcul = r.ok ? { r, reglages, signal: { ...signalCourant } } : null;
-    zoneResultat.innerHTML = r.ok ? afficherResultat(r, reglages, spec, ctx)
-      : r.objectifAtteint ? afficherObjectifAtteint(r, ctx) : afficherBlocage(r, reglages, spec);
+    zoneResultat.innerHTML = r.ok ? afficherResultat(r, reglages, spec, ctx) : afficherBlocage(r, reglages, spec);
     memoriserCalcul();
     if (r.ok) verifierMarges(r);
     // Trades restants + compte à rebours de la prochaine annonce, avec le résultat.
@@ -460,8 +403,6 @@
     texteCalcule = null;
     const champSignal = document.getElementById("champ-signal");
     if (champSignal) champSignal.value = "";
-    calculConfirme = false;
-    avertissementGain = null;
     const zoneSignal = document.getElementById("zone-signal-interprete");
     if (zoneSignal) { zoneSignal.innerHTML = ""; zoneSignal.classList.add("hidden"); }
     const zoneResultat = document.getElementById("zone-resultat-calcul");
@@ -473,9 +414,9 @@
   // est toujours là. S'il n'est plus en mémoire (app rechargée), on le refait à
   // l'identique à partir du signal mémorisé.
   async function restaurer() {
-    if (!window.GoldAI.auth?.getToken?.() || avertissementGain) return;
+    if (!window.GoldAI.auth?.getToken?.()) return;
     if (signalCourant) {
-      if (aRecalculer) { aRecalculer = false; await calculer({ depuisTexte: false, confirme: true }); return; }
+      if (aRecalculer) { aRecalculer = false; await calculer({ depuisTexte: false }); return; }
       if (dernierCalcul) window.GoldAI.discipline?.afficher();
       return;
     }
@@ -491,8 +432,7 @@
     const zoneSignal = document.getElementById("zone-signal-interprete");
     zoneSignal.innerHTML = afficherSignalEditable(signalCourant, lectureCourante);
     zoneSignal.classList.toggle("hidden", !(lectureCourante.ambiguites.length || lectureCourante.aPreciser.length));
-    // confirme : l'avertissement « déjà un trade gagnant » a déjà été vu pour ce calcul.
-    await calculer({ depuisTexte: false, confirme: true });
+    await calculer({ depuisTexte: false });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -525,14 +465,6 @@
       } else if (t.closest("#calc-retour")) {
         reinitialiser();
         document.getElementById("champ-signal")?.scrollIntoView({ block: "center" });
-      } else if (t.id === "gain-annuler") {
-        // Nouveau calcul annulé : le calcul précédent (s'il y en a un) revient.
-        avertissementGain = null;
-        document.getElementById("zone-resultat-calcul").innerHTML = "";
-        signalCourant = null;
-        restaurer();
-      } else if (t.id === "gain-continuer" && avertissementGain) {
-        calculer({ depuisTexte: avertissementGain.depuisTexte, confirme: true });
       } else if (t.id === "aller-general") {
         window.GoldAI.app.allerA("profil");
         document.getElementById("bouton-ouvrir-parametres").click();
@@ -567,8 +499,8 @@
   // si l'onglet Calcul est ouvert, sinon dès qu'on y revient (restaurer).
   let aRecalculer = false;
   const actualiserCalcul = () => {
-    if (!signalCourant || avertissementGain) return;
-    if (document.getElementById("section-calculateur")?.classList.contains("actif")) calculer({ depuisTexte: false, confirme: true });
+    if (!signalCourant) return;
+    if (document.getElementById("section-calculateur")?.classList.contains("actif")) calculer({ depuisTexte: false });
     else aRecalculer = true;
   };
   ["goldai:reglages-calculateur", "goldai:regles", "goldai:comptes", "goldai:trades"].forEach((ev) => window.addEventListener(ev, actualiserCalcul));

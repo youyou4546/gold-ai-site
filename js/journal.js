@@ -331,7 +331,10 @@
     tradesJour.forEach((trade) => {
       const item = document.createElement("div");
       item.className = "trade-item";
+      // Heure d'ouverture (trades importés de TradeLocker), en heure du Québec.
+      const heure = trade.ouvertLe ? new Intl.DateTimeFormat("fr-CA", { timeZone: "America/Toronto", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(trade.ouvertLe)) : "";
       const details = [
+        heure ? `🕒 ${heure}` : "",
         trade.instrument,
         trade.compteTl ? surnoms[trade.compteTl] || trade.compteTlNom : "",
         trade.rr !== null && trade.rr !== undefined ? `RR ${trade.rr}` : "",
@@ -451,10 +454,19 @@
   // « Actualiser les trades » : va chercher les trades fermés sur TradeLocker
   // UNIQUEMENT à ce moment-là (plus d'import automatique). Le serveur retient
   // chaque position déjà importée : recliquer n'ajoute jamais un trade deux fois.
-  let actualisationEnCours = false;
-  async function actualiserTrades() {
-    if (actualisationEnCours || !token()) return;
-    actualisationEnCours = true;
+  // { auto: true } (ouverture du Calcul, retour sur l'app) : au plus une fois par minute.
+  // Le calculateur attend la fin d'un import en cours avant de calculer (finActualisation).
+  let actualisationEnCours = null;
+  let derniereActualisation = 0;
+  function actualiserTrades({ auto = false } = {}) {
+    if (actualisationEnCours) return actualisationEnCours;
+    if (!token() || (auto === true && Date.now() - derniereActualisation < 60000)) return Promise.resolve();
+    derniereActualisation = Date.now();
+    actualisationEnCours = importer().finally(() => { actualisationEnCours = null; });
+    return actualisationEnCours;
+  }
+  const finActualisation = () => actualisationEnCours || Promise.resolve();
+  async function importer() {
     const boutons = document.querySelectorAll(".bouton-actualiser-trades");
     const messages = document.querySelectorAll(".message-actualiser-trades");
     const ecrire = (texte, classe = "") => messages.forEach((m) => { m.textContent = texte; m.className = `texte-attenue petit message-actualiser-trades ${classe}`; });
@@ -478,7 +490,6 @@
     } catch {
       ecrire("Impossible de joindre le serveur. Vérifie ta connexion et réessaie.", "erreur");
     } finally {
-      actualisationEnCours = false;
       boutons.forEach((b) => { b.disabled = false; b.textContent = "🔄 Actualiser les trades"; });
     }
   }
@@ -522,7 +533,7 @@
       if (!document.getElementById("journal-calendrier").classList.contains("hidden")) afficherMoisCourant();
     });
 
-    document.querySelectorAll(".bouton-actualiser-trades").forEach((b) => b.addEventListener("click", actualiserTrades));
+    document.querySelectorAll(".bouton-actualiser-trades").forEach((b) => b.addEventListener("click", () => actualiserTrades()));
 
     // Trades ajoutés depuis un autre appareil : le Journal se relit (base de
     // l'app seulement, pas TradeLocker) quand il est affiché, toutes les 30 s.
@@ -559,5 +570,6 @@
     filtreActuel: () => filtreCompte,
     // Comptes reliés avec leur solde (rechargés à la demande : le solde change).
     comptesReliesAJour: async () => { comptesRelies = null; await chargerComptesRelies(); return comptesRelies || []; },
+    actualiserTrades, finActualisation,
     surnomDe: (cle) => surnoms[cle] || null };
 })();

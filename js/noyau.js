@@ -886,7 +886,7 @@
       else if (pertes >= 1 && pertes === pertesArret - 1) alertes.push({ cle: "pertes", niveau: "attention", texte: "Encore une perte et ta journée s'arrête" });
     }
     if (seuilGain !== null && net >= seuilGain) {
-      alertes.push({ cle: "gain", niveau: "bloque", texte: `Objectif du jour atteint (+${net}) : on protège le gain` });
+      alertes.push({ cle: "gain", niveau: "bloque", texte: `Seuil de gain qui arrête la journée atteint (+${net}) : on protège le gain` });
     }
     let resteAvantLimite = null;
     if (limite !== null) {

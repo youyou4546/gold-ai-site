@@ -24,7 +24,6 @@
   let jourCalcule = null;
   let tradesDuJour = [];
   let tradesMaitre = [];   // trades du jour du compte maître (règles du garde-fou)
-  let objectifAtteint = false; // objectif de profit (Profil › Général) atteint → plus de « X trades sur N »
 
   const $ = (id) => document.getElementById(id);
   const dollars = (v, signe = false) => U.montant(v, "USD", { signe });
@@ -73,7 +72,6 @@
       const maitre = reglages?.compteMaitre;
       tradesMaitre = maitre ? tradesDuJour.filter((t) => t.compteTl === maitre || !t.compteTl) : tradesDuJour;
       etat = N.evaluerGardeFou({ trades: tradesMaitre, regles, limitesComptes: limitesDuJour() });
-      await majObjectifAtteint(parJour);
       afficherBandeau();
       afficherBlocageCalculateur();
       window.dispatchEvent(new CustomEvent("goldai:garde-fou", { detail: etat })); // bloc Discipline de l'accueil
@@ -83,19 +81,8 @@
     try { return await tache; } finally { if (chargement === tache) chargement = null; }
   }
 
-  // Même calcul que la barre d'objectif (js/accueil-discipline.js) : compte maître seulement.
-  async function majObjectifAtteint(parJour) {
-    try {
-      const reglages = await window.GoldAI.reglagesCalculateur.charger();
-      if (!reglages.compteMaitre) { objectifAtteint = false; return; }
-      const trades = Object.values(parJour || await window.GoldAI.journal.chargerTousLesTrades()).flat();
-      const tl = await window.GoldAI.compteMaitre?.lire(reglages.compteMaitre, "XAUUSD", { attendre: false });
-      objectifAtteint = window.GoldAI.compteMaitre.progression(trades, reglages, cleAujourdhui(), tl).atteint;
-    } catch { objectifAtteint = false; }
-  }
-
   function texteAlerte(a) {
-    if (a.cle === "gain") return `Objectif du jour atteint (${dollars(etat.net, true)}) : on protège le gain`;
+    if (a.cle === "gain") return `Seuil de gain qui arrête la journée atteint (${dollars(etat.net, true)}) : on protège le gain`;
     return a.texte;
   }
 
@@ -168,13 +155,6 @@
     return etat?.niveau !== "bloque" || forceAujourdhui();
   }
 
-  // Un trade gagnant est-il déjà enregistré aujourd'hui (journée locale) ?
-  async function gainDejaFaitAujourdhui() {
-    if (chargement) await chargement;
-    if (!etat || jourCalcule !== cleAujourdhui()) await recalculer();
-    return N.aUnTradeGagnant(tradesMaitre);
-  }
-
   function annonceProche(maintenant = Date.now()) {
     const evs = window.GoldAI.calendrier?.evenementsCalendrier?.() || [];
     return evs
@@ -208,7 +188,7 @@
   }
 
   function viderCache() {
-    regles = null; limitesJour = []; etat = null; jourCalcule = null; tradesDuJour = []; tradesMaitre = []; objectifAtteint = false;
+    regles = null; limitesJour = []; etat = null; jourCalcule = null; tradesDuJour = []; tradesMaitre = [];
     window.GoldAI.compteMaitre?.oublier();
     clearInterval(minuterie);
     const zone = $("garde-fou");
@@ -226,7 +206,7 @@
   window.addEventListener("goldai:donnees", () => { if ($("section-calculateur")?.classList.contains("actif")) afficherAlerteAnnonce(); });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.gardeFou = { demarrer, viderCache, recalculer, calculAutorise, gainDejaFaitAujourdhui, afficherAlerteAnnonce, annonceProche, etat: () => etat, cleAujourdhui,
+  window.GoldAI.gardeFou = { demarrer, viderCache, recalculer, calculAutorise, afficherAlerteAnnonce, annonceProche, etat: () => etat, cleAujourdhui,
     // Pour le calculateur : marge restante aujourd'hui sur chaque compte réglé.
     margesJour: async () => { if (chargement) await chargement; if (!etat || jourCalcule !== cleAujourdhui()) await recalculer(); return etat?.limitesComptes || []; } };
 })();
