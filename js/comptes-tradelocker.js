@@ -132,6 +132,15 @@
     </div>`;
   }
 
+  const ouverts = new Set(); // comptes dont le volet est ouvert (gardés ouverts au redessin)
+  function soldeDe(cle) {
+    for (const cx of donnees?.connexions || []) {
+      const c = (cx.comptes || []).find((x) => `${cx.environnement}|${x.id}` === cle);
+      if (c) return c;
+    }
+    return null;
+  }
+
   function afficherNoms() {
     const bloc = $("noms-comptes-tradelocker");
     if (!bloc) return;
@@ -151,10 +160,16 @@
       const maitre = compteMaitre === c.cle;
       const st = statuts[c.cle] || {};
       const finance = st.statut === "finance";
+      const s = soldeDe(c.cle);
       return `<li class="compte-tl-ligne">
-        <span class="nom-compte-tl"><strong>${esc(surnom || c.nom)}</strong>
-          ${maitre ? `<span class="badge-maitre">⭐ Maître</span>` : ""}
-          <span class="badge-statut-compte ${finance ? "finance" : "challenge"}">${finance ? "Financé" : "Évaluation"}</span></span>
+        <details class="details-compte" data-cle="${esc(c.cle)}" ${ouverts.has(c.cle) ? "open" : ""}>
+        <summary class="resume-compte">
+          <span class="nom-compte-tl"><strong>${esc(surnom || c.nom)}</strong>
+            ${maitre ? `<span class="badge-maitre">⭐ Maître</span>` : ""}
+            <span class="badge-statut-compte ${finance ? "finance" : "challenge"}">${finance ? "Financé" : "Évaluation"}</span></span>
+          <span class="solde-compte-tl">${s ? argent(s.solde, s.devise) : ""}</span>
+        </summary>
+        <div class="contenu-compte">
         <span class="actions-compte-tl">
           ${maitre ? "" : `<button type="button" class="bouton secondaire bouton-petit" data-maitre="${esc(c.cle)}">⭐ Compte maître</button>`}
           <button type="button" class="bouton secondaire bouton-petit" data-renommer="${esc(c.cle)}">✏️ Renommer</button>
@@ -168,6 +183,8 @@
           ${finance ? `<label>Financé depuis le <input type="date" data-depuis="${esc(c.cle)}" value="${esc(st.depuis || "")}"></label>` : ""}
         </div>
         ${blocEss(c.cle)}
+        </div>
+        </details>
       </li>`;
     }).join("");
     $("liste-noms-tradelocker").querySelector("[data-renommer-form] input")?.focus();
@@ -227,19 +244,6 @@
   const argent = (v, devise, signe = false) => (v === null || v === undefined ? "—" : U.montant(v, devise || "USD", { signe }));
   const classe = (v) => (v > 0 ? "positif" : v < 0 ? "negatif" : "");
 
-  // Une ligne par compte : son nom (ou le nom choisi dans l'app) et son solde actuel.
-  function ligneCompte(c, env) {
-    const cle = `${env}|${c.id}`;
-    const origine = `${c.nom || "Compte"} #${c.accNum}`;
-    const surnom = surnoms[cle];
-    return `
-      <li>
-        <span><strong>${esc(surnom || origine)}</strong>
-          ${c.statut && c.statut !== "ACTIVE" ? ` <span class="statut-compte-tl">${esc(c.statut)}</span>` : ""}</span>
-        <span class="solde-compte-tl">${argent(c.solde, c.devise)}</span>
-      </li>`;
-  }
-
   function afficher() {
     const zone = $("contenu-tradelocker");
     if (!zone) return;
@@ -283,8 +287,8 @@
             </div>
           </div>
           ${cx.erreur ? `<p class="alerte-donnees">${esc(cx.erreur)}</p>` : ""}
-          ${(cx.comptes || []).length ? `<ul class="carte liste-soldes-tl">${cx.comptes.map((c) => ligneCompte(c, cx.environnement)).join("")}</ul>` : ""}
         </div>`).join("")}`;
+    afficherNoms(); // soldes à jour dans chaque volet
   }
 
   // ---------------------------------------------------------------- Trades supprimés → Réimporter
@@ -370,6 +374,11 @@
       else if (t.dataset.renommer) { enEdition = t.dataset.renommer; afficherNoms(); }
       else if (t.hasAttribute("data-annuler-renommer")) { enEdition = null; afficherNoms(); }
     });
+    // Ouverture / fermeture d'un volet de compte : mémorisée pour le prochain redessin.
+    $("liste-noms-tradelocker")?.addEventListener("toggle", (e) => {
+      const d = e.target.closest?.("details.details-compte");
+      if (d) d.open ? ouverts.add(d.dataset.cle) : ouverts.delete(d.dataset.cle);
+    }, true);
     $("liste-noms-tradelocker")?.addEventListener("change", (e) => {
       const t = e.target;
       if (t.dataset.statut) enregistrerStatut(t.dataset.statut, { statut: t.value });

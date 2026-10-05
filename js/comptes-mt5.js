@@ -16,6 +16,7 @@
   let connexions = [];
   let erreur = null;
   let message = null; // { texte, ok } après un ajout / un retrait
+  const ouverts = new Set(); // volets de comptes ouverts (gardés ouverts au redessin)
 
   const rpc = (nom, params = {}) => window.GoldAI.auth.client.rpc(nom, { p_token: window.GoldAI.auth.getToken(), ...params });
 
@@ -73,11 +74,13 @@
     const vieux = Date.now() - Date.parse(ligne.maj_le) > 15 * 60000; // > 15 min : PC éteint ?
     const couleur = e.ratioMarge <= 0.25 ? "negatif" : e.ratioMarge <= 0.5 ? "attention" : "positif";
     return `
-      <div class="carte carte-mt5">
-        <div class="entete-mt5">
-          <strong>${esc(c.nom || ligne.cle)}</strong>
-          <span class="texte-attenue petit">MT5 · ${esc(c.serveur || "")} · ${c.lectureSeule ? "lecture seule 🔒" : "lecture"}</span>
-        </div>
+      <details class="carte carte-mt5 details-compte" data-cle="${esc(ligne.cle)}" ${ouverts.has(ligne.cle) ? "open" : ""}>
+        <summary class="resume-compte">
+          <span class="nom-compte-tl"><strong>${esc(c.nom || ligne.cle)}</strong> <span class="badge-statut-compte challenge">MT5</span></span>
+          <span class="solde-compte-tl">${argent(c.solde, d)}</span>
+        </summary>
+        <div class="contenu-compte">
+        <p class="texte-attenue petit">${esc(c.serveur || "")} · ${c.lectureSeule ? "lecture seule 🔒" : "lecture"}</p>
         <div class="grille-mt5">
           <div><span class="lib">Solde</span><span class="val">${argent(c.solde, d)}</span></div>
           <div><span class="lib">Équité</span><span class="val">${argent(c.equite, d)}</span></div>
@@ -92,7 +95,8 @@
         </div>
         ${e.progression !== null ? `<div class="barre-mt5"><span style="width:${e.progression.toFixed(1)}%"></span></div>` : ""}
         <p class="texte-attenue petit">${vieux ? "⚠️ " : ""}Lu à ${esc(U.heure(ligne.maj_le))}${vieux ? " — le PC qui lit les comptes est peut-être éteint" : " · toutes les 5 min"}.</p>
-      </div>`;
+        </div>
+      </details>`;
   }
 
   // Comptes ajoutés dans l'app : état de la lecture + bouton Retirer.
@@ -156,6 +160,10 @@
       e.preventDefault();
       ajouter(e.target);
     });
+    $("contenu-mt5")?.addEventListener("toggle", (e) => {
+      const d = e.target.closest?.("details.details-compte");
+      if (d) d.open ? ouverts.add(d.dataset.cle) : ouverts.delete(d.dataset.cle);
+    }, true);
     $("contenu-mt5")?.addEventListener("click", (e) => {
       const id = e.target.dataset?.retirerMt5;
       if (id) retirer(id);

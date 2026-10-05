@@ -2081,3 +2081,13 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .barre-mt5 { height: 6px; border-radius: 3px; background: var(--bordure); overflow: hidden; }
 .barre-mt5 span { display: block; height: 100%; background: var(--vert); }
 @media (min-width: 900px) { .grille-mt5 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* ---------- Mes comptes : chaque compte est un volet (flèche pour ouvrir son contenu) ---------- */
+.liste-noms-tl li > .details-compte { flex: 1 1 100%; min-width: 0; }
+.details-compte > summary.resume-compte { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; }
+.details-compte > summary.resume-compte::-webkit-details-marker { display: none; }
+.details-compte > summary.resume-compte .solde-compte-tl { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.details-compte > summary.resume-compte::after { content: "›"; font-size: 22px; line-height: 1; color: var(--texte-attenue); transition: transform 0.15s; flex-shrink: 0; }
+.details-compte[open] > summary.resume-compte::after { transform: rotate(90deg); }
+.details-compte > .contenu-compte { display: flex; flex-direction: column; gap: 10px; padding-top: 12px; }
+.carte-mt5.details-compte { gap: 0; }
