@@ -170,7 +170,7 @@
             </tbody>
           </table>
         </div>
-        ${r.modeLot === "objectif" ? ligneEssTous(ctx, r.portions.find((p) => p.type === "tp")?.gainAuTp || 0, r.perteTotaleSl, r.gainTotalSiTousTps) : ""}
+        ${ctx ? ligneEssTous(ctx, r.portions.find((p) => p.type === "tp")?.gainAuTp || 0, r.perteTotaleSl, r.gainTotalSiTousTps) : ""}
         ${ligneSource(ctx, reglages)}
       </div>
 
@@ -430,19 +430,13 @@
     // Lots par TP (réglages « Lots par TP » du compte maître) ; sans Journal lisible :
     // ancien calcul selon le risque et la répartition.
     const ctx = await contexteObjectif(reglages);
-    // La part TP1 de la répartition rapporte l'objectif restant, le lot total est partagé selon
-    // la répartition. Switch ESS (Journal › ESS) ON : les lots sont coupés à partir du TP2 pour
-    // que la journée ne batte pas la plus grosse journée gagnante.
+    // Lot selon le RISQUE PAR TRADE (Profil › Général › Compte et risque), sans tenir compte
+    // de l'objectif restant (à la demande de l'utilisateur : il donnait des lots minuscules quand
+    // il restait peu à faire). Switch ESS (Journal › ESS) ON : les lots sont coupés à partir du
+    // TP2 pour que la journée ne batte pas la plus grosse journée gagnante.
     reglages = reglagesAvecTradeLocker(reglages, ctx);
-    let r;
-    if (!ctx) r = N.calculerPosition(signalCourant, reglages, tauxUtilise);
-    else {
-      r = N.calculerPosition(signalCourant, reglages, tauxUtilise, {
-        objectifRestant: ctx.objectifRestant,
-        plafondEss: plafondEss(reglages, ctx),
-      });
-      if (r.objectifAtteint) Object.assign(r, { objectif: ctx.objectif, profitJour: ctx.realise });
-    }
+    const r = N.calculerPosition(signalCourant, reglages, tauxUtilise,
+      ctx ? { plafondEss: plafondEss(reglages, ctx) } : undefined);
     dernierCalcul = r.ok ? { r, reglages, signal: { ...signalCourant } } : null;
     zoneResultat.innerHTML = r.ok ? afficherResultat(r, reglages, spec, ctx)
       : r.objectifAtteint ? afficherObjectifAtteint(r, ctx) : afficherBlocage(r, reglages, spec);
