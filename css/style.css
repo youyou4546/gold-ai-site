@@ -2068,3 +2068,16 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
   #journal-calendrier .entete-mois, #journal-calendrier .total-mois { margin-bottom: 10px; }
   #journal-calendrier .choix-compte-bas { margin-top: 10px; }
 }
+
+/* ---------- Profil › Mes comptes : comptes MT5 (js/comptes-mt5.js) ---------- */
+.carte-mt5 { display: flex; flex-direction: column; gap: 10px; }
+.entete-mt5 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.grille-mt5 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.grille-mt5 > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.grille-mt5 .lib { font-size: 11.5px; color: var(--texte-attenue); }
+.grille-mt5 .val { font-size: 16px; font-weight: 700; }
+.grille-mt5 .val.attention { color: var(--orange); }
+.grille-mt5 .sous { font-size: 11px; color: var(--texte-attenue); }
+.barre-mt5 { height: 6px; border-radius: 3px; background: var(--bordure); overflow: hidden; }
+.barre-mt5 span { display: block; height: 100%; background: var(--vert); }
+@media (min-width: 900px) { .grille-mt5 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
