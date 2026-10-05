@@ -401,5 +401,5 @@
   window.addEventListener("goldai:reglages-calculateur", () => { if (ouverte() && !enEdition) chargerSurnoms().then(afficherNoms); });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.comptesTradelocker = { ouvrir, viderCache };
+  window.GoldAI.comptesTradelocker = { ouvrir, viderCache, relire: () => { if (ouverte()) charger(); } };
 })();

@@ -169,5 +169,5 @@
   });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.comptesMt5 = { charger, viderCache: () => { comptes = null; connexions = []; erreur = null; message = null; clearInterval(minuterie); const z = $("contenu-mt5"); if (z) z.innerHTML = ""; } };
+  window.GoldAI.comptesMt5 = { charger, relire: () => { if (ouverte()) charger(); }, viderCache: () => { comptes = null; connexions = []; erreur = null; message = null; clearInterval(minuterie); const z = $("contenu-mt5"); if (z) z.innerHTML = ""; } };
 })();

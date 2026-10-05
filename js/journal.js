@@ -490,6 +490,15 @@
     } catch {
       ecrire("Impossible de joindre le serveur. Vérifie ta connexion et réessaie.", "erreur");
     } finally {
+      // Tout le reste est relu en même temps : comptes TopOne (solde, résultat du jour du compte
+      // maître, marges du challenge), comptes MT5 publiés par le PC, garde-fou et calculateur.
+      if (token()) {
+        window.GoldAI.compteMaitre?.oublier();
+        window.GoldAI.challenge?.toutRelire?.();
+        window.GoldAI.comptesTradelocker?.relire?.();
+        window.GoldAI.comptesMt5?.relire?.();
+        window.dispatchEvent(new CustomEvent("goldai:comptes"));
+      }
       boutons.forEach((b) => { b.disabled = false; b.textContent = "🔄 Actualiser les trades"; });
     }
   }

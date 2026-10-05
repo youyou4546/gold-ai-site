@@ -143,7 +143,12 @@
     cacheMarges = { t: Date.now(), liste };
     return liste;
   }
-  window.GoldAI.challenge = { margesComptes };
+  // « Actualiser les trades » : soldes relus tout de suite (cache vidé) et cartes redessinées si visibles.
+  function toutRelire() {
+    cacheMarges = { t: 0, liste: null };
+    if (!$("journal-performance")?.classList.contains("hidden") && !enReglage) rafraichir();
+  }
+  window.GoldAI.challenge = { margesComptes, toutRelire };
 
   document.addEventListener("DOMContentLoaded", () => {
     $("bouton-ouvrir-performance")?.addEventListener("click", () => { enReglage = null; rafraichir(); });
