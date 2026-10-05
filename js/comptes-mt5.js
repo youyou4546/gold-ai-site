@@ -2,7 +2,7 @@
 //
 // Chaque utilisateur ajoute ses comptes ici (numéro, serveur, mot de passe
 // INVESTISSEUR, chiffré dans Supabase : connexions_mt5). Le PC (site/sync_mt5.py)
-// les lit toutes les 15 min avec MetaTrader 5 et publie leurs chiffres (table
+// les lit toutes les 5 min avec MetaTrader 5 et publie leurs chiffres (table
 // comptes_mt5, seulement pour la personne connectée). Ici : solde, résultat du
 // jour, marge avant rupture, perte max du jour restante, progression vers l'objectif.
 (() => {
@@ -42,7 +42,7 @@
       message = { ok: false, texte: /CHAMPS_MANQUANTS/.test(error.message || "") ? "Numéro du compte, serveur et mot de passe investisseur sont obligatoires." : "Ajout impossible pour l'instant, réessaie." };
     } else {
       form.reset();
-      message = { ok: true, texte: "✓ Compte ajouté. Ses chiffres apparaîtront ici dans 15 min au plus." };
+      message = { ok: true, texte: "✓ Compte ajouté. Ses chiffres apparaîtront ici dans 5 min au plus." };
     }
     document.activeElement?.blur();
     await charger();
@@ -70,7 +70,7 @@
     const c = ligne.contenu || {};
     const d = c.devise || "USD";
     const e = etat(c);
-    const vieux = Date.now() - Date.parse(ligne.maj_le) > 40 * 60000; // > 40 min : PC éteint ?
+    const vieux = Date.now() - Date.parse(ligne.maj_le) > 15 * 60000; // > 15 min : PC éteint ?
     const couleur = e.ratioMarge <= 0.25 ? "negatif" : e.ratioMarge <= 0.5 ? "attention" : "positif";
     return `
       <div class="carte carte-mt5">
@@ -91,14 +91,14 @@
             <span class="sous">cible ${argent(e.cible, d)}</span></div>` : ""}
         </div>
         ${e.progression !== null ? `<div class="barre-mt5"><span style="width:${e.progression.toFixed(1)}%"></span></div>` : ""}
-        <p class="texte-attenue petit">${vieux ? "⚠️ " : ""}Lu à ${esc(U.heure(ligne.maj_le))}${vieux ? " — le PC qui lit les comptes est peut-être éteint" : " · toutes les 15 min"}.</p>
+        <p class="texte-attenue petit">${vieux ? "⚠️ " : ""}Lu à ${esc(U.heure(ligne.maj_le))}${vieux ? " — le PC qui lit les comptes est peut-être éteint" : " · toutes les 5 min"}.</p>
       </div>`;
   }
 
   // Comptes ajoutés dans l'app : état de la lecture + bouton Retirer.
   function ligneConnexion(c) {
     const lu = (comptes || []).some((x) => x.cle === `mt5|${c.login}`);
-    const etatLecture = c.erreur ? `<span class="negatif">${esc(c.erreur)}</span>` : lu ? "lu ✓" : "en attente de la première lecture (15 min max)";
+    const etatLecture = c.erreur ? `<span class="negatif">${esc(c.erreur)}</span>` : lu ? "lu ✓" : "en attente de la première lecture (5 min max)";
     return `
       <li>
         <span><strong>${esc(c.nom || `MT5 ${c.login}`)}</strong> <span class="texte-attenue petit">${esc(String(c.login))} · ${esc(c.serveur)}</span><br>

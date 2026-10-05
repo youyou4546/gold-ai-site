@@ -6,7 +6,7 @@ Deux sources :
     « Ajouter un compte MetaTrader 5 », RPC connexions_mt5_a_lire) ;
   - les sections [mt5_...] de config.ini (ex. [mt5_fundednext]).
 
-Lancé par sync_site.py (tâche planifiée "gold-ai site", toutes les 15 min).
+Lancé toutes les 5 min par la tâche planifiée "gold-ai mt5" (scripts/lancer_mt5.bat).
 Le terminal MT5 doit être installé sur ce PC (chemin `terminal` de la section).
 Rien n'est publié si la connexion échoue : l'app garde les derniers chiffres
 et affiche leur heure.

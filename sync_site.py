@@ -1,7 +1,7 @@
 """
 Met à jour TOUTES les données du site en une fois : prix (sync_marche.py),
-calendrier (sync_calendrier.py), actualités urgentes (sync_actualites.py)
-et comptes MT5 en lecture seule (sync_mt5.py),
+calendrier (sync_calendrier.py), actualités urgentes (sync_actualites.py),
+(les comptes MT5 ont leur propre tâche « gold-ai mt5 », toutes les 5 min)
 puis les publie en ligne (Supabase).
 
 Lancé toutes les 15 minutes par la tâche planifiée Windows "gold-ai site"
@@ -17,9 +17,8 @@ sys.stdout.reconfigure(encoding="utf-8")
 import sync_actualites
 import sync_calendrier
 import sync_marche
-import sync_mt5
 
-for nom, module in (("marché", sync_marche), ("calendrier", sync_calendrier), ("actualités", sync_actualites), ("comptes MT5", sync_mt5)):
+for nom, module in (("marché", sync_marche), ("calendrier", sync_calendrier), ("actualités", sync_actualites)):
     try:
         module.main()
     except Exception:
