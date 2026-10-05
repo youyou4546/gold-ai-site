@@ -24,8 +24,10 @@
     const statut = actives.length
       ? `<span class="point-session actif"></span><strong>${actives.map((s) => esc(s.nom)).join(" + ")}</strong>&nbsp;${actives.length > 1 ? "ouvertes" : "ouverte"}`
       : `<span class="point-session"></span>Aucune session majeure active${prochaine ? ` · <span class="texte-attenue">prochaine : ${esc(prochaine.nom)} ${quand(prochaine.debutMs, maintenant)}</span>` : ""}`;
+    // Chevauchement (deux sessions ouvertes) : les deux cases sont entourées en mauve-rose.
+    const chevauchement = actives.length > 1;
     const cases = sessions.map((s) => `
-      <div class="case-session${s.active ? " active" : ""}">
+      <div class="case-session${s.active ? " active" : ""}${s.active && chevauchement ? " chevauchement" : ""}">
         <span class="nom-session">${esc(s.nom)}</span>
         <span class="heures-session">${heureQc(s.debutMs)} – ${heureQc(s.finMs)}</span>
       </div>`).join("");

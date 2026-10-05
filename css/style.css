@@ -1964,6 +1964,7 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .case-session.active { border-color: rgba(47, 224, 163, 0.55); background: var(--vert-fond); }
 .nom-session { font-size: 12px; color: var(--texte-attenue); }
 .case-session.active .nom-session { color: var(--vert); font-weight: 700; }
+.case-session.chevauchement { border: 2px solid #e05cc8; box-shadow: 0 0 8px rgba(224, 92, 200, 0.45); padding: 7px; }
 .heures-session { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .note-sessions { margin: 8px 0 0; font-size: 11px; color: var(--texte-attenue); text-align: right; }
 @media (max-width: 380px) { .heures-session { font-size: 12.5px; } }
