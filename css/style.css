@@ -2034,3 +2034,25 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 
 /* Profil › Général : la zone du message « Enregistré » ne prend de place que lorsqu'elle s'affiche. */
 #zone-parametres-calculateur > .message-succes:not(.succes-visible) { display: none; }
+
+/* ---------- Ordinateur : menu à gauche (téléphone : barre du bas inchangée) ---------- */
+@media (min-width: 900px) {
+  #app-principale { padding-left: 230px; }
+  nav.barre-onglets {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 230px; z-index: 20;
+    flex-direction: column; gap: 4px;
+    padding: 20px 12px; border-top: none; border-right: 1px solid var(--bordure);
+  }
+  nav.barre-onglets::before {
+    content: "Trading Tool"; display: block; padding: 4px 12px 22px;
+    font-size: 18px; font-weight: 700; letter-spacing: 0.02em; color: var(--texte);
+  }
+  nav.barre-onglets button {
+    flex: 0 0 auto; flex-direction: row; justify-content: flex-start; gap: 12px;
+    padding: 11px 14px; border-radius: 10px; font-size: 14.5px; font-weight: 600; text-align: left;
+  }
+  nav.barre-onglets button .icone-onglet { font-size: 19px; width: 24px; text-align: center; }
+  nav.barre-onglets button:hover { background: rgba(255, 255, 255, 0.05); color: var(--texte); }
+  nav.barre-onglets button.actif { background: var(--accent); color: var(--fond); box-shadow: var(--lueur-accent); }
+  main { padding: 22px 32px 32px; }
+}
