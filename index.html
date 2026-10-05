@@ -257,7 +257,6 @@
       <div class="carte" id="carte-analyse-trades">
         <h3 class="titre-bloc">📈 Analyse de mes trades</h3>
         <div class="ligne-champs">
-          <div class="champ choix-compte-journal hidden" id="choix-compte-analyse"></div>
           <div class="champ">
             <label for="periode-analyse">Période</label>
             <select id="periode-analyse">
@@ -268,6 +267,8 @@
           </div>
         </div>
         <div id="contenu-analyse-trades"><p class="etat-vide">Chargement…</p></div>
+        <!-- Choix du compte, tout en bas -->
+        <div class="champ choix-compte-journal choix-compte-bas hidden" id="choix-compte-analyse"></div>
       </div>
 
       </div>
@@ -299,9 +300,6 @@
       <!-- Vue Performance (masquée tant qu'on n'a pas cliqué sur "Performance" ci-dessus) -->
       <div id="journal-performance" class="hidden">
         <button type="button" class="bouton-retour" id="bouton-retour-performance"><span aria-hidden="true">←</span> Retour</button>
-        <div class="champ choix-compte-journal hidden" id="choix-compte-performance"></div>
-        <!-- Suivi du challenge (perte max, objectif) des comptes TradeLocker : js/challenge-comptes.js -->
-        <div id="challenge-performance"></div>
 
 
         <div class="barre-filtres" id="filtres-periode-perf" role="group" aria-label="Période">
@@ -313,6 +311,10 @@
         </div>
 
         <div id="contenu-performance"></div>
+
+        <!-- Comptes TopOne tout en bas : choix du compte + suivi du challenge (js/challenge-comptes.js) -->
+        <div class="champ choix-compte-journal choix-compte-bas hidden" id="choix-compte-performance"></div>
+        <div id="challenge-performance"></div>
       </div>
     </section>
 
