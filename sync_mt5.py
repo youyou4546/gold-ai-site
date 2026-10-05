@@ -1,7 +1,10 @@
 """
-Lit les comptes MT5 de config.ini (sections [mt5_...], ex. [mt5_fundednext]) en
-LECTURE SEULE (mot de passe investisseur : impossible de passer un ordre) et
-publie leurs chiffres dans l'app (Supabase › publier_compte_mt5).
+Lit des comptes MT5 en LECTURE SEULE (mot de passe investisseur : impossible de
+passer un ordre) et publie leurs chiffres dans l'app (Supabase › publier_compte_mt5).
+Deux sources :
+  - les comptes ajoutés DANS L'APP par chaque utilisateur (Profil › Mes comptes ›
+    « Ajouter un compte MetaTrader 5 », RPC connexions_mt5_a_lire) ;
+  - les sections [mt5_...] de config.ini (ex. [mt5_fundednext]).
 
 Lancé par sync_site.py (tâche planifiée "gold-ai site", toutes les 15 min).
 Le terminal MT5 doit être installé sur ce PC (chemin `terminal` de la section).
@@ -27,8 +30,12 @@ def utc(ts):
     return dt.datetime.fromtimestamp(ts, dt.timezone.utc).replace(tzinfo=None)
 
 
-def lire_compte(mt5, sec):
-    if not mt5.initialize(path=sec["terminal"], login=int(sec["login"]), password=sec["mot_de_passe_investisseur"],
+TERMINAL_PAR_DEFAUT = "C:/Program Files/MetaTrader 5/terminal64.exe"
+
+
+def lire_compte(mt5, terminal, sec):
+    """sec : login, serveur, mdp, nom, depart, perte_max, perte_jour, objectif_pct."""
+    if not mt5.initialize(path=terminal, login=int(sec["login"]), password=sec["mdp"],
                           server=sec["serveur"], timeout=60000):
         raise RuntimeError(f"connexion MT5 impossible : {mt5.last_error()}")
     try:
@@ -55,12 +62,12 @@ def lire_compte(mt5, sec):
         flottant = sum(p.profit + p.swap for p in positions)
         jour_ferme = round(par_jour.get(jour_serveur, 0.0), 2)
 
-        depart = float(sec.get("depart", 0) or 0)
+        depart = float(sec.get("depart") or 0) or round(a.balance - sum(par_jour.values()), 2)  # sinon : dépôt de départ
         return {
-            "login": a.login, "nom": sec.get("nom", f"MT5 {a.login}"), "serveur": a.server, "devise": a.currency,
+            "login": a.login, "nom": sec.get("nom") or f"MT5 {a.login}", "serveur": a.server, "devise": a.currency,
             "solde": round(a.balance, 2), "equite": round(a.equity, 2),
-            "depart": depart, "perteMax": float(sec.get("perte_max", 0) or 0), "perteJour": float(sec.get("perte_jour", 0) or 0),
-            "objectifPct": float(sec.get("objectif_pct", 0) or 0),
+            "depart": depart, "perteMax": float(sec.get("perte_max") or 0), "perteJour": float(sec.get("perte_jour") or 0),
+            "objectifPct": float(sec.get("objectif_pct") or 0),
             # Solde au début de la journée du serveur (base habituelle de la perte max par jour).
             "soldeDebutJour": round(a.balance - jour_ferme, 2),
             "jourFerme": jour_ferme, "flottant": round(flottant, 2), "jourNet": round(jour_ferme + flottant, 2),
@@ -73,37 +80,67 @@ def lire_compte(mt5, sec):
         mt5.shutdown()
 
 
-def publier(utilisateur, cle, contenu):
+def _rpc(nom, corps):
     cfg = publication._config()
     if not cfg:
-        return False, "section [site_supabase] absente"
-    r = requests.post(f"{cfg['url']}/rest/v1/rpc/publier_compte_mt5",
+        raise RuntimeError("section [site_supabase] absente de config.ini")
+    r = requests.post(f"{cfg['url']}/rest/v1/rpc/{nom}",
                       headers={"apikey": cfg["cle_publique"], "Authorization": f"Bearer {cfg['cle_publique']}",
                                "Content-Type": "application/json"},
-                      json={"p_secret": cfg["secret_publication"], "p_utilisateur": utilisateur, "p_cle": cle, "p_contenu": contenu},
-                      timeout=20)
-    return r.status_code < 400, (r.text[:200] if r.status_code >= 400 else "OK")
+                      json={"p_secret": cfg["secret_publication"], **corps}, timeout=20)
+    if r.status_code >= 400:
+        raise RuntimeError(f"{nom} refusé (HTTP {r.status_code}) : {r.text[:200]}")
+    return r.json() if r.text else None
+
+
+def comptes_a_lire(config):
+    """Comptes de l'app + sections [mt5_...] de config.ini (sans doublon utilisateur/login)."""
+    comptes = []
+    try:
+        for c in _rpc("connexions_mt5_a_lire", {}) or []:
+            comptes.append({"id": c["id"], "utilisateur": c["utilisateur"], "login": c["login"], "serveur": c["serveur"],
+                            "mdp": c["mdp"], "nom": c["nom"], "depart": c["depart"], "perte_max": c["perte_max"],
+                            "perte_jour": c["perte_jour"], "objectif_pct": c["objectif_pct"]})
+    except Exception as erreur:
+        print(f"MT5 : liste des comptes de l'app illisible — {erreur}")
+    deja = {(c["utilisateur"], int(c["login"])) for c in comptes}
+    for nom in [s for s in config.sections() if s.startswith("mt5_")]:
+        sec = config[nom]
+        cle = (sec.get("utilisateur_app", ""), int(sec["login"]))
+        if cle in deja:
+            continue
+        comptes.append({"id": None, "utilisateur": cle[0], "login": cle[1], "serveur": sec["serveur"],
+                        "mdp": sec["mot_de_passe_investisseur"], "nom": sec.get("nom"), "depart": sec.get("depart"),
+                        "perte_max": sec.get("perte_max"), "perte_jour": sec.get("perte_jour"), "objectif_pct": sec.get("objectif_pct"),
+                        "terminal": sec.get("terminal")})
+    return comptes
 
 
 def main():
     config = configparser.ConfigParser(interpolation=None)
     config.read(publication.CONFIG_PATH, encoding="utf-8")
-    sections = [s for s in config.sections() if s.startswith("mt5_")]
-    if not sections:
+    comptes = comptes_a_lire(config)
+    if not comptes:
         return
     try:
         import MetaTrader5 as mt5
     except ImportError:
         print("MT5 : module MetaTrader5 absent (pip install MetaTrader5)")
         return
-    for nom in sections:
-        sec = config[nom]
+    for c in comptes:
         try:
-            contenu = lire_compte(mt5, sec)
-            ok, msg = publier(sec.get("utilisateur_app", ""), f"mt5|{contenu['login']}", contenu)
-            print(f"MT5 {contenu['nom']} : solde {contenu['solde']} · publication {msg}")
+            contenu = lire_compte(mt5, c.get("terminal") or TERMINAL_PAR_DEFAUT, c)
+            _rpc("publier_compte_mt5", {"p_utilisateur": c["utilisateur"], "p_cle": f"mt5|{contenu['login']}", "p_contenu": contenu})
+            if c["id"]:
+                _rpc("signaler_connexion_mt5", {"p_id": c["id"], "p_erreur": None})
+            print(f"MT5 {contenu['nom']} ({c['utilisateur']}) : solde {contenu['solde']} · publié")
         except Exception as erreur:  # un compte en échec n'empêche pas les autres
-            print(f"MT5 {nom} : ÉCHEC — {erreur}")
+            print(f"MT5 {c['login']} ({c['utilisateur']}) : ÉCHEC — {erreur}")
+            if c["id"]:
+                try:
+                    _rpc("signaler_connexion_mt5", {"p_id": c["id"], "p_erreur": "Connexion refusée : vérifie le numéro, le serveur et le mot de passe investisseur."})
+                except Exception:
+                    pass
 
 
 if __name__ == "__main__":
