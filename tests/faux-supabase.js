@@ -91,6 +91,11 @@
             return { data: { ok: true }, error: null };
           }
           if (body.action === "comptes") return { data: { comptes: cx.flatMap(() => [{ cle: "live|1", nom: "NOVA 100K #1", solde: 98492.74, devise: "USD" }, { cle: "live|2", nom: "NOVA 50K (copie) #2", solde: 50880, devise: "USD" }]) }, error: null };
+          if (nom === "assistant-trading") {
+            const q = body.messages?.[body.messages.length - 1]?.texte || "";
+            if (/erreur/i.test(q)) return { data: null, error: { context: { json: async () => ({ erreur: "Limite gratuite atteinte pour le moment. Réessaie dans une minute." }) } } };
+            return { data: { ok: true, modele: "banc", reponse: "Sur l'or (XAUUSD), **1 pip = 0,10 $** de mouvement de prix.\n\n- Avec **1 lot** (100 onces), 1 pip vaut **10 $**\n- Avec **0,10 lot**, 1 pip vaut **1 $**\n- Avec **0,01 lot**, 1 pip vaut **0,10 $**\n\nExemple : l'or passe de 2650,00 à 2652,00 = **20 pips**. Avec 0,10 lot, ça fait **20 $** de gain ou de perte." }, error: null };
+          }
           if (nom === "analyse-graphique") {
             const liste = lire("banc_ia", []);
             if (liste.length >= 5) return { data: null, error: { context: { json: async () => ({ erreur: "Tu as déjà utilisé tes 5 analyses d'aujourd'hui. Reviens demain." }) } } };
