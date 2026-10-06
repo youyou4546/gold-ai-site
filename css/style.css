@@ -2091,3 +2091,28 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .details-compte[open] > summary.resume-compte::after { transform: rotate(90deg); }
 .details-compte > .contenu-compte { display: flex; flex-direction: column; gap: 10px; padding-top: 12px; }
 .carte-mt5.details-compte { gap: 0; }
+
+/* ---------- Mes comptes : cartes façon TopOne (courbe, solde, profit), à toucher pour ouvrir ---------- */
+.liste-cartes-comptes { list-style: none; padding: 0; margin: 0 0 14px; display: flex; flex-direction: column; gap: 14px; }
+.carte-compte { background: var(--fond-carte); border: 1px solid var(--bordure); border-radius: 18px; overflow: hidden; }
+.tete-carte-compte { padding: 18px 18px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 12px; -webkit-tap-highlight-color: transparent; }
+.titre-carte-compte { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 17px; }
+.courbe-compte { width: 100%; height: 64px; display: block; }
+.courbe-compte.hausse { color: var(--vert); }
+.courbe-compte.baisse { color: var(--rouge); }
+.chiffres-carte-compte { display: flex; justify-content: space-between; gap: 10px; }
+.chiffres-carte-compte > div { display: flex; flex-direction: column; gap: 4px; }
+.chiffres-carte-compte .droite { text-align: right; }
+.chiffres-carte-compte .lib { font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--texte-attenue); }
+.chiffres-carte-compte .val { font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.pied-carte-compte { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--bordure); }
+.pied-carte-compte .numero { display: block; color: var(--texte-attenue); font-size: 15px; }
+.pied-carte-compte .plateforme { display: block; color: var(--texte-attenue); font-size: 12px; }
+.etat-compte { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; }
+.etat-compte i { width: 9px; height: 9px; border-radius: 50%; background: var(--vert); }
+.etat-compte.ko i { background: var(--orange); }
+.fleche-compte { font-size: 22px; color: var(--texte-attenue); transition: transform 0.15s; margin-left: 4px; }
+.carte-compte.ouverte .fleche-compte { transform: rotate(90deg); }
+.carte-compte > .contenu-compte { display: none; flex-direction: column; gap: 10px; padding: 0 18px 18px; }
+.carte-compte.ouverte > .contenu-compte { display: flex; }
+.carte-compte > form, .carte-compte > .texte-attenue { margin: 14px 18px; }

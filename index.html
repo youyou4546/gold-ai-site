@@ -359,14 +359,14 @@
       <!-- Vue Mes comptes TradeLocker : solde, résultat du jour, trades ouverts (js/comptes-tradelocker.js) — remplace l'ancien « Mes comptes » -->
       <div id="profil-tradelocker" class="hidden">
         <button type="button" class="bouton-retour" id="bouton-retour-tradelocker"><span aria-hidden="true">←</span> Retour</button>
-        <div class="carte hidden" id="noms-comptes-tradelocker">
-          <h3 class="titre-bloc">💼 Mes comptes</h3>
-          <p class="texte-attenue petit">Noms utilisés seulement dans l'app. Le compte <strong>Maître</strong> est celui que suit la barre d'objectif en haut.</p>
-          <ul class="liste-noms-tl" id="liste-noms-tradelocker"></ul>
+        <!-- Une carte par compte (courbe, solde, profit), à toucher pour l'ouvrir -->
+        <div class="hidden" id="noms-comptes-tradelocker">
+          <ul class="liste-cartes-comptes" id="liste-noms-tradelocker"></ul>
         </div>
-        <div id="contenu-tradelocker"></div>
         <!-- Comptes MT5 (FundedNext…) lus en lecture seule par le PC : js/comptes-mt5.js -->
         <div id="contenu-mt5"></div>
+        <!-- Solde total + connexions TradeLocker (Retirer) -->
+        <div id="contenu-tradelocker"></div>
 
         <details class="carte hidden" id="carte-supprimes-tl">
           <summary><strong>🗑️ Trades importés que tu as supprimés</strong> <span class="texte-attenue petit" id="nb-supprimes-tl"></span></summary>

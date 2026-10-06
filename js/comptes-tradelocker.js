@@ -22,6 +22,7 @@
   let compteMaitre = "";   // clé du compte « maître » (suivi par la barre d'objectif)
   let statuts = {};        // { "live|123": { statut: "finance" | "evaluation", depuis: "AAAA-MM-JJ" } }
   let seuilEss = 20;
+  let reglesComptes = {};  // { cle: { depart, perteMax, … } } (Performance › ⚙️ Règles)
   let enEdition = null;    // clé du compte en train d'être renommé (pas de rafraîchissement pendant ce temps)
 
   const ouverte = () => !$("profil-tradelocker")?.classList.contains("hidden");
@@ -50,6 +51,7 @@
     compteMaitre = r.compteMaitre || "";
     statuts = { ...(r.statutsComptes || {}) };
     seuilEss = Number(r.seuilEss) > 0 ? Number(r.seuilEss) : 20;
+    reglesComptes = { ...(r.reglesComptes || {}) };
   }
 
   // Compte maître : un seul à la fois (le choisir sur un compte le retire de l'ancien).
@@ -132,13 +134,64 @@
     </div>`;
   }
 
-  const ouverts = new Set(); // comptes dont le volet est ouvert (gardés ouverts au redessin)
+  const ouverts = new Set(); // cartes ouvertes (gardées ouvertes quand la liste est redessinée)
   function soldeDe(cle) {
     for (const cx of donnees?.connexions || []) {
       const c = (cx.comptes || []).find((x) => `${cx.environnement}|${x.id}` === cle);
       if (c) return c;
     }
     return null;
+  }
+
+  // Petite courbe du compte (comme sur TopOne) : valeurs successives du solde.
+  let numeroCourbe = 0;
+  function courbe(valeurs) {
+    const v = (valeurs || []).filter(Number.isFinite);
+    if (v.length < 2) v.unshift(v[0] ?? 0);
+    const min = Math.min(...v), max = Math.max(...v), h = max - min || 1;
+    const L = 300, H = 64;
+    const pts = v.map((y, i) => [(i / (v.length - 1)) * L, 4 + (1 - (y - min) / h) * (H - 8)]);
+    const ligne = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+    const hausse = v[v.length - 1] >= v[0];
+    const id = `degrade-compte-${++numeroCourbe}`;
+    return `<svg class="courbe-compte ${hausse ? "hausse" : "baisse"}" viewBox="0 0 ${L} ${H}" preserveAspectRatio="none" aria-hidden="true">
+      <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity="0.28"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+      <polygon points="0,${H} ${ligne} ${L},${H}" fill="url(#${id})"/>
+      <polyline points="${ligne}" fill="none" stroke="currentColor" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+    </svg>`;
+  }
+
+  // Carte d'un compte : nom + badges, courbe, solde, profit, numéro, plateforme, état.
+  // Toucher la tête de la carte ouvre / ferme son contenu (géré en JS : fiable sur iPhone).
+  function carteCompte({ cle, nom, badges = "", valeurs, solde, profit, devise = "USD", numero, plateforme, etat = "Active", etatOk = true, contenu }) {
+    const ouvert = ouverts.has(cle);
+    return `
+      <li class="carte-compte${ouvert ? " ouverte" : ""}" data-cle="${esc(cle)}">
+        <div class="tete-carte-compte" role="button" tabindex="0" aria-expanded="${ouvert}" data-basculer="${esc(cle)}">
+          <div class="titre-carte-compte"><strong>${esc(nom)}</strong>${badges}</div>
+          ${courbe(valeurs)}
+          <div class="chiffres-carte-compte">
+            <div><span class="lib">Solde</span><span class="val">${argent(solde, devise)}</span></div>
+            <div class="droite"><span class="lib">Profit</span><span class="val ${classe(profit)}">${profit === null ? "—" : argent(profit, devise, true)}</span></div>
+          </div>
+          <div class="pied-carte-compte">
+            <span><span class="numero">#${esc(String(numero ?? ""))}</span><span class="plateforme">${esc(plateforme)}</span></span>
+            <span class="etat-compte ${etatOk ? "ok" : "ko"}"><i></i>${esc(etat)}<span class="fleche-compte" aria-hidden="true">›</span></span>
+          </div>
+        </div>
+        <div class="contenu-compte">${contenu}</div>
+      </li>`;
+  }
+
+  // Courbe d'un compte TradeLocker : départ, puis résultat cumulé jour par jour (Journal), puis solde actuel.
+  function valeursCompte(cle, depart, solde) {
+    const parJour = {};
+    (window.GoldAI.journal.obtenirTradesBruts() || []).filter((t) => t.compteTl === cle)
+      .forEach((t) => { parJour[t.date] = (parJour[t.date] || 0) + Number(t.resultat) - (Number(t.frais) || 0); });
+    let cumul = depart;
+    const v = [depart, ...Object.keys(parJour).sort().map((j) => (cumul += parJour[j]))];
+    if (Number.isFinite(solde)) v.push(solde);
+    return v;
   }
 
   function afficherNoms() {
@@ -148,7 +201,7 @@
     $("liste-noms-tradelocker").innerHTML = (comptesListe || []).map((c) => {
       const surnom = surnoms[c.cle];
       if (enEdition === c.cle) {
-        return `<li>
+        return `<li class="carte-compte ouverte">
           <form class="renommer-compte-tl" data-renommer-form="${esc(c.cle)}">
             <input type="text" maxlength="40" value="${esc(surnom || "")}" placeholder="${esc(c.nom)}" aria-label="Nouveau nom pour ${esc(c.nom)}">
             <button type="submit" class="bouton bouton-petit">OK</button>
@@ -161,33 +214,47 @@
       const st = statuts[c.cle] || {};
       const finance = st.statut === "finance";
       const s = soldeDe(c.cle);
-      return `<li class="compte-tl-ligne">
-        <details class="details-compte" data-cle="${esc(c.cle)}" ${ouverts.has(c.cle) ? "open" : ""}>
-        <summary class="resume-compte">
-          <span class="nom-compte-tl"><strong>${esc(surnom || c.nom)}</strong>
-            ${maitre ? `<span class="badge-maitre">⭐ Maître</span>` : ""}
-            <span class="badge-statut-compte ${finance ? "finance" : "challenge"}">${finance ? "Financé" : "Évaluation"}</span></span>
-          <span class="solde-compte-tl">${s ? argent(s.solde, s.devise) : ""}</span>
-        </summary>
-        <div class="contenu-compte">
-        <span class="actions-compte-tl">
-          ${maitre ? "" : `<button type="button" class="bouton secondaire bouton-petit" data-maitre="${esc(c.cle)}">⭐ Compte maître</button>`}
-          <button type="button" class="bouton secondaire bouton-petit" data-renommer="${esc(c.cle)}">✏️ Renommer</button>
-        </span>
-        <div class="reglage-statut-tl">
-          <label>Statut
-            <select data-statut="${esc(c.cle)}">
-              <option value="evaluation" ${finance ? "" : "selected"}>Évaluation / challenge</option>
-              <option value="finance" ${finance ? "selected" : ""}>Financé</option>
-            </select></label>
-          ${finance ? `<label>Financé depuis le <input type="date" data-depuis="${esc(c.cle)}" value="${esc(st.depuis || "")}"></label>` : ""}
-        </div>
-        ${blocEss(c.cle)}
-        </div>
-        </details>
-      </li>`;
+      const solde = s && s.solde !== null && s.solde !== undefined ? Number(s.solde) : null;
+      const valeursJournal = valeursCompte(c.cle, 0, null);
+      const depart = Number(reglesComptes[c.cle]?.depart) > 0 ? Number(reglesComptes[c.cle].depart)
+        : solde !== null ? solde - valeursJournal[valeursJournal.length - 1] : null;
+      const actif = !s?.statut || s.statut === "ACTIVE";
+      return carteCompte({
+        cle: c.cle, nom: surnom || c.nom, devise: s?.devise || "USD",
+        badges: `${maitre ? `<span class="badge-maitre">⭐ Maître</span>` : ""}<span class="badge-statut-compte ${finance ? "finance" : "challenge"}">${finance ? "Financé" : "Évaluation"}</span>`,
+        valeurs: depart !== null ? valeursCompte(c.cle, depart, solde) : [],
+        solde, profit: solde !== null && depart !== null ? Math.round((solde - depart) * 100) / 100 : null,
+        numero: s?.accNum ?? c.cle.split("|")[1], plateforme: "TradeLocker",
+        etat: actif ? "Active" : String(s.statut), etatOk: actif,
+        contenu: `
+          <span class="actions-compte-tl">
+            ${maitre ? "" : `<button type="button" class="bouton secondaire bouton-petit" data-maitre="${esc(c.cle)}">⭐ Compte maître</button>`}
+            <button type="button" class="bouton secondaire bouton-petit" data-renommer="${esc(c.cle)}">✏️ Renommer</button>
+          </span>
+          <div class="reglage-statut-tl">
+            <label>Statut
+              <select data-statut="${esc(c.cle)}">
+                <option value="evaluation" ${finance ? "" : "selected"}>Évaluation / challenge</option>
+                <option value="finance" ${finance ? "selected" : ""}>Financé</option>
+              </select></label>
+            ${finance ? `<label>Financé depuis le <input type="date" data-depuis="${esc(c.cle)}" value="${esc(st.depuis || "")}"></label>` : ""}
+          </div>
+          ${blocEss(c.cle)}`,
+      });
     }).join("");
     $("liste-noms-tradelocker").querySelector("[data-renommer-form] input")?.focus();
+  }
+
+  // Ouvrir / fermer une carte (TopOne et MT5) : sans redessiner la liste.
+  function basculer(e) {
+    const tete = e.target.closest?.("[data-basculer]");
+    if (!tete || (e.type === "keydown" && e.key !== "Enter" && e.key !== " ")) return;
+    if (e.type === "keydown") e.preventDefault();
+    const carte = tete.closest(".carte-compte");
+    const ouvert = !carte.classList.contains("ouverte");
+    carte.classList.toggle("ouverte", ouvert);
+    tete.setAttribute("aria-expanded", String(ouvert));
+    ouvert ? ouverts.add(tete.dataset.basculer) : ouverts.delete(tete.dataset.basculer);
   }
 
   async function charger() {
@@ -267,11 +334,6 @@
       </div>` : "";
 
     zone.innerHTML = `
-      <p class="texte-attenue petit maj-tradelocker">${erreur ? `⚠️ ${esc(erreur)} — ` : ""}Mis à jour ${esc(U.heure(donnees.lu_le))} · toutes les 30 s
-        <button type="button" class="lien-retour" id="rafraichir-tradelocker">Actualiser</button></p>
-      <p class="texte-attenue petit">🔄 Pour ajouter tes trades fermés au <strong>Journal</strong>, appuie sur « Actualiser les trades » dans le Journal. Ils restent modifiables comme les autres.
-        ${donnees.importes24h ? `<strong>${donnees.importes24h}</strong> importé${donnees.importes24h > 1 ? "s" : ""} ces dernières 24 h.` : ""}
-        Profit calculé sans commissions ni swap.</p>
       ${total}
       ${connexions.map((cx) => `
         <div class="groupe-connexion-tl">
@@ -374,11 +436,8 @@
       else if (t.dataset.renommer) { enEdition = t.dataset.renommer; afficherNoms(); }
       else if (t.hasAttribute("data-annuler-renommer")) { enEdition = null; afficherNoms(); }
     });
-    // Ouverture / fermeture d'un volet de compte : mémorisée pour le prochain redessin.
-    $("liste-noms-tradelocker")?.addEventListener("toggle", (e) => {
-      const d = e.target.closest?.("details.details-compte");
-      if (d) d.open ? ouverts.add(d.dataset.cle) : ouverts.delete(d.dataset.cle);
-    }, true);
+    $("liste-noms-tradelocker")?.addEventListener("click", basculer);
+    $("liste-noms-tradelocker")?.addEventListener("keydown", basculer);
     $("liste-noms-tradelocker")?.addEventListener("change", (e) => {
       const t = e.target;
       if (t.dataset.statut) enregistrerStatut(t.dataset.statut, { statut: t.value });
@@ -410,5 +469,5 @@
   window.addEventListener("goldai:reglages-calculateur", () => { if (ouverte() && !enEdition) chargerSurnoms().then(afficherNoms); });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.comptesTradelocker = { ouvrir, viderCache, relire: () => { if (ouverte()) charger(); } };
+  window.GoldAI.comptesTradelocker = { ouvrir, viderCache, relire: () => { if (ouverte()) charger(); }, carteCompte, basculer };
 })();
