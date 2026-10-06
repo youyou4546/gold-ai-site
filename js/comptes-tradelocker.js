@@ -1,4 +1,4 @@
-// Gold AI — Profil › Mes comptes TradeLocker : solde, équité, résultat du
+// Gold AI — Profil › Mes comptes (TradeLocker) : solde, équité, résultat du
 // jour et trades ouverts (avec leur P&L en direct) de TOUS tes comptes
 // TradeLocker. Les trades FERMÉS sont importés dans le Journal au clic sur
 // « Actualiser les trades » (Journal) seulement ; ils restent modifiables
@@ -289,7 +289,7 @@
     if (r?.erreur) return message(r.erreur);
     $("formulaire-tradelocker").reset();
     window.GoldAI.journal.oublierComptesRelies?.();
-    $("carte-ajout-tradelocker").open = false;
+    $("carte-ajout-compte").open = false;
     chargerNoms();
     await charger();
   }
@@ -319,8 +319,8 @@
 
     const connexions = donnees.connexions || [];
     if (!connexions.length) {
-      zone.innerHTML = `<div class="carte"><strong>Aucun compte connecté</strong><p class="texte-attenue petit">Ajoute ta connexion TradeLocker ci-dessous pour voir le solde de tous tes comptes ici.</p></div>`;
-      $("carte-ajout-tradelocker").open = true;
+      // Pas de TradeLocker : rien ici (les comptes MetaTrader 5 ont leurs cartes juste au-dessus).
+      zone.innerHTML = "";
       return;
     }
 
@@ -353,47 +353,18 @@
     afficherNoms(); // soldes à jour dans chaque volet
   }
 
-  // ---------------------------------------------------------------- Trades supprimés → Réimporter
+  // ---------------------------------------------------------------- Ajouter un compte
 
-  let supprimes = [];
-  async function chargerSupprimes() {
-    const r = await appeler("supprimes");
-    supprimes = r?.trades || [];
-    afficherSupprimes();
+  // « + Ajouter un compte » : on choisit la plateforme, puis son formulaire s'affiche.
+  function choisirPlateforme(plateforme) {
+    document.querySelectorAll("#choix-plateforme button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.plateforme === plateforme)));
+    $("ajout-tradelocker")?.classList.toggle("hidden", plateforme !== "tradelocker");
+    $("ajout-mt5")?.classList.toggle("hidden", plateforme !== "mt5");
   }
-
-  function afficherSupprimes() {
-    const carte = $("carte-supprimes-tl");
-    if (!carte) return;
-    carte.classList.toggle("hidden", !supprimes.length);
-    $("nb-supprimes-tl").textContent = supprimes.length ? `(${supprimes.length})` : "";
-    $("liste-supprimes-tl").innerHTML = supprimes.map((t) => {
-      const nom = surnoms[t.compteTl] || window.GoldAI.journal.obtenirTradesBruts().find((x) => x.compteTl === t.compteTl)?.compteTlNom || t.compteTl;
-      return `<li>
-        <span><strong class="${t.resultat >= 0 ? "positif" : "negatif"}">${argent(t.resultat, "USD", true)}</strong>
-          <span class="texte-attenue petit">· ${esc(nom)} · fermé le ${esc(U.jourHeure(Date.parse(t.fermeLe)))} · ${t.positions} position${t.positions > 1 ? "s" : ""}</span></span>
-        <button type="button" class="bouton secondaire bouton-petit" data-reimporter="${esc(t.tradeId)}">↩️ Réimporter</button>
-      </li>`;
-    }).join("");
-  }
-
-  async function reimporterTrade(bouton) {
-    const zone = $("message-supprimes-tl");
-    if (bouton.disabled) return; // double appui
-    bouton.disabled = true;
-    bouton.textContent = "Réimport…";
-    const r = await appeler("reimporter", { tradeId: bouton.dataset.reimporter });
-    zone.classList.remove("hidden");
-    if (r?.erreur) {
-      zone.textContent = r.erreur;
-      bouton.disabled = false;
-      bouton.textContent = "↩️ Réimporter";
-      return;
-    }
-    zone.textContent = r.importes ? "✓ Trade remis dans le Journal." : "TradeLocker n'a pas renvoyé ce trade pour l'instant : réessaie dans quelques minutes.";
-    await window.GoldAI.journal.chargerTousLesTrades(true);
-    window.dispatchEvent(new CustomEvent("goldai:trades")); // calendrier, objectif, garde-fou, ESS
-    await chargerSupprimes();
+  function ouvrirAjout(plateforme) {
+    const carte = $("carte-ajout-compte");
+    if (carte) carte.open = true;
+    choisirPlateforme(plateforme);
   }
 
   // ---------------------------------------------------------------- Cycle de vie
@@ -406,8 +377,6 @@
     chargerSurnoms().then(() => { afficher(); afficherNoms(); });
     // Trades du journal : nécessaires au calcul de l'ESS de chaque compte.
     window.GoldAI.journal.chargerTousLesTrades().then(afficherNoms);
-    supprimes = []; afficherSupprimes();
-    chargerSupprimes();
     chargerNoms();
     afficher();
     charger();
@@ -453,7 +422,7 @@
       environnement = b.dataset.env;
       document.querySelectorAll("#formulaire-tradelocker .segmente button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
     }));
-    $("liste-supprimes-tl")?.addEventListener("click", (e) => { if (e.target.dataset.reimporter) reimporterTrade(e.target); });
+    $("choix-plateforme")?.addEventListener("click", (e) => { const p = e.target.closest("[data-plateforme]")?.dataset.plateforme; if (p) choisirPlateforme(p); });
     $("contenu-tradelocker")?.addEventListener("click", (e) => {
       const t = e.target;
       if (t.id === "rafraichir-tradelocker") charger();

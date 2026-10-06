@@ -351,12 +351,12 @@
           </button>
           <button class="tuile-journal" id="bouton-ouvrir-tradelocker">
             <span class="icone-tuile">💼</span>
-            <span>Mes comptes TradeLocker</span>
+            <span>Mes comptes</span>
           </button>
         </div>
       </div>
 
-      <!-- Vue Mes comptes TradeLocker : solde, résultat du jour, trades ouverts (js/comptes-tradelocker.js) — remplace l'ancien « Mes comptes » -->
+      <!-- Vue Mes comptes : cartes TradeLocker (js/comptes-tradelocker.js) et MetaTrader 5 (js/comptes-mt5.js) -->
       <div id="profil-tradelocker" class="hidden">
         <button type="button" class="bouton-retour" id="bouton-retour-tradelocker"><span aria-hidden="true">←</span> Retour</button>
         <!-- Une carte par compte (courbe, solde, profit), à toucher pour l'ouvrir -->
@@ -368,15 +368,15 @@
         <!-- Solde total + connexions TradeLocker (Retirer) -->
         <div id="contenu-tradelocker"></div>
 
-        <details class="carte hidden" id="carte-supprimes-tl">
-          <summary><strong>🗑️ Trades importés que tu as supprimés</strong> <span class="texte-attenue petit" id="nb-supprimes-tl"></span></summary>
-          <p class="texte-attenue petit">Un trade importé puis supprimé du Journal ne revient pas tout seul. « Réimporter » le remet dans le Journal. ⚠️ Si tu l'as ressaisi à la main, supprime d'abord ta version manuelle, sinon il sera compté deux fois.</p>
-          <ul class="liste-noms-tl" id="liste-supprimes-tl"></ul>
-          <p class="alerte-donnees hidden" id="message-supprimes-tl" role="status"></p>
-        </details>
-
-        <details class="carte" id="carte-ajout-tradelocker">
-          <summary><strong>+ Ajouter une connexion TradeLocker</strong></summary>
+        <!-- Un seul bouton « Ajouter un compte » tout en bas : on choisit d'abord la plateforme -->
+        <details class="carte" id="carte-ajout-compte">
+          <summary><strong>+ Ajouter un compte</strong></summary>
+          <p class="petit">Sur quelle plateforme est ce compte ?</p>
+          <div class="segmente" role="group" aria-label="Plateforme du compte" id="choix-plateforme">
+            <button type="button" data-plateforme="tradelocker" aria-pressed="false">TradeLocker</button>
+            <button type="button" data-plateforme="mt5" aria-pressed="false">MetaTrader 5</button>
+          </div>
+          <div id="ajout-tradelocker" class="hidden">
           <p class="texte-attenue petit">Les identifiants de connexion à TradeLocker (ceux de ta prop firm). Un seul login suffit pour voir tous les comptes qui y sont rattachés.</p>
           <form id="formulaire-tradelocker" novalidate>
             <div class="segmente" role="group" aria-label="Type de compte">
@@ -399,6 +399,9 @@
             <button type="submit" class="bouton" id="bouton-ajouter-tradelocker">Connecter</button>
           </form>
           <p class="texte-attenue petit">🔒 Le mot de passe est chiffré chez Supabase et ne sert qu'à <strong>lire</strong> tes comptes : l'app ne passe jamais d'ordre.</p>
+          </div>
+          <!-- Formulaire MetaTrader 5 : rempli par js/comptes-mt5.js -->
+          <div id="ajout-mt5" class="hidden"></div>
         </details>
       </div>
 

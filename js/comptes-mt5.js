@@ -38,12 +38,16 @@
       p_depart: num("depart"), p_perte_max: num("perte_max"), p_perte_jour: num("perte_jour"), p_objectif_pct: num("objectif_pct"),
     });
     bouton.disabled = false;
+    const zoneErreur = $("erreur-ajout-mt5");
     if (error) {
-      message = { ok: false, texte: /CHAMPS_MANQUANTS/.test(error.message || "") ? "Numéro du compte, serveur et mot de passe investisseur sont obligatoires." : "Ajout impossible pour l'instant, réessaie." };
-    } else {
-      form.reset();
-      message = { ok: true, texte: "✓ Compte ajouté. Ses chiffres apparaîtront ici dans 5 min au plus." };
+      zoneErreur.textContent = /CHAMPS_MANQUANTS/.test(error.message || "") ? "Numéro du compte, serveur et mot de passe investisseur sont obligatoires." : "Ajout impossible pour l'instant, réessaie.";
+      zoneErreur.classList.remove("hidden");
+      return;
     }
+    zoneErreur.classList.add("hidden");
+    form.reset();
+    $("carte-ajout-compte").open = false;
+    message = { ok: true, texte: "✓ Compte ajouté. Ses chiffres apparaîtront ici dans 5 min au plus." };
     document.activeElement?.blur();
     await charger();
   }
@@ -111,8 +115,6 @@
   }
 
   const formulaire = `
-    <details class="carte" id="carte-ajout-mt5">
-      <summary><strong>+ Ajouter un compte MetaTrader 5</strong></summary>
       <p class="texte-attenue petit">Utilise le mot de passe <strong>investisseur</strong> (lecture seule) donné par ta prop firm : l'app peut seulement regarder, jamais passer d'ordre. Il est chiffré et n'est plus jamais affiché.</p>
       <form id="formulaire-mt5" novalidate>
         <div class="ligne-champs">
@@ -131,29 +133,26 @@
           <div class="champ"><label for="mt5-perte-jour">Perte max par jour ($)</label><input id="mt5-perte-jour" name="perte_jour" inputmode="decimal" placeholder="ex. 4000"></div>
           <div class="champ"><label for="mt5-objectif">Objectif (%)</label><input id="mt5-objectif" name="objectif_pct" inputmode="decimal" placeholder="ex. 8"></div>
         </div>
+        <p class="alerte-donnees negatif hidden" id="erreur-ajout-mt5" role="status"></p>
         <button type="submit" class="bouton">Ajouter ce compte</button>
-      </form>
-    </details>`;
+      </form>`;
 
   function afficher() {
     const zone = $("contenu-mt5");
     if (!zone) return;
-    // Jamais redessiné pendant la saisie dans le formulaire.
-    if (document.activeElement?.closest?.("#formulaire-mt5")) return;
-    const ouvert = $("carte-ajout-mt5")?.open;
     zone.innerHTML = `
       ${erreur && !comptes ? `<p class="alerte-donnees">${esc(erreur)}</p>` : ""}
       ${comptes?.length ? `<ul class="liste-cartes-comptes">${comptes.map(carte).join("")}</ul>` : ""}
       ${connexions.length ? `<ul class="carte liste-noms-tl">${connexions.map(ligneConnexion).join("")}</ul>` : ""}
-      ${message ? `<p class="alerte-donnees${message.ok ? "" : " negatif"}" role="status">${esc(message.texte)}</p>` : ""}
-      ${formulaire}`;
-    if (ouvert) $("carte-ajout-mt5").open = true;
+      ${message ? `<p class="alerte-donnees${message.ok ? "" : " negatif"}" role="status">${esc(message.texte)}</p>` : ""}`;
   }
 
   const ouverte = () => !$("profil-tradelocker")?.classList.contains("hidden");
   let minuterie = null;
   document.addEventListener("DOMContentLoaded", () => {
-    $("contenu-mt5")?.addEventListener("submit", (e) => {
+    // Formulaire posé une fois dans « + Ajouter un compte » › MetaTrader 5 (jamais redessiné).
+    if ($("ajout-mt5")) $("ajout-mt5").innerHTML = formulaire;
+    $("ajout-mt5")?.addEventListener("submit", (e) => {
       if (e.target.id !== "formulaire-mt5") return;
       e.preventDefault();
       ajouter(e.target);
