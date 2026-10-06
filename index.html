@@ -150,6 +150,24 @@
       </div>
       </details>
 
+      <!-- Pose ta question : assistant trading GRATUIT (js/assistant-ia.js, Google Gemini via la
+           fonction Supabase assistant-trading). Conversation gardée sur le téléphone. -->
+      <details class="volet-analyse" id="volet-assistant-ia">
+      <summary class="entete-volet"><span>💬 Pose ta question à l'IA</span><span class="texte-attenue petit">gratuit</span></summary>
+      <div class="carte" id="carte-assistant-ia">
+        <div class="messages-assistant" id="assistant-messages"></div>
+        <div class="champ">
+          <label for="assistant-question">Ta question sur le trading</label>
+          <textarea id="assistant-question" rows="2" maxlength="1500" placeholder="ex. C'est quoi le drawdown maximum ?"></textarea>
+        </div>
+        <div class="boutons-assistant">
+          <button type="button" class="bouton" id="assistant-envoyer">Envoyer</button>
+          <button type="button" class="bouton secondaire hidden" id="assistant-effacer">Nouvelle conversation</button>
+        </div>
+        <p class="avertissement-erreur" id="assistant-erreur"></p>
+      </div>
+      </details>
+
       <!-- Briefing du jour lu à voix haute (js/briefing.js) — voix gratuite du téléphone -->
       <details class="volet-analyse" id="volet-briefing">
       <summary class="entete-volet"><span>🎙️ Briefing du jour</span><span class="texte-attenue petit" id="briefing-maj"></span></summary>
@@ -634,6 +652,7 @@
 <script src="js/analyse-trades.js"></script>
 <script src="js/page-ess.js"></script>
 <script src="js/analyse-ia.js"></script>
+<script src="js/assistant-ia.js"></script>
 <script src="js/parametres.js"></script>
 <script src="js/profil-mon-compte.js"></script>
 <script src="js/app.js"></script>

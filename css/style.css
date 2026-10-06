@@ -2116,3 +2116,13 @@ button.tuile-discipline:active { background: var(--fond-carte-survol); }
 .carte-compte > .contenu-compte { display: none; flex-direction: column; gap: 10px; padding: 0 18px 18px; }
 .carte-compte.ouverte > .contenu-compte { display: flex; }
 .carte-compte > form, .carte-compte > .texte-attenue { margin: 14px 18px; }
+
+/* Analyse › Pose ta question à l'IA (js/assistant-ia.js) */
+.messages-assistant { display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto; margin-bottom: 10px; }
+.bulle-assistant { max-width: 88%; padding: 8px 12px; border-radius: var(--rayon); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.bulle-assistant.moi { align-self: flex-end; background: var(--accent); color: var(--accent-texte); white-space: pre-wrap; }
+.bulle-assistant.ia { align-self: flex-start; background: var(--fond-carte-survol); border: 1px solid var(--bordure); }
+.bulle-assistant.ia p { margin: 4px 0; }
+.bulle-assistant.ia ul { margin: 4px 0; padding-left: 18px; }
+.bulle-assistant.attente { opacity: .7; font-style: italic; }
+.boutons-assistant { display: flex; gap: 8px; flex-wrap: wrap; }
