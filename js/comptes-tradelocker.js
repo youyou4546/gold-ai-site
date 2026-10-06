@@ -135,6 +135,10 @@
   }
 
   const ouverts = new Set(); // cartes ouvertes (gardées ouvertes quand la liste est redessinée)
+  // Connexion TradeLocker (login) à laquelle appartient un compte.
+  function connexionDe(cle) {
+    return (donnees?.connexions || []).find((cx) => (cx.comptes || []).some((x) => `${cx.environnement}|${x.id}` === cle)) || null;
+  }
   function soldeDe(cle) {
     for (const cx of donnees?.connexions || []) {
       const c = (cx.comptes || []).find((x) => `${cx.environnement}|${x.id}` === cle);
@@ -239,7 +243,21 @@
               </select></label>
             ${finance ? `<label>Financé depuis le <input type="date" data-depuis="${esc(c.cle)}" value="${esc(st.depuis || "")}"></label>` : ""}
           </div>
-          ${blocEss(c.cle)}`,
+          ${blocEss(c.cle)}
+          ${(() => {
+            const cx = connexionDe(c.cle);
+            if (!cx) return "";
+            return `<div class="retrait-connexion-tl">
+              <button type="button" class="lien-retour" data-oublier="${esc(cx.id)}">Retirer la connexion TradeLocker</button>
+              <div class="confirmation-arret hidden" data-confirmation="${esc(cx.id)}">
+                <span>Retirer cette connexion de l'app ? Tous les comptes de ce login disparaîtront d'ici (rien n'est touché chez TradeLocker).</span>
+                <div class="boutons-confirmation">
+                  <button type="button" class="bouton secondaire bouton-petit" data-annuler-oubli="${esc(cx.id)}">Non</button>
+                  <button type="button" class="bouton danger bouton-petit" data-confirmer-oubli="${esc(cx.id)}">Oui, retirer</button>
+                </div>
+              </div>
+            </div>`;
+          })()}`,
       });
     }).join("");
     $("liste-noms-tradelocker").querySelector("[data-renommer-form] input")?.focus();
@@ -324,32 +342,7 @@
       return;
     }
 
-    // Solde total (seulement si tous les comptes sont dans la même devise).
-    const comptes = connexions.flatMap((c) => c.comptes || []).filter((c) => c.solde !== null && c.solde !== undefined);
-    const devises = [...new Set(comptes.map((c) => c.devise))];
-    const total = devises.length === 1 ? `
-      <div class="carte solde-total-tl">
-        <span class="lib">Solde total${comptes.length > 1 ? ` · ${comptes.length} comptes` : ""}</span>
-        <span class="val">${argent(comptes.reduce((t, c) => t + Number(c.solde), 0), devises[0])}</span>
-      </div>` : "";
-
-    zone.innerHTML = `
-      ${total}
-      ${connexions.map((cx) => `
-        <div class="groupe-connexion-tl">
-          <div class="entete-connexion-tl">
-            <span class="texte-attenue petit">${esc(cx.email)} · ${esc(cx.serveur)} · ${cx.environnement === "live" ? "Réel" : "Démo"}</span>
-            <button type="button" class="lien-retour" data-oublier="${esc(cx.id)}">Retirer</button>
-          </div>
-          <div class="confirmation-arret hidden" data-confirmation="${esc(cx.id)}">
-            <span>Retirer cette connexion de l'app ? (Tes comptes TradeLocker ne sont pas touchés.)</span>
-            <div class="boutons-confirmation">
-              <button type="button" class="bouton secondaire bouton-petit" data-annuler-oubli="${esc(cx.id)}">Non</button>
-              <button type="button" class="bouton danger bouton-petit" data-confirmer-oubli="${esc(cx.id)}">Oui, retirer</button>
-            </div>
-          </div>
-          ${cx.erreur ? `<p class="alerte-donnees">${esc(cx.erreur)}</p>` : ""}
-        </div>`).join("")}`;
+    zone.innerHTML = connexions.filter((cx) => cx.erreur).map((cx) => `<p class="alerte-donnees">${esc(cx.erreur)}</p>`).join("");
     afficherNoms(); // soldes à jour dans chaque volet
   }
 
@@ -423,10 +416,16 @@
       document.querySelectorAll("#formulaire-tradelocker .segmente button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
     }));
     $("choix-plateforme")?.addEventListener("click", (e) => { const p = e.target.closest("[data-plateforme]")?.dataset.plateforme; if (p) choisirPlateforme(p); });
+    $("liste-noms-tradelocker")?.addEventListener("click", (e) => {
+      const t = e.target;
+      const carte = t.closest(".carte-compte");
+      if (t.dataset.oublier) carte?.querySelector(`[data-confirmation="${CSS.escape(t.dataset.oublier)}"]`)?.classList.remove("hidden");
+      else if (t.dataset.annulerOubli) carte?.querySelector(`[data-confirmation="${CSS.escape(t.dataset.annulerOubli)}"]`)?.classList.add("hidden");
+      else if (t.dataset.confirmerOubli) supprimer(t.dataset.confirmerOubli);
+    });
     $("contenu-tradelocker")?.addEventListener("click", (e) => {
       const t = e.target;
-      if (t.id === "rafraichir-tradelocker") charger();
-      else if (t.dataset.oublier) document.querySelector(`[data-confirmation="${CSS.escape(t.dataset.oublier)}"]`)?.classList.remove("hidden");
+      if (t.dataset.oublier) document.querySelector(`[data-confirmation="${CSS.escape(t.dataset.oublier)}"]`)?.classList.remove("hidden");
       else if (t.dataset.annulerOubli) document.querySelector(`[data-confirmation="${CSS.escape(t.dataset.annulerOubli)}"]`)?.classList.add("hidden");
       else if (t.dataset.confirmerOubli) supprimer(t.dataset.confirmerOubli);
     });
