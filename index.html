@@ -353,7 +353,12 @@
       <div id="profil-accueil">
         <div class="carte carte-profil">
           <div class="icone-profil"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
-          <div class="nom-connecte" id="nom-utilisateur-affiche"></div>
+          <div class="ligne-nom-profil">
+            <div class="nom-connecte" id="nom-utilisateur-affiche"></div>
+            <button type="button" class="bouton-crayon-profil" id="bouton-ouvrir-mon-compte" aria-label="Modifier mes infos"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+          </div>
+          <!-- Niveau de la Formation (js/formation.js) -->
+          <button type="button" class="niveau-profil hidden" id="niveau-profil" aria-label="Ouvrir la formation"></button>
           <p class="sous-titre-ecran" style="margin-bottom:20px;">Connecté sur cet appareil</p>
           <button class="bouton danger" id="bouton-deconnexion">Déconnexion</button>
         </div>
@@ -369,10 +374,6 @@
         </div>
 
         <div class="grille-tuiles-profil">
-          <button class="tuile-journal" id="bouton-ouvrir-mon-compte">
-            <span class="icone-tuile"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4M14 14h4"/></svg></span>
-            <span>Mon compte</span>
-          </button>
           <button class="tuile-journal" id="bouton-ouvrir-parametres">
             <span class="icone-tuile"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
             <span>Général</span>

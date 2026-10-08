@@ -179,6 +179,19 @@ input {
   margin-bottom: 4px;
 }
 
+/* Nom + petit crayon (ouvre « Mon compte ») */
+.ligne-nom-profil { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px; }
+.ligne-nom-profil .nom-connecte { margin-bottom: 0; }
+.bouton-crayon-profil { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: none; background: none; color: var(--texte-attenue); cursor: pointer; }
+.bouton-crayon-profil:active { background: var(--fond-carte-survol); color: var(--accent); }
+.bouton-crayon-profil .ico { width: 16px; height: 16px; }
+
+/* Niveau de la Formation sous le nom */
+.niveau-profil { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 280px; margin: 12px auto 12px; padding: 0; border: none; background: none; color: var(--texte); font: inherit; cursor: pointer; }
+.niveau-profil .haut-niveau-profil { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; }
+.niveau-profil .haut-niveau-profil span:first-child { color: var(--accent-clair); }
+.niveau-profil .haut-niveau-profil span:last-child { color: var(--texte-attenue); }
+
 /* ---------- Contenu des sections ---------- */
 
 main {

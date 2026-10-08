@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
       window.GoldAI?.notifications?.rafraichir();
     }
     if (cible === "formation") window.GoldAI?.formation?.ouvrir();
+    if (cible === "profil") window.GoldAI?.formation?.afficherNiveauProfil();
     if (cible === "profil" && window.GoldAI?.profilCompte?.charger) {
       window.GoldAI.profilCompte.charger();
     }

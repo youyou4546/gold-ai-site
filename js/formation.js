@@ -104,6 +104,7 @@
     gainsSession.push([xp, raison]);
     if (!silencieux) toast(`+${xp} XP`, raison);
     sauvegarder();
+    afficherNiveauProfil();
   }
 
   function toast(titre, texte) {
@@ -362,6 +363,17 @@
   }
 
   // ---------------------------------------------------------------- Ouverture et clics
+  // Profil : barre de niveau sous le nom (seulement la progression, pas besoin des cours).
+  async function afficherNiveauProfil() {
+    const el = $("niveau-profil");
+    if (!el || !window.GoldAI.auth?.getToken()) return;
+    try { await chargerEtat(); } catch { return; }
+    const n = niveauDe(etat.xp);
+    const avance = n >= NIVEAU_MAX ? 1 : (etat.xp - seuil(n)) / (seuil(n + 1) - seuil(n));
+    el.innerHTML = `<span class="haut-niveau-profil"><span>${esc(titreDe(n))}</span><span>Niveau ${n}</span></span>${barre(avance, "xp")}`;
+    el.classList.remove("hidden");
+  }
+
   async function ouvrir() {
     const zone = $("formation-contenu");
     if (!zone || !window.GoldAI.auth?.getToken()) return;
@@ -379,6 +391,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     const zone = $("formation-contenu");
     if (!zone) return;
+    $("niveau-profil")?.addEventListener("click", () => window.GoldAI.app?.allerA("formation"));
     zone.addEventListener("click", (e) => {
       const b = e.target.closest("[data-action]");
       if (!b || b.disabled) return;
@@ -398,5 +411,6 @@
   });
 
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.formation = { ouvrir, viderCache: () => { etat = null; vue = { nom: "accueil" }; session = null; } };
+  window.GoldAI.formation = { ouvrir, afficherNiveauProfil,
+    viderCache: () => { etat = null; vue = { nom: "accueil" }; session = null; $("niveau-profil")?.classList.add("hidden"); } };
 })();
