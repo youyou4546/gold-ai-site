@@ -129,11 +129,23 @@
     <section class="section" id="section-analyse">
       <h2 class="titre-section">Analyse</h2>
 
-      <!-- Analyse de capture de graphique par l'IA (js/analyse-ia.js) : Claude Sonnet 5.5, payant,
-           5 par personne et 10 au total par jour (fonction Supabase analyse-graphique) -->
-      <!-- Les 3 parties d'Analyse sont des volets : on touche le titre, le contenu se déplie en dessous. -->
-      <details class="volet-analyse" id="volet-analyse-ia">
-      <summary class="entete-volet"><span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg> Analyse de graphique par l'IA</span></summary>
+      <!-- Deux grandes tuiles en haut : Analyse (capture de graphique par l'IA, js/analyse-ia.js,
+           fonction Supabase analyse-graphique) et Question (assistant trading gratuit, js/assistant-ia.js,
+           Google Gemini via la fonction assistant-trading). Toucher une tuile ouvre son panneau dessous. -->
+      <div class="tuiles-analyse" role="group" aria-label="Outils IA">
+        <button type="button" class="tuile-analyse" data-panneau="panneau-analyse-ia" aria-expanded="false" aria-controls="panneau-analyse-ia">
+          <span class="icone-tuile"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="m7 15 3-3 2 2 5-5"/></svg></span>
+          <span class="nom-tuile">Analyse</span>
+          <span class="desc-tuile">Ton graphique lu par l'IA</span>
+        </button>
+        <button type="button" class="tuile-analyse" data-panneau="panneau-assistant-ia" aria-expanded="false" aria-controls="panneau-assistant-ia">
+          <span class="icone-tuile"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg></span>
+          <span class="nom-tuile">Question</span>
+          <span class="desc-tuile">Assistant trading · gratuit</span>
+        </button>
+      </div>
+
+      <div class="panneau-analyse hidden" id="panneau-analyse-ia">
       <div class="carte" id="carte-analyse-ia">
         <p class="compteur-ia" id="compteur-ia">Chargement des compteurs…</p>
         <input type="file" id="ia-fichier" accept="image/*" class="hidden" />
@@ -151,25 +163,22 @@
           <div id="ia-liste-historique"></div>
         </details>
       </div>
-      </details>
-
-      <!-- Pose ta question : assistant trading GRATUIT (js/assistant-ia.js, Google Gemini via la
-           fonction Supabase assistant-trading). Conversation gardée sur le téléphone. -->
-      <details class="volet-analyse" id="volet-assistant-ia">
-      <summary class="entete-volet"><span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Pose ta question à l'IA</span><span class="texte-attenue petit">gratuit</span></summary>
-      <div class="carte" id="carte-assistant-ia">
-        <div class="messages-assistant" id="assistant-messages"></div>
-        <div class="champ">
-          <label for="assistant-question">Ta question sur le trading</label>
-          <textarea id="assistant-question" rows="2" maxlength="1500" placeholder="ex. C'est quoi le drawdown maximum ?"></textarea>
-        </div>
-        <div class="boutons-assistant">
-          <button type="button" class="bouton" id="assistant-envoyer">Envoyer</button>
-          <button type="button" class="bouton secondaire hidden" id="assistant-effacer">Nouvelle conversation</button>
-        </div>
-        <p class="avertissement-erreur" id="assistant-erreur"></p>
       </div>
-      </details>
+
+      <div class="panneau-analyse hidden" id="panneau-assistant-ia">
+        <div class="carte chat-assistant" id="carte-assistant-ia">
+          <div class="entete-chat">
+            <span class="statut-chat"><span class="point-en-ligne" aria-hidden="true"></span>Assistant trading</span>
+            <button type="button" class="bouton-nouveau-chat hidden" id="assistant-effacer"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Nouvelle conversation</button>
+          </div>
+          <div class="messages-assistant" id="assistant-messages" aria-live="polite"></div>
+          <p class="avertissement-erreur" id="assistant-erreur"></p>
+          <div class="barre-saisie-chat">
+            <textarea id="assistant-question" rows="1" maxlength="1500" placeholder="Écris ta question…" aria-label="Ta question sur le trading"></textarea>
+            <button type="button" class="bouton-envoyer-chat" id="assistant-envoyer" aria-label="Envoyer"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+          </div>
+        </div>
+      </div>
 
       <!-- Briefing du jour lu à voix haute (js/briefing.js) — voix gratuite du téléphone -->
       <details class="volet-analyse" id="volet-briefing">
@@ -177,8 +186,8 @@
       <div class="carte carte-briefing">
         <p class="texte-attenue petit">L'or, le dollar, les annonces du jour, les actualités et ta journée, lus à voix haute.</p>
         <div class="boutons-briefing">
-          <button type="button" class="bouton" id="briefing-play">▶️ Écouter le briefing</button>
-          <button type="button" class="bouton secondaire hidden" id="briefing-stop" aria-label="Arrêter la lecture">⏹ Stop</button>
+          <button type="button" class="bouton" id="briefing-play"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg> Écouter le briefing</button>
+          <button type="button" class="bouton secondaire hidden" id="briefing-stop" aria-label="Arrêter la lecture">Stop</button>
         </div>
         <details class="texte-briefing-replie">
           <summary class="texte-attenue petit">Voir le texte</summary>

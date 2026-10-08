@@ -69,7 +69,7 @@
   const VERDICT = {
     achat: { mot: "ACHETER", icone: "●", classe: "achat" },
     vente: { mot: "VENDRE", icone: "●", classe: "vente" },
-    attendre: { mot: "ATTENDRE", icone: "⏸️", classe: "attendre" },
+    attendre: { mot: "ATTENDRE", icone: "●", classe: "attendre" },
   };
 
   function effet(e) {
@@ -238,3 +238,20 @@
   window.GoldAI = window.GoldAI || {};
   window.GoldAI.analyseIa = { rafraichir, rendu };
 })();
+
+// Tuiles Analyse / Question : une seule ouverte à la fois, toucher la tuile active la referme.
+document.addEventListener("DOMContentLoaded", () => {
+  const tuiles = [...document.querySelectorAll(".tuile-analyse")];
+  tuiles.forEach((t) => t.addEventListener("click", () => {
+    const ouvrir = t.getAttribute("aria-expanded") !== "true";
+    tuiles.forEach((x) => {
+      const actif = ouvrir && x === t;
+      x.setAttribute("aria-expanded", String(actif));
+      document.getElementById(x.dataset.panneau)?.classList.toggle("hidden", !actif);
+    });
+    if (ouvrir && t.dataset.panneau === "panneau-assistant-ia") {
+      const zone = document.getElementById("assistant-messages");
+      if (zone) zone.scrollTop = zone.scrollHeight;
+    }
+  }));
+});

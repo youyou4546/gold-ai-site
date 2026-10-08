@@ -14,7 +14,7 @@
     direct: { txt: "En direct", icone: "●", classe: "ok" },
     retard: { txt: "Retard", icone: "◐", classe: "attention" },
     ancien: { txt: "Donnée ancienne", icone: "▲", classe: "alerte" },
-    "marché fermé": { txt: "Marché fermé", icone: "⏸", classe: "neutre" },
+    "marché fermé": { txt: "Marché fermé", icone: "‖", classe: "neutre" },
     "différé": { txt: "Différé", icone: "◔", classe: "attention" },
     chargement: { txt: "Chargement…", icone: "…", classe: "neutre" },
     indisponible: { txt: "Indisponible", icone: "✕", classe: "alerte" },

@@ -149,7 +149,7 @@
   }
 
   function etatBoutons() {
-    $("briefing-play").textContent = enLecture ? (speechSynthesis.paused ? "▶️ Reprendre" : "⏸ Pause") : "▶️ Écouter le briefing";
+    $("briefing-play").textContent = enLecture ? (speechSynthesis.paused ? "Reprendre" : "Pause") : "Écouter le briefing";
     $("briefing-stop").classList.toggle("hidden", !enLecture);
   }
 

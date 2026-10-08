@@ -470,7 +470,7 @@
     const boutons = document.querySelectorAll(".bouton-actualiser-trades");
     const messages = document.querySelectorAll(".message-actualiser-trades");
     const ecrire = (texte, classe = "") => messages.forEach((m) => { m.textContent = texte; m.className = `texte-attenue petit message-actualiser-trades ${classe}`; });
-    boutons.forEach((b) => { b.disabled = true; b.textContent = "⏳ Recherche sur TradeLocker…"; });
+    boutons.forEach((b) => { b.disabled = true; b.textContent = "Recherche sur TradeLocker…"; });
     ecrire("");
     try {
       const { data, error } = await client().functions.invoke("tradelocker", { body: { token: token(), action: "importer" } });

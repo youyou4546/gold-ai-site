@@ -41,12 +41,20 @@
       ? messages.map((m) => m.role === "user"
         ? `<div class="bulle-assistant moi">${esc(m.texte)}</div>`
         : `<div class="bulle-assistant ia">${miseEnForme(m.texte)}</div>`).join("")
-        + (enCours ? `<div class="bulle-assistant ia attente">L'assistant réfléchit…</div>` : "")
-      : `<p class="texte-attenue petit">Exemples : « C'est quoi un pip sur l'or ? », « Comment calculer mon lot pour risquer 1 % ? », « Pourquoi le NFP fait bouger l'or ? »</p>`;
+        + (enCours ? `<div class="bulle-assistant ia attente" aria-label="L'assistant réfléchit"><span></span><span></span><span></span></div>` : "")
+      : `<div class="chat-vide">Pose ta question sur le trading.</div>`;
     $("assistant-effacer").classList.toggle("hidden", !messages.length || enCours);
-    $("assistant-envoyer").disabled = enCours;
-    $("assistant-envoyer").textContent = enCours ? "…" : "Envoyer";
+    $("assistant-envoyer").disabled = enCours || !$("assistant-question").value.trim();
     zone.scrollTop = zone.scrollHeight;
+  }
+
+  // Le champ grandit avec le texte (jusqu'à ~5 lignes), comme une messagerie.
+  function ajuster() {
+    const champ = $("assistant-question");
+    champ.style.height = "auto";
+    champ.style.height = Math.min(champ.scrollHeight + 2, 120) + "px";
+    champ.style.overflowY = champ.scrollHeight > 120 ? "auto" : "hidden";
+    $("assistant-envoyer").disabled = enCours || !champ.value.trim();
   }
 
   function erreur(message) {
@@ -61,6 +69,7 @@
     erreur("");
     messages.push({ role: "user", texte: question });
     champ.value = "";
+    ajuster();
     enCours = true;
     afficher();
     let message = "";
@@ -85,6 +94,7 @@
       // La question non répondue revient dans le champ pour pouvoir la renvoyer.
       messages.pop();
       champ.value = question;
+      ajuster();
       erreur(message);
     }
     sauver();
@@ -96,6 +106,7 @@
     charger();
     afficher();
     $("assistant-envoyer").addEventListener("click", envoyer);
+    $("assistant-question").addEventListener("input", ajuster);
     $("assistant-question").addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); envoyer(); }
     });
