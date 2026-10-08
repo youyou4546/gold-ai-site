@@ -92,6 +92,7 @@ window.GoldAI = window.GoldAI || {};
     window.GoldAI.comptesTradelocker?.viderCache();
     window.GoldAI.comptesMt5?.viderCache();
     window.GoldAI.analyseTrades?.viderCache();
+    window.GoldAI.formation?.viderCache();
     window.GoldAI.calculateur?.viderCache();
     reinitialiserSousVues();
     if (message) {

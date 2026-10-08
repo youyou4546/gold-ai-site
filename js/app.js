@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     onglets.forEach((o) => o.classList.toggle("actif", o.dataset.section === cible));
     // Rectangle du haut (objectif / garde-fou) : caché dans Profil et Journal.
-    document.getElementById("barre-haut")?.classList.toggle("cachee-onglet", cible === "profil" || cible === "journal");
+    document.getElementById("barre-haut")?.classList.toggle("cachee-onglet", cible === "profil" || cible === "journal" || cible === "formation");
     // Sens de l'animation : vers la droite si l'onglet choisi est après l'actuel, sinon vers la gauche.
     const ordre = [...onglets].map((o) => o.dataset.section);
     const avant = ordre.indexOf(document.querySelector("main .section.actif")?.id.replace("section-", ""));
@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cible === "profil" || cible === "calendrier") {
       window.GoldAI?.notifications?.rafraichir();
     }
+    if (cible === "formation") window.GoldAI?.formation?.ouvrir();
     if (cible === "profil" && window.GoldAI?.profilCompte?.charger) {
       window.GoldAI.profilCompte.charger();
     }

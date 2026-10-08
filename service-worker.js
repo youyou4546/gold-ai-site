@@ -10,7 +10,7 @@
 //  - Bibliothèques du CDN (Supabase, Chart.js) : cache d'abord (versions figées).
 //
 // Change ce numéro à chaque mise à jour pour nettoyer les anciens caches.
-const VERSION = "goldai-v110";
+const VERSION = "goldai-v111";
 
 const FICHIERS_A_METTRE_EN_CACHE = [
   "./",
@@ -48,6 +48,7 @@ const FICHIERS_A_METTRE_EN_CACHE = [
   "./js/assistant-ia.js",
   "./js/parametres.js",
   "./js/profil-mon-compte.js",
+  "./js/formation.js",
   "./data/glossaire_annonces.json",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
@@ -93,6 +94,8 @@ self.addEventListener("fetch", (evenement) => {
   }
 
   if (url.origin !== self.location.origin) return; // Twelve Data, Supabase… : réseau direct
+  // Vidéos de la formation : jamais en cache ni interceptées (lecture par morceaux, fichiers lourds).
+  if (url.pathname.includes("/formation/videos/")) return;
 
   evenement.respondWith(
     fetch(requete, { cache: "no-store" })
