@@ -2385,17 +2385,6 @@ nav.barre-onglets button > span:last-child { max-width: 100%; overflow: hidden; 
 .message-resultat { font-size: 20px; }
 .niveau-monte { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: rgba(245, 183, 90, 0.12); color: var(--orange); }
 .niveau-monte .ico { width: 22px; height: 22px; }
-.gains-xp { list-style: none; margin: 6px 0 0; padding: 0; width: 100%; max-width: 360px; }
-.gains-xp li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--bordure); font-size: 14px; }
-.gains-xp strong { color: var(--accent-clair); }
-.grille-badges { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-.grille-badges li { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 10px; border-radius: 12px; border: 1px solid var(--bordure);
-  text-align: center; font-size: 12px; color: var(--texte-attenue); opacity: 0.45; }
-.grille-badges li strong { color: var(--texte); font-size: 13.5px; }
-.grille-badges li.obtenu { opacity: 1; border-color: rgba(245, 183, 90, 0.5); }
-.icone-badge { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--fond); color: var(--texte-attenue); }
-.grille-badges li.obtenu .icone-badge { background: rgba(245, 183, 90, 0.15); color: var(--orange); }
-.icone-badge .ico { width: 20px; height: 20px; }
 .toasts-formation { position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 14px); transform: translateX(-50%); z-index: 60; display: flex; flex-direction: column; gap: 8px;
   pointer-events: none; width: max-content; max-width: 92vw; align-items: center; }
 .toast-formation { display: flex; align-items: baseline; gap: 8px; padding: 8px 14px; border-radius: 999px; background: #101a2e; border: 1px solid var(--accent); font-size: 14px;
@@ -2405,3 +2394,15 @@ nav.barre-onglets button > span:last-child { max-width: 100%; overflow: hidden; 
 .toast-formation.sortie { opacity: 0; transform: translateY(-8px); }
 @keyframes entree-toast { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
 #formation-contenu .bouton { width: 100%; }
+/* Lignes minimalistes : titre + « Go » */
+.ligne-formation { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 58px; padding: 10px 14px 10px 16px; border-radius: 14px; border: 1px solid var(--bordure);
+  background: var(--fond-carte); color: var(--texte); font: inherit; text-align: left; cursor: pointer; }
+.ligne-formation:active { border-color: var(--accent); }
+.ligne-formation:disabled { cursor: default; opacity: 0.5; }
+.titre-ligne-formation { flex: 1; min-width: 0; font-size: 15.5px; font-weight: 600; }
+.go-formation { display: grid; place-items: center; min-width: 48px; height: 32px; padding: 0 12px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 13.5px; font-weight: 700; flex: 0 0 auto; }
+.ligne-formation.fait .go-formation { background: var(--vert-fond); color: var(--vert); }
+.go-formation .ico, .ligne-formation .cadenas .ico { width: 16px; height: 16px; }
+.ligne-formation .cadenas { display: grid; place-items: center; min-width: 48px; color: var(--texte-attenue); }
+.ligne-formation.fait .numero-lecon { background: var(--vert-fond); border-color: var(--vert); color: var(--vert); }
+.titre-lecon .maitrise { vertical-align: middle; margin-left: 6px; }

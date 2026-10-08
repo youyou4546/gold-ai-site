@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
       volet?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
-    onglets.forEach((o) => o.classList.toggle("actif", o.dataset.section === cible));
+    onglets.forEach((o) => o.classList.toggle("actif", o.dataset.section === (cible === "formation" ? "profil" : cible)));
     // Rectangle du haut (objectif / garde-fou) : caché dans Profil et Journal.
     document.getElementById("barre-haut")?.classList.toggle("cachee-onglet", cible === "profil" || cible === "journal" || cible === "formation");
     // Sens de l'animation : vers la droite si l'onglet choisi est après l'actuel, sinon vers la gauche.
@@ -66,6 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
   onglets.forEach((onglet) => {
     onglet.addEventListener("click", () => allerA(onglet.dataset.section));
   });
+  // Formation : ouverte depuis la tuile de Profil (pas d'onglet en bas).
+  document.getElementById("bouton-ouvrir-formation")?.addEventListener("click", () => allerA("formation"));
 
   // Rectangle du haut (garde-fou + objectif) : la croix le masque jusqu'à la
   // prochaine ouverture de l'app (rien n'est enregistré : il revient au
