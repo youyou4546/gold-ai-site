@@ -67,8 +67,8 @@
   // Rendu d'une analyse (réponse JSON de l'IA) :
   // verdict → marché maintenant → annonces → niveaux clés (échelle de prix) → plan.
   const VERDICT = {
-    achat: { mot: "ACHETER", icone: "🟢", classe: "achat" },
-    vente: { mot: "VENDRE", icone: "🔴", classe: "vente" },
+    achat: { mot: "ACHETER", icone: "●", classe: "achat" },
+    vente: { mot: "VENDRE", icone: "●", classe: "vente" },
     attendre: { mot: "ATTENDRE", icone: "⏸️", classe: "attendre" },
   };
 
@@ -114,7 +114,7 @@
   function rendu(a, cout, date) {
     if (!a) return "";
     if (a.lisible === false) {
-      return `<div class="resultat-ia"><p class="alerte-donnees">🤔 ${esc(a.resume || "Ce n'est pas un graphique lisible.")}</p></div>`;
+      return `<div class="resultat-ia"><p class="alerte-donnees">${esc(a.resume || "Ce n'est pas un graphique lisible.")}</p></div>`;
     }
     const v = VERDICT[a.biais?.direction];
     const achatPrincipal = a.biais?.direction !== "vente";
@@ -142,10 +142,10 @@
       ${echelle(a.zones, Number(a.prix_actuel))}
 
       <h4 class="sous-titre-analyse">Plan</h4>
-      ${achatPrincipal ? plan("🟢 Achat", a.scenario_achat, "achat", a.biais?.direction === "achat") + plan("🔴 Vente", a.scenario_vente, "vente", false)
-        : plan("🔴 Vente", a.scenario_vente, "vente", true) + plan("🟢 Achat", a.scenario_achat, "achat", false)}
-      ${a.invalidation ? `<p class="petit"><strong>❌ Invalidation :</strong> ${esc(a.invalidation)}</p>` : ""}
-      ${a.prudence ? `<p class="texte-attenue petit">⚠️ ${esc(a.prudence)}</p>` : ""}
+      ${achatPrincipal ? plan("Achat", a.scenario_achat, "achat", a.biais?.direction === "achat") + plan("Vente", a.scenario_vente, "vente", false)
+        : plan("Vente", a.scenario_vente, "vente", true) + plan("Achat", a.scenario_achat, "achat", false)}
+      ${a.invalidation ? `<p class="petit"><strong>✕ Invalidation :</strong> ${esc(a.invalidation)}</p>` : ""}
+      ${a.prudence ? `<p class="texte-attenue petit">${esc(a.prudence)}</p>` : ""}
     </div>`;
   }
 
@@ -188,7 +188,7 @@
     erreur("");
     enCours = true;
     majBouton();
-    $("ia-resultat").innerHTML = `<p class="etat-vide">🤖 L'IA lit ton graphique…</p>`;
+    $("ia-resultat").innerHTML = `<p class="etat-vide">L'IA lit ton graphique…</p>`;
     let data = null, message = "";
     try {
       const r = await window.GoldAI.auth.client.functions.invoke("analyse-graphique", {
@@ -227,7 +227,7 @@
         image = await compresser(f);
         $("ia-apercu").src = image;
         $("ia-apercu").classList.remove("hidden");
-        $("ia-choisir").textContent = "📷 Changer de capture";
+        $("ia-choisir").textContent = "Changer de capture";
         $("ia-resultat").innerHTML = "";
       } catch { image = null; erreur("Image illisible : choisis une autre capture."); }
       majBouton();

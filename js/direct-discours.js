@@ -100,7 +100,7 @@
     const lecteur = N.lecteurYoutube(lienEffectif(e));
     const entete = `
       <div class="entete-discours">
-        <span class="etiquette-discours">🎙 Discours</span>
+        <span class="etiquette-discours">Discours</span>
         <span class="nom-discours">${esc(nomCourt(e.titre))}</span>
         <span class="texte-attenue petit">${esc(e.devise)} · ${heureQc(ms)}</span>
       </div>`;

@@ -136,7 +136,7 @@
     if (!zone) return;
     zone.innerHTML = `
       ${stockage === "appareil" ? `<div class="alerte-donnees">Sauvegarde en ligne indisponible (patch Supabase non installé) : ces réglages sont gardés sur cet appareil seulement.</div>` : ""}
-      ${volet("💰 Compte et risque", `
+      ${volet("Compte et risque", `
       <div class="ligne-champs">
         <div class="champ">
           <label for="calc-solde">Solde du compte</label>
@@ -158,7 +158,7 @@
         <input type="number" id="calc-risque" inputmode="decimal" step="any" min="0" value="${r.risqueValeur ?? ""}" placeholder="${r.risqueMode === "montant" ? "ex : 300" : "ex : 0.3"}" />
       </div>`)}
 
-      ${volet("📐 Répartition des TP", `
+      ${volet("Répartition des TP", `
       <label class="label-groupe">Répartition — signal avec 4 TP (ou plus)</label>
       <div id="liste-repartition">${lignesRepartition(r.repartition, "")}</div>
       <div class="ligne-actions">
@@ -174,11 +174,11 @@
       </div>`)}
 
 
-      ${volet("🔧 Instruments", `
+      ${volet("Instruments", `
       <div id="liste-instruments">${Object.entries(r.instruments || {}).map(([s, spec]) => carteInstrument(s, spec)).join("") || ""}</div>
       <button type="button" class="bouton secondaire bouton-petit" id="ajouter-instrument">+ Ajouter un instrument</button>`)}
 
-      ${volet("🕐 Fuseau horaire", `
+      ${volet("Fuseau horaire", `
       <div class="champ">
         <label for="calc-fuseau">Fuseau horaire d'affichage</label>
         <select id="calc-fuseau">${FUSEAUX.map((f) => `<option ${((r.fuseau || window.GoldAI.utils.FUSEAU_DEFAUT) === f) ? "selected" : ""}>${f}</option>`).join("")}</select>

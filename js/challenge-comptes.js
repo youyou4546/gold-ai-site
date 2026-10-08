@@ -69,7 +69,7 @@
     const perte = Math.max(0, -net), reste = Math.max(0, limite - perte), pct = Math.min(100, (perte / limite) * 100);
     return `<div class="bloc-challenge perte">
         <div class="lib">Perte max du jour</div>
-        <div class="grand ${perte > 0 ? "negatif" : ""}">${argent(perte, d)} perdus aujourd'hui${perte >= limite ? " · ⛔ limite atteinte" : ""}</div>
+        <div class="grand ${perte > 0 ? "negatif" : ""}">${argent(perte, d)} perdus aujourd'hui${perte >= limite ? " · limite atteinte" : ""}</div>
         <div class="barre-objectif"><div class="remplissage-objectif" style="width:${pct}%"></div></div>
         <div class="pied"><span>Limite ${argent(limite, d)}</span><span>Reste <strong>${argent(reste, d)}</strong></span></div>
       </div>`;
@@ -79,23 +79,23 @@
     const nom = J().surnomDe(c.cle) || c.nom;
     const d = c.devise || "USD";
     const e = N.etatChallenge(regles[c.cle], c.solde);
-    const entete = `<div class="entete-challenge"><strong>🏁 ${esc(nom)}</strong>
+    const entete = `<div class="entete-challenge"><strong>${esc(nom)}</strong>
       <span>Solde <strong>${Number.isFinite(c.solde) ? argent(c.solde, d) : "—"}</strong>
-      ${enReglage === c.cle ? "" : ` · <button type="button" class="lien-retour" data-regler="${esc(c.cle)}">⚙️ Règles</button>`}</span></div>`;
+      ${enReglage === c.cle ? "" : ` · <button type="button" class="lien-retour" data-regler="${esc(c.cle)}">Règles</button>`}</span></div>`;
     if (enReglage === c.cle) return `<div class="carte carte-challenge">${entete}${formulaire(c)}</div>`;
     const jour = blocPerteJour(c, d);
     if (!e || (!e.perte && !e.objectif)) {
       if (jour) return `<div class="carte carte-challenge">${entete}${jour}</div>`;
       return `<div class="carte carte-challenge">${entete}
         <p class="texte-attenue petit">Indique la taille de départ, la perte max et l'objectif de ce compte pour suivre ton challenge ici.</p>
-        <button type="button" class="bouton bouton-petit" data-regler="${esc(c.cle)}">⚙️ Régler ce compte</button></div>`;
+        <button type="button" class="bouton bouton-petit" data-regler="${esc(c.cle)}">Régler ce compte</button></div>`;
     }
     const p = e.perte, o = e.objectif;
     return `<div class="carte carte-challenge">${entete}
       ${jour}
       ${p ? `<div class="bloc-challenge perte">
         <div class="lib">Perte max</div>
-        <div class="grand ${p.perdu > 0 ? "negatif" : ""}">${argent(p.perdu, d)} perdus${p.depassee ? " · ⛔ limite atteinte" : ""}</div>
+        <div class="grand ${p.perdu > 0 ? "negatif" : ""}">${argent(p.perdu, d)} perdus${p.depassee ? " · limite atteinte" : ""}</div>
         <div class="barre-objectif"><div class="remplissage-objectif" style="width:${p.pourcentage}%"></div></div>
         <div class="pied"><span>Limite ${argent(p.limite, d)}</span><span>Niveau de rupture : ${argent(p.niveau, d)}</span></div>
         <div class="pied"><span>Marge avant rupture</span><strong>${argent(p.marge, d)}</strong></div>
@@ -103,7 +103,7 @@
       </div>` : ""}
       ${o ? `<div class="bloc-challenge gain">
         <div class="lib">Objectif de profit</div>
-        <div class="grand ${o.profit > 0 ? "positif" : o.profit < 0 ? "negatif" : ""}">${argent(o.profit, d, true)}${o.atteint ? " · ✅ atteint" : ""}</div>
+        <div class="grand ${o.profit > 0 ? "positif" : o.profit < 0 ? "negatif" : ""}">${argent(o.profit, d, true)}${o.atteint ? " · ✓ atteint" : ""}</div>
         <div class="barre-objectif"><div class="remplissage-objectif" style="width:${o.pourcentage}%"></div></div>
         <div class="pied"><span>Objectif ${argent(o.montant, d)}</span><span>Reste ${argent(o.restant, d)}</span></div>
         <div class="pied"><span>Solde à atteindre</span><strong>${argent(o.niveau, d)}</strong></div>

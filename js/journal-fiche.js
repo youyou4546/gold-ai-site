@@ -64,7 +64,7 @@
     galerie.innerHTML = existantes.map((i) => vignette(i.image_data, `data-existante="${i.id}"`)).join("")
       + imagesNouvelles.map((d, n) => vignette(d, `data-nouvelle="${n}"`)).join("");
     $("fiche-bouton-images").textContent = existantes.length + imagesNouvelles.length
-      ? "📷 Ajouter d'autres images" : "📷 Ajouter une ou plusieurs images";
+      ? "Ajouter d'autres images" : "Ajouter une ou plusieurs images";
   }
 
   let apresEnregistrement = null; // action à faire une fois le trade enregistré (ex. arrêter le suivi)

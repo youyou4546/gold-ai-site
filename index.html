@@ -7,7 +7,7 @@
 
 <!-- PWA : permet l'installation sur l'écran d'accueil -->
 <link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#090d15" />
+<meta name="theme-color" content="#05070d" />
 
 <!-- iOS ne lit pas toujours le manifest.json pour le mode plein écran :
      ces balises font le même travail spécifiquement pour Safari/iPhone -->
@@ -17,6 +17,9 @@
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=taureau" />
 
 <link rel="icon" href="icons/icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -26,7 +29,7 @@
      connexion (utile si le lien du site venait à circuler). -->
 <div class="ecran-plein" id="ecran-acces">
   <div class="carte-connexion">
-    <div class="icone-ecran">🔒</div>
+    <div class="icone-ecran"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
     <h1 class="titre-ecran">Trading Tool</h1>
     <p class="sous-titre-ecran">Site privé. Entre le code d'accès pour continuer.</p>
 
@@ -71,7 +74,7 @@
   <div class="barre-haut" id="barre-haut">
     <div id="garde-fou" class="garde-fou" hidden aria-live="polite"></div>
     <div id="bloc-objectif" class="bloc-objectif" hidden></div>
-    <button type="button" class="fermer-barre-haut" id="fermer-barre-haut" aria-label="Masquer ce rectangle">✕</button>
+    <button type="button" class="fermer-barre-haut" id="fermer-barre-haut" aria-label="Masquer ce rectangle"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
   </div>
 
   <main>
@@ -95,7 +98,7 @@
     <section class="section" id="section-calendrier">
       <h2 class="titre-section">Annonces</h2>
 
-      <button type="button" class="proposition-notifications hidden" id="proposition-notifications">🔔 Être prévenu 15 min avant les annonces fortes, même app fermée — <strong>Activer</strong></button>
+      <button type="button" class="proposition-notifications hidden" id="proposition-notifications"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> Être prévenu 15 min avant les annonces fortes, même app fermée — <strong>Activer</strong></button>
       <div class="grille-annonces">
         <aside class="carte encadre-impact" id="encadre-impact" aria-live="polite"><p class="etat-vide">Analyse en cours…</p></aside>
         <div id="contenu-annonces"><p class="etat-vide">Chargement…</p></div>
@@ -130,11 +133,11 @@
            5 par personne et 10 au total par jour (fonction Supabase analyse-graphique) -->
       <!-- Les 3 parties d'Analyse sont des volets : on touche le titre, le contenu se déplie en dessous. -->
       <details class="volet-analyse" id="volet-analyse-ia">
-      <summary class="entete-volet"><span>🤖 Analyse de graphique par l'IA</span></summary>
+      <summary class="entete-volet"><span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg> Analyse de graphique par l'IA</span></summary>
       <div class="carte" id="carte-analyse-ia">
         <p class="compteur-ia" id="compteur-ia">Chargement des compteurs…</p>
         <input type="file" id="ia-fichier" accept="image/*" class="hidden" />
-        <button type="button" class="zone-upload" id="ia-choisir">📷 Choisir une capture</button>
+        <button type="button" class="zone-upload" id="ia-choisir"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg> Choisir une capture</button>
         <img id="ia-apercu" class="apercu-ia hidden" alt="Capture à analyser" />
         <div class="champ">
           <label for="ia-question">Ta question (facultatif)</label>
@@ -153,7 +156,7 @@
       <!-- Pose ta question : assistant trading GRATUIT (js/assistant-ia.js, Google Gemini via la
            fonction Supabase assistant-trading). Conversation gardée sur le téléphone. -->
       <details class="volet-analyse" id="volet-assistant-ia">
-      <summary class="entete-volet"><span>💬 Pose ta question à l'IA</span><span class="texte-attenue petit">gratuit</span></summary>
+      <summary class="entete-volet"><span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Pose ta question à l'IA</span><span class="texte-attenue petit">gratuit</span></summary>
       <div class="carte" id="carte-assistant-ia">
         <div class="messages-assistant" id="assistant-messages"></div>
         <div class="champ">
@@ -170,7 +173,7 @@
 
       <!-- Briefing du jour lu à voix haute (js/briefing.js) — voix gratuite du téléphone -->
       <details class="volet-analyse" id="volet-briefing">
-      <summary class="entete-volet"><span>🎙️ Briefing du jour</span><span class="texte-attenue petit" id="briefing-maj"></span></summary>
+      <summary class="entete-volet"><span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4"/></svg> Briefing du jour</span><span class="texte-attenue petit" id="briefing-maj"></span></summary>
       <div class="carte carte-briefing">
         <p class="texte-attenue petit">L'or, le dollar, les annonces du jour, les actualités et ta journée, lus à voix haute.</p>
         <div class="boutons-briefing">
@@ -187,7 +190,7 @@
 
       <!-- Suivre le prix : alertes de prix / zone sur l'or (js/alertes-prix.js), tout en bas d'Analyse -->
       <details id="journal-alertes" class="volet-analyse bloc-suivre-prix">
-        <summary class="entete-volet"><span>🎯 Suivre le prix</span><span class="prix-alertes" id="alertes-prix-actuel">—</span></summary>
+        <summary class="entete-volet"><span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg> Suivre le prix</span><span class="prix-alertes" id="alertes-prix-actuel">—</span></summary>
         <div class="carte">
           <div class="segmente" role="group" aria-label="Type d'alerte">
             <button type="button" data-type="prix" aria-pressed="true">Un prix</button>
@@ -209,7 +212,7 @@
               <input type="text" id="alerte-note" maxlength="120" placeholder="ex. zone d'achat H4">
             </div>
             <p class="alerte-donnees hidden" id="message-alerte" role="status"></p>
-            <button type="submit" class="bouton" id="bouton-creer-alerte">🔔 Me prévenir quand c'est touché</button>
+            <button type="submit" class="bouton" id="bouton-creer-alerte"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> Me prévenir quand c'est touché</button>
           </form>
           <p class="texte-attenue petit hidden" id="alertes-notif-inactives">
             Les notifications ne sont pas activées sur cet appareil :
@@ -229,23 +232,23 @@
       <div id="journal-accueil">
         <!-- Import des trades TradeLocker à la demande (js/journal.js › actualiserTrades) -->
         <div class="bloc-actualiser-trades">
-          <button type="button" class="bouton bouton-actualiser-trades">🔄 Actualiser les trades</button>
+          <button type="button" class="bouton bouton-actualiser-trades"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></svg> Actualiser les trades</button>
           <p class="texte-attenue petit message-actualiser-trades" aria-live="polite"></p>
         </div>
         <button class="tuile-journal" id="bouton-ouvrir-calendrier-trades">
-          <span class="icone-tuile">📅</span>
+          <span class="icone-tuile"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
           <span>Calendrier</span>
         </button>
         <button class="tuile-journal" id="bouton-ouvrir-performance">
-          <span class="icone-tuile">📊</span>
+          <span class="icone-tuile"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17v-5M13 17V8M18 17v-9"/></svg></span>
           <span>Performance</span>
         </button>
         <button class="tuile-journal" id="bouton-ouvrir-analyse-trades">
-          <span class="icone-tuile">📈</span>
+          <span class="icone-tuile"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg></span>
           <span>Analyse de mes trades</span>
         </button>
         <button class="tuile-journal" id="bouton-ouvrir-ess">
-          <span class="icone-tuile">⚖️</span>
+          <span class="icone-tuile"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M5 21h14M3 7h18"/><path d="m6 7-3 7a3 3 0 0 0 6 0zM18 7l-3 7a3 3 0 0 0 6 0z"/></svg></span>
           <span>ESS</span>
         </button>
       </div>
@@ -253,7 +256,7 @@
       <!-- Vue ESS (js/page-ess.js) : passe / ne passe pas + tableau des résultats, ouverte par sa tuile -->
       <div id="journal-ess" class="hidden">
         <button type="button" class="bouton-retour" id="bouton-retour-ess"><span aria-hidden="true">←</span> Retour</button>
-        <h3 class="titre-bloc">⚖️ ESS</h3>
+        <h3 class="titre-bloc"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M5 21h14M3 7h18"/><path d="m6 7-3 7a3 3 0 0 0 6 0zM18 7l-3 7a3 3 0 0 0 6 0z"/></svg> ESS</h3>
         <div class="carte ligne-switch-ess">
           <label class="switch-ess" for="switch-ess-calcul">
             <span>
@@ -273,7 +276,7 @@
       <div id="journal-analyse" class="hidden">
         <button type="button" class="bouton-retour" id="bouton-retour-analyse-trades"><span aria-hidden="true">←</span> Retour</button>
       <div class="carte" id="carte-analyse-trades">
-        <h3 class="titre-bloc">📈 Analyse de mes trades</h3>
+        <h3 class="titre-bloc"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg> Analyse de mes trades</h3>
         <div class="ligne-champs">
           <div class="champ">
             <label for="periode-analyse">Période</label>
@@ -342,7 +345,7 @@
 
       <div id="profil-accueil">
         <div class="carte carte-profil">
-          <div class="icone-profil">👤</div>
+          <div class="icone-profil"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
           <div class="nom-connecte" id="nom-utilisateur-affiche"></div>
           <p class="sous-titre-ecran" style="margin-bottom:20px;">Connecté sur cet appareil</p>
           <button class="bouton danger" id="bouton-deconnexion">Déconnexion</button>
@@ -351,7 +354,7 @@
         <div class="carte carte-notifications" id="carte-notifications">
           <div class="ligne-notifications">
             <div>
-              <strong>🔔 Notifications d'annonces</strong>
+              <strong><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> Notifications d'annonces</strong>
               <div class="petit texte-attenue" id="etat-notifications">…</div>
             </div>
             <button class="bouton bouton-petit hidden" id="bouton-notifications"></button>
@@ -360,15 +363,15 @@
 
         <div class="grille-tuiles-profil">
           <button class="tuile-journal" id="bouton-ouvrir-mon-compte">
-            <span class="icone-tuile">🪪</span>
+            <span class="icone-tuile"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4M14 14h4"/></svg></span>
             <span>Mon compte</span>
           </button>
           <button class="tuile-journal" id="bouton-ouvrir-parametres">
-            <span class="icone-tuile">⚙️</span>
+            <span class="icone-tuile"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
             <span>Général</span>
           </button>
           <button class="tuile-journal" id="bouton-ouvrir-tradelocker">
-            <span class="icone-tuile">💼</span>
+            <span class="icone-tuile"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20M16 15h2"/><path d="M6 6V4h12v2"/></svg></span>
             <span>Mes comptes</span>
           </button>
         </div>
@@ -416,7 +419,7 @@
             <p class="alerte-donnees hidden" id="message-tradelocker" role="status"></p>
             <button type="submit" class="bouton" id="bouton-ajouter-tradelocker">Connecter</button>
           </form>
-          <p class="texte-attenue petit">🔒 Le mot de passe est chiffré chez Supabase et ne sert qu'à <strong>lire</strong> tes comptes : l'app ne passe jamais d'ordre.</p>
+          <p class="texte-attenue petit"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Le mot de passe est chiffré chez Supabase et ne sert qu'à <strong>lire</strong> tes comptes : l'app ne passe jamais d'ordre.</p>
           </div>
           <!-- Formulaire MetaTrader 5 : rempli par js/comptes-mt5.js -->
           <div id="ajout-mt5" class="hidden"></div>
@@ -428,7 +431,7 @@
         <button type="button" class="bouton-retour" id="bouton-retour-mon-compte"><span aria-hidden="true">←</span> Retour</button>
 
         <div class="carte" style="text-align:center;">
-          <div class="avatar-profil">👤</div>
+          <div class="avatar-profil"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
           <input type="file" id="champ-photo-profil" accept="image/*" class="hidden" />
           <button class="bouton secondaire bouton-petit" id="bouton-changer-photo" style="width:auto; display:inline-flex; margin:12px auto 0;">
             Changer la photo
@@ -464,7 +467,7 @@
 
         <!-- Chaque réglage est une boîte qui s'ouvre au toucher (comme les volets d'Analyse). -->
         <details class="volet-analyse">
-        <summary class="entete-volet"><span>🎯 Objectif de profit</span></summary>
+        <summary class="entete-volet"><span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg> Objectif de profit</span></summary>
         <div class="carte" id="carte-objectif">
           <div class="ligne-champs">
             <div class="champ">
@@ -485,7 +488,7 @@
         </details>
 
         <details class="volet-analyse">
-        <summary class="entete-volet"><span>📊 ESS (Equity Stability Score)</span></summary>
+        <summary class="entete-volet"><span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17v-5M13 17V8M18 17v-9"/></svg> ESS (Equity Stability Score)</span></summary>
         <div class="carte" id="carte-ess">
           <div class="champ">
             <label for="seuil-ess">Seuil ESS maximum (%)</label>
@@ -499,7 +502,7 @@
         <div id="zone-parametres-calculateur"></div>
 
         <details class="volet-analyse">
-        <summary class="entete-volet"><span>⚖️ Règles de trading</span></summary>
+        <summary class="entete-volet"><span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M5 21h14M3 7h18"/><path d="m6 7-3 7a3 3 0 0 0 6 0zM18 7l-3 7a3 3 0 0 0 6 0z"/></svg> Règles de trading</span></summary>
         <div class="carte">
           <div class="champ">
             <label for="param-max-trades-jour">Nombre max de trades par jour</label>
@@ -576,7 +579,7 @@
       <label class="label-groupe">Captures du graphique</label>
       <div class="galerie-trade" id="fiche-galerie"></div>
       <input type="file" id="fiche-fichiers" accept="image/*" multiple class="hidden" />
-      <button type="button" class="zone-upload" id="fiche-bouton-images">📷 Ajouter une ou plusieurs images</button>
+      <button type="button" class="zone-upload" id="fiche-bouton-images"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg> Ajouter une ou plusieurs images</button>
 
       <div class="champ">
         <label for="fiche-notes">Notes</label>
@@ -594,27 +597,27 @@
 
   <nav class="barre-onglets">
     <button class="onglet actif" data-section="marche">
-      <span class="icone-onglet">📈</span>
+      <span class="icone-onglet"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg></span>
       <span>Marché</span>
     </button>
     <button class="onglet" data-section="calendrier">
-      <span class="icone-onglet">📰</span>
+      <span class="icone-onglet"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9h4"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg></span>
       <span>Annonces</span>
     </button>
     <button class="onglet" data-section="calculateur">
-      <span class="icone-onglet">🧮</span>
+      <span class="icone-onglet"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h4"/></svg></span>
       <span>Calcul</span>
     </button>
     <button class="onglet" data-section="analyse">
-      <span class="icone-onglet">📊</span>
+      <span class="icone-onglet"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17v-5M13 17V8M18 17v-9"/></svg></span>
       <span>Analyse</span>
     </button>
     <button class="onglet" data-section="journal">
-      <span class="icone-onglet">📓</span>
+      <span class="icone-onglet"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg></span>
       <span>Journal</span>
     </button>
     <button class="onglet" data-section="profil">
-      <span class="icone-onglet">👤</span>
+      <span class="icone-onglet"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
       <span>Profil</span>
     </button>
   </nav>

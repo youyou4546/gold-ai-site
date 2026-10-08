@@ -183,7 +183,7 @@
       nbImages: 0,
     }));
 
-    // Nombre d'images par trade (📷 dans la liste). Sans le patch SQL : aucune image.
+    // Nombre d'images par trade (dans la liste). Sans le patch SQL : aucune image.
     const images = await client().rpc("compter_images_mes_trades", { p_token: token() });
     if (!images.error) {
       const parTrade = new Map((images.data || []).map((x) => [x.trade_id, x.nombre]));
@@ -334,12 +334,12 @@
       // Heure d'ouverture (trades importés de TradeLocker), en heure du Québec.
       const heure = trade.ouvertLe ? new Intl.DateTimeFormat("fr-CA", { timeZone: "America/Toronto", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(trade.ouvertLe)) : "";
       const details = [
-        heure ? `🕒 ${heure}` : "",
+        heure ? `${heure}` : "",
         trade.instrument,
         trade.compteTl ? surnoms[trade.compteTl] || trade.compteTlNom : "",
         trade.rr !== null && trade.rr !== undefined ? `RR ${trade.rr}` : "",
         trade.frais ? `frais ${formaterDollars(-trade.frais)}` : "",
-        trade.nbImages ? `📷 ${trade.nbImages}` : "",
+        trade.nbImages ? `${trade.nbImages}` : "",
       ].filter(Boolean).join(" · ");
       item.innerHTML = `
         <button type="button" class="infos-trade ouvrir-fiche" aria-label="Ouvrir la fiche de ce trade">
@@ -499,7 +499,7 @@
         window.GoldAI.comptesMt5?.relire?.();
         window.dispatchEvent(new CustomEvent("goldai:comptes"));
       }
-      boutons.forEach((b) => { b.disabled = false; b.textContent = "🔄 Actualiser les trades"; });
+      boutons.forEach((b) => { b.disabled = false; b.textContent = "Actualiser les trades"; });
     }
   }
 

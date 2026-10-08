@@ -22,7 +22,7 @@
   let compteMaitre = "";   // clé du compte « maître » (suivi par la barre d'objectif)
   let statuts = {};        // { "live|123": { statut: "finance" | "evaluation", depuis: "AAAA-MM-JJ" } }
   let seuilEss = 20;
-  let reglesComptes = {};  // { cle: { depart, perteMax, … } } (Performance › ⚙️ Règles)
+  let reglesComptes = {};  // { cle: { depart, perteMax, … } } (Performance › Règles)
   let enEdition = null;    // clé du compte en train d'être renommé (pas de rafraîchissement pendant ce temps)
 
   const ouverte = () => !$("profil-tradelocker")?.classList.contains("hidden");
@@ -120,7 +120,7 @@
     if (!e.calculable) {
       return `<div class="bloc-ess ko"><div class="entete-ess"><span>ESS</span><strong>non calculable</strong></div>${details}
         <p class="petit">Ton bénéfice net total n'est pas positif : l'ESS ne peut pas encore être calculé. Il te faut au moins ${m(e.requis)} de bénéfice net total pour être sous ${seuil}, sans battre ta plus grande journée gagnante ou perdante actuelle.</p>
-        <p class="texte-attenue petit">💡 ${general}</p>${rappel}</div>`;
+        <p class="texte-attenue petit">${general}</p>${rappel}</div>`;
     }
     const conseil = e.eligible
       ? `Tu es en dessous de ${seuil}, éligible selon ce critère. Marge avant de le dépasser : ${m(e.marge)} de bénéfice net total en plus, sans battre ta plus grande journée gagnante ou perdante actuelle.`
@@ -129,7 +129,7 @@
       <div class="entete-ess"><span>ESS <span class="texte-attenue petit">· seuil ${seuil}</span></span><strong>${pct(e.ess)}</strong></div>
       ${details}
       <p class="petit">${esc(conseil)}</p>
-      <p class="texte-attenue petit">💡 ${general}</p>
+      <p class="texte-attenue petit">${general}</p>
       ${rappel}
     </div>`;
   }
@@ -233,7 +233,7 @@
         contenu: `
           <span class="actions-compte-tl">
             ${maitre ? "" : `<button type="button" class="bouton secondaire bouton-petit" data-maitre="${esc(c.cle)}">⭐ Compte maître</button>`}
-            <button type="button" class="bouton secondaire bouton-petit" data-renommer="${esc(c.cle)}">✏️ Renommer</button>
+            <button type="button" class="bouton secondaire bouton-petit" data-renommer="${esc(c.cle)}">Renommer</button>
           </span>
           <div class="reglage-statut-tl">
             <label>Statut

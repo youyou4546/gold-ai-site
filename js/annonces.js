@@ -84,7 +84,7 @@
     haussier: { classe: "haussier", texte: "Haussier or", fleche: "↑" },
     baissier: { classe: "baissier", texte: "Baissier or", fleche: "↓" },
     neutre: { classe: "neutre", texte: "Neutre", fleche: "" },
-    discours: { classe: "discours", texte: "🎙 Discours", fleche: "" },
+    discours: { classe: "discours", texte: "Discours", fleche: "" },
   };
   const LIBELLE_IMPACT_COURT = { high: "Élevé", medium: "Moyen", low: "Faible", holiday: "Férié" };
 
@@ -118,7 +118,7 @@
       <p class="texte-attenue petit">${esc(LIBELLE_CATEGORIE[n.categorie] || n.categorie)} · ${esc(n.statut)} (${esc(n.raison_statut)}) · publié ${U.jourHeure(n.publie_le)}</p>
       ${n.statut === "non confirmé" ? `<p class="texte-attenue petit">Non confirmée : badge laissé neutre.</p>` : ""}
       <ul class="liens-actu petit">${liens}</ul>
-      ${glossaire?.avertissement ? `<p class="avertissement-annonce">⚠️ ${esc(glossaire.avertissement)}</p>` : ""}`;
+      ${glossaire?.avertissement ? `<p class="avertissement-annonce">${esc(glossaire.avertissement)}</p>` : ""}`;
     return carteCompacte({
       id: n.id, heureTxt: U.depuis(n.publie_le, maintenant), impact: imp, nom: titre,
       ligne: n.statut === "non confirmé" ? "Non confirmé — à surveiller" : (n.resume_fr || LIBELLE_CATEGORIE[n.categorie] || ""),
@@ -164,7 +164,7 @@
       ${b.base === "prevision" ? `<p class="texte-attenue petit">Résultat pas encore connu : le badge compare la prévision au chiffre précédent.</p>` : ""}
       ${e.divergences?.length ? `<div class="alerte-donnees">Divergence entre sources : ${e.divergences.map(esc).join(" ; ")}</div>` : ""}
       ${v.url ? `<p class="petit"><a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer">Fiche ${esc(e.sources.join(", "))}</a></p>` : ""}
-      ${expl?.or_affecte && glossaire?.avertissement ? `<p class="avertissement-annonce">⚠️ ${esc(glossaire.avertissement)}</p>` : ""}`;
+      ${expl?.or_affecte && glossaire?.avertissement ? `<p class="avertissement-annonce">${esc(glossaire.avertissement)}</p>` : ""}`;
     return carteCompacte({ id: e.id, heureTxt, impact: e.impact, nom: e.titre, ligne: b.ligne, biais: b.biais, detail });
   }
 
@@ -235,12 +235,12 @@
 
     zone.innerHTML = `
       <section class="bloc-annonces" aria-labelledby="titre-calendrier">
-        <h2 class="titre-bloc-annonces" id="titre-calendrier">📅 Annonces économiques</h2>
+        <h2 class="titre-bloc-annonces" id="titre-calendrier">Annonces économiques</h2>
         ${filtres.mode === "urgent" ? `<p class="etat-vide">Filtre « Urgent » : seules les actualités sont affichées.</p>` : `
           ${liste(aVenir, jeuCal ? "Aucune annonce à venir pour ces filtres." : "Calendrier indisponible pour l'instant.")}`}
       </section>
       <section class="bloc-annonces" aria-labelledby="titre-urgentes">
-        <h2 class="titre-bloc-annonces" id="titre-urgentes">⚡ Actualités urgentes</h2>
+        <h2 class="titre-bloc-annonces" id="titre-urgentes">Actualités urgentes</h2>
         ${htmlActus}
       </section>`;
 

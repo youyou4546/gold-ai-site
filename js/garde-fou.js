@@ -6,7 +6,7 @@
 //    quand une règle est atteinte (rouge) ; plus de compteur affiché. Règles :
 //    Profil › Général (max trades, pertes qui arrêtent la journée, gain qui
 //    arrête la journée) + « Perte max par jour » de CHAQUE compte TradeLocker
-//    (Journal › Performance › ⚙️ Règles), comparée aux trades du jour de ce
+//    (Journal › Performance › Règles), comparée aux trades du jour de ce
 //    compte. Calcul : js/noyau.js › evaluerGardeFou.
 // 2. Blocage du calculateur quand une règle est atteinte (« Journée terminée »).
 // 3. Alerte dans le calculateur si une annonce USD à fort impact tombe dans
@@ -39,7 +39,7 @@
     regles = { maxTrades: p?.max_trades_jour ?? null, pertesArret: p?.nombre_pertes_arret ?? null, seuilGain: p?.seuil_gain_arret ?? null };
   }
 
-  // Perte max par jour réglée sur chaque compte (Performance › ⚙️ Règles).
+  // Perte max par jour réglée sur chaque compte (Performance › Règles).
   // (L'ancien écran « Mes comptes », vide depuis TradeLocker, n'est plus lu.)
   async function chargerLimite() {
     const r = await window.GoldAI.reglagesCalculateur.charger();
@@ -101,7 +101,7 @@
     const niveau = principale.niveau;
     zone.className = `garde-fou ${niveau}`;
     zone.innerHTML = `
-      <div class="ligne-garde-fou"><span class="icone-garde-fou" aria-hidden="true">${{ attention: "⚠️", bloque: "⛔" }[niveau]}</span>
+      <div class="ligne-garde-fou"><span class="icone-garde-fou" aria-hidden="true">${{ attention: "!", bloque: "!" }[niveau]}</span>
         <span>${esc(texteAlerte(principale))}${niveau === "bloque" ? " — journée terminée" : ""}</span></div>`;
     zone.hidden = false;
   }
@@ -128,11 +128,11 @@
     if (!bloque) return;
     const regles = etat.alertes.filter((a) => a.niveau === "bloque").map((a) => esc(texteAlerte(a)));
     if (force) {
-      zone.innerHTML = `<p class="rappel-debloque">⛔ ${regles.join(" · ")}<br><span class="texte-attenue petit">Calculateur débloqué exceptionnellement pour aujourd'hui.</span></p>`;
+      zone.innerHTML = `<p class="rappel-debloque">${regles.join(" · ")}<br><span class="texte-attenue petit">Calculateur débloqué exceptionnellement pour aujourd'hui.</span></p>`;
       return;
     }
     zone.innerHTML = `
-      <div class="icone-blocage" aria-hidden="true">⛔</div>
+      <div class="icone-blocage" aria-hidden="true">!</div>
       <h3>Journée terminée</h3>
       <ul>${regles.map((r) => `<li>${r}</li>`).join("")}</ul>
       <p class="texte-attenue petit">Le trade de trop pour « se refaire » est celui qui fait perdre les comptes.</p>
@@ -171,7 +171,7 @@
     zone.classList.toggle("hidden", !p);
     if (!p) { zone.innerHTML = ""; return; }
     const min = Math.max(1, Math.round((p.ms - Date.now()) / 60000));
-    zone.innerHTML = `⚠️ <strong>${esc(p.e.titre)}</strong> (USD, fort impact) dans <strong>${min} min</strong> — à ${U.heure(p.ms)}. Le prix peut bouger très fort : attends la publication avant d'entrer.`;
+    zone.innerHTML = `<strong>${esc(p.e.titre)}</strong> (USD, fort impact) dans <strong>${min} min</strong> — à ${U.heure(p.ms)}. Le prix peut bouger très fort : attends la publication avant d'entrer.`;
   }
 
   // ---------------------------------------------------------------- Cycle de vie

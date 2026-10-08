@@ -131,7 +131,7 @@
   function ligneEssTous(ctx, gainTp1, risque, gainTous) {
     if (!ctx) return "";
     const t = N.essDuTrade({ trades: ctx.tradesCompte, aujourdhui: ctx.aujourdhui, seuil: ctx.seuil, gainTp1, risque, gainTous }).siTous;
-    return `<p class="petit">ESS requis : ≤ ${nombre(t.seuil, 0)} % · si tous les TP sont touchés : <strong class="${t.calculable ? (t.eligible ? "positif" : "negatif") : ""}">${t.calculable ? `${nombre(t.ess, 2)} % ${t.eligible ? "✅" : "❌"}` : "—"}</strong></p>`;
+    return `<p class="petit">ESS requis : ≤ ${nombre(t.seuil, 0)} % · si tous les TP sont touchés : <strong class="${t.calculable ? (t.eligible ? "positif" : "negatif") : ""}">${t.calculable ? `${nombre(t.ess, 2)} % ${t.eligible ? "✓" : "✕"}` : "—"}</strong></p>`;
   }
 
   function afficherResultat(r, reglages, spec, ctx = null) {
@@ -203,7 +203,7 @@
       // TradeLocker en direct (compte maître) : solde, résultat du jour, fiche de l'instrument.
       // Indisponible (maintenance…) → Journal et réglages manuels.
       const tl = compte ? await window.GoldAI.compteMaitre?.lire(compte, signalCourant?.instrument || "XAUUSD") : null;
-      // Objectif : le même que la barre du haut (Profil › Général › 🎯 Objectif de profit),
+      // Objectif : le même que la barre du haut (Profil › Général › Objectif de profit),
       // compte maître seulement, sur sa période (jour / semaine / mois).
       const p = window.GoldAI.compteMaitre.progression(trades, reglages, aujourdhui, tl);
       return {
@@ -298,18 +298,18 @@
         ? ` Lot réduit proposé : <strong>${nombre(lot, 2)} lot</strong> (perte au SL ≈ ${montant(lot * perteParLot, r.devise)}).`
         : " Aucun lot possible : même le lot minimum dépasserait la limite.";
     };
-    // Perte max par jour (Performance › ⚙️ Règles) : ce trade au SL la dépasserait-il ?
+    // Perte max par jour (Performance › Règles) : ce trade au SL la dépasserait-il ?
     for (const j of jour) {
-      if (j.reste <= 0) lignes.push(["rouge", `⛔ <strong>${esc(j.nom)}</strong> : perte max du jour déjà atteinte.`]);
-      else if (r.perteTotaleSl >= j.reste) lignes.push(["rouge", `⛔ Au SL, ce trade dépasse la perte max du jour de <strong>${esc(j.nom)}</strong> : perte ${montant(r.perteTotaleSl, r.devise)}, il ne reste que ${montant(j.reste, r.devise)} aujourd'hui.${lotReduit(j.reste)}`]);
-      else if (r.perteTotaleSl >= 0.5 * j.reste) lignes.push(["orange", `⚠️ Sur <strong>${esc(j.nom)}</strong>, ce trade utilise ${nombre((r.perteTotaleSl / j.reste) * 100, 0)} % de ce qui reste de ta perte max du jour (${montant(j.reste, r.devise)}).`]);
+      if (j.reste <= 0) lignes.push(["rouge", `<strong>${esc(j.nom)}</strong> : perte max du jour déjà atteinte.`]);
+      else if (r.perteTotaleSl >= j.reste) lignes.push(["rouge", `Au SL, ce trade dépasse la perte max du jour de <strong>${esc(j.nom)}</strong> : perte ${montant(r.perteTotaleSl, r.devise)}, il ne reste que ${montant(j.reste, r.devise)} aujourd'hui.${lotReduit(j.reste)}`]);
+      else if (r.perteTotaleSl >= 0.5 * j.reste) lignes.push(["orange", `Sur <strong>${esc(j.nom)}</strong>, ce trade utilise ${nombre((r.perteTotaleSl / j.reste) * 100, 0)} % de ce qui reste de ta perte max du jour (${montant(j.reste, r.devise)}).`]);
     }
     for (const m of marges) {
       if (m.devise !== r.devise) continue;
       const marge = m.etat.perte.marge;
-      if (marge <= 0) lignes.push(["rouge", `⛔ <strong>${esc(m.nom)}</strong> : la perte max est déjà atteinte.`]);
-      else if (r.perteTotaleSl >= marge) lignes.push(["rouge", `⛔ Ce trade peut faire sauter <strong>${esc(m.nom)}</strong> : perte au SL ${montant(r.perteTotaleSl, r.devise)}, il ne reste que ${montant(marge, r.devise)} avant le niveau de rupture.${lotReduit(marge)}`]);
-      else if (r.perteTotaleSl >= 0.5 * marge) lignes.push(["orange", `⚠️ Sur <strong>${esc(m.nom)}</strong>, ce trade utilise ${nombre((r.perteTotaleSl / marge) * 100, 0)} % de ta marge avant rupture (${montant(marge, r.devise)}).`]);
+      if (marge <= 0) lignes.push(["rouge", `<strong>${esc(m.nom)}</strong> : la perte max est déjà atteinte.`]);
+      else if (r.perteTotaleSl >= marge) lignes.push(["rouge", `Ce trade peut faire sauter <strong>${esc(m.nom)}</strong> : perte au SL ${montant(r.perteTotaleSl, r.devise)}, il ne reste que ${montant(marge, r.devise)} avant le niveau de rupture.${lotReduit(marge)}`]);
+      else if (r.perteTotaleSl >= 0.5 * marge) lignes.push(["orange", `Sur <strong>${esc(m.nom)}</strong>, ce trade utilise ${nombre((r.perteTotaleSl / marge) * 100, 0)} % de ta marge avant rupture (${montant(marge, r.devise)}).`]);
     }
     const zone = document.getElementById("zone-resultat-calcul");
     zone.querySelector("#alerte-marges")?.remove();

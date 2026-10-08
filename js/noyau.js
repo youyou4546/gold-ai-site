@@ -95,7 +95,7 @@
           resultat.tps.push({ numero: numeroAuto, prix: prix[0] });
           if (prix.length > 1) resultat.ambiguites.push({ champ: `tp${numeroAuto}`, message: `TP${numeroAuto} : plusieurs nombres sur la ligne « ${ligne} » — le premier (${prix[0]}) est retenu, vérifie-le.` });
         } else if ((/^[^A-Za-z0-9]*$/.test(ligne.slice(0, tp.index)) && /^(?:tp|take)/i.test(tp[0].trim())) || MOTIF_TP_OUVERT.test(reste) || reste.trim() === "") {
-          // Ligne qui commence par un TP sans chiffre (« TP4 », « TP4 : ? », « TP4 🚀 », « TP ouvert »…) = TP RUNNER.
+          // Ligne qui commence par un TP sans chiffre (« TP4 », « TP4 : ? », « TP4 », « TP ouvert »…) = TP RUNNER.
           // (« Objectif … » / « Target … » sans chiffre : seulement si « ouvert / runner… » ou vide.)
           resultat.tpOuverts += 1;
         }
@@ -863,7 +863,7 @@
 
   /**
    * limitesComptes : [{ nom, limite, perte }] — perte max par jour de chaque
-   * compte (Performance › ⚙️ Règles) et perte déjà prise aujourd'hui sur ce
+   * compte (Performance › Règles) et perte déjà prise aujourd'hui sur ce
    * compte (en $, positive). La plus proche de sa limite donne l'alerte.
    */
   function evaluerGardeFou({ trades = [], regles = {}, limitePerte = null, limitesComptes = [] } = {}) {

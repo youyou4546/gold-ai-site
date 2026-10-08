@@ -141,7 +141,7 @@
     // raisonnement est replié dans « Voir le détail ».
     return `
       <div class="entete-impact">
-        <h2 class="titre-bloc-annonces">🧭 Tendance de l'or</h2>
+        <h2 class="titre-bloc-annonces">Tendance de l'or</h2>
         <span class="badge-or ${badge[0]}">${esc(badge[1])}</span>
       </div>
       <div class="rangee-tf">${["30min", "1h", "4h"].map(puceTf).join("")}</div>

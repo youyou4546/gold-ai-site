@@ -43,7 +43,7 @@
     photoDataActuelle = photoData || null;
     const html = photoDataActuelle
       ? `<img src="${photoDataActuelle}" alt="Photo de profil" />`
-      : "👤";
+      : '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>';
 
     document.querySelectorAll(".avatar-profil, .icone-profil").forEach((el) => {
       el.innerHTML = html;

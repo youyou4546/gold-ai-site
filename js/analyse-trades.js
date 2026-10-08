@@ -87,7 +87,7 @@
       zone.innerHTML = `<p class="etat-vide">Aucun trade dans le journal pour ce compte et cette période.</p>`;
       return;
     }
-    const icone = { attention: "⚠️", ok: "✅", info: "💡" };
+    const icone = { attention: "!", ok: "✓", info: "i" };
     const ordre = { attention: 0, ok: 1, info: 2 }; // les alertes d'abord
     const conseils = [...r.conseils].sort((a, b) => (ordre[a.niveau] ?? 3) - (ordre[b.niveau] ?? 3));
     const gm = r.gainMoyen, pm = r.perteMoyenne, somme = gm + pm;

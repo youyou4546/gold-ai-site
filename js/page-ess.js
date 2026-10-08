@@ -39,7 +39,7 @@
     const passe = e.calculable && e.eligible;
     const verdict = `
       <div class="verdict-ess ${passe ? "ok" : "ko"}">
-        <div class="icone-verdict-ess">${passe ? "✅" : "❌"}</div>
+        <div class="icone-verdict-ess">${passe ? "✓" : "✕"}</div>
         <div class="texte-verdict-ess">${passe ? "Tu passes l'ESS" : "Tu ne passes pas l'ESS"}</div>
         <div class="chiffre-verdict-ess">${e.calculable ? `${pct(e.ess)} <span>· seuil ${pct(e.seuil)}</span>` : `Bénéfice total pas positif <span>· seuil ${pct(e.seuil)}</span>`}</div>
         <p class="petit">${passe

@@ -123,7 +123,7 @@
     const ligne = (a) => `
       <li class="${a.touchee_le ? "touchee" : ""}">
         <div class="infos-alerte">
-          <strong>${a.touchee_le ? "✅" : "🎯"} ${esc(nomAlerte(a))}</strong>
+          <strong>${a.touchee_le ? "✓" : "•"} ${esc(nomAlerte(a))}</strong>
           ${a.note ? `<span class="texte-attenue">${esc(a.note)}</span>` : ""}
           <span class="petit texte-attenue" ${a.touchee_le ? "" : `data-distance="${esc(a.id)}"`}>${a.touchee_le
             ? `Touché ${esc(U.jourHeure(a.touchee_le))}${a.prix_touche ? ` · or à ${px(a.prix_touche)}` : ""}`

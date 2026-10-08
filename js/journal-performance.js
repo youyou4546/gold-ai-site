@@ -113,7 +113,7 @@
     const signeNet = s.resultatNet > 0 ? "▲ " : s.resultatNet < 0 ? "▼ " : "";
 
     if (trades.length === 0) {
-      conteneur.innerHTML = `<div class="etat-vide-soigne"><div class="icone-placeholder">📊</div><h3>Aucun trade sur cette période</h3>
+      conteneur.innerHTML = `<div class="etat-vide-soigne"><div class="icone-placeholder"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17v-5M13 17V8M18 17v-9"/></svg></div><h3>Aucun trade sur cette période</h3>
         <p>Ajoute tes trades depuis le Calendrier du journal, ou élargis la période ci-dessus. Les graphiques se construisent uniquement à partir de tes trades enregistrés.</p></div>`;
       return;
     }

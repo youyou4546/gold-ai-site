@@ -78,7 +78,7 @@
       window.GoldAI.dernierObjectif = null;
       zone.className = "bloc-objectif";
       zone.hidden = false;
-      zone.innerHTML = `<div class="entete-objectif"><span>🎯 <button type="button" class="lien-objectif" id="lien-choisir-maitre">Choisis un compte maître dans Mes comptes</button></span></div>`;
+      zone.innerHTML = `<div class="entete-objectif"><span><button type="button" class="lien-objectif" id="lien-choisir-maitre">Choisis un compte maître dans Mes comptes</button></span></div>`;
       $("lien-choisir-maitre").addEventListener("click", () => {
         window.GoldAI.app.allerA("profil");
         window.GoldAI.comptesTradelocker.ouvrir();
@@ -103,7 +103,7 @@
     zone.hidden = false;
     zone.innerHTML = `
       <div class="entete-objectif">
-        <span>🎯 Objectif ${LIBELLE_PERIODE[p.periode] || ""}${nomCompte ? ` <span class="texte-attenue petit">· ${esc(nomCompte)}</span>` : ""}${p.atteint ? ` <span class="objectif-atteint">✅ atteint</span>` : ""}</span>
+        <span>Objectif ${LIBELLE_PERIODE[p.periode] || ""}${nomCompte ? ` <span class="texte-attenue petit">· ${esc(nomCompte)}</span>` : ""}${p.atteint ? ` <span class="objectif-atteint">✓ atteint</span>` : ""}</span>
         <strong class="${p.realise < 0 ? "negatif" : ""}">${m(p.realise)} / ${m(p.montant)}</strong>
       </div>
       <div class="barre-objectif" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(p.pourcentage)}">

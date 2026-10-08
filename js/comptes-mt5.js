@@ -88,11 +88,11 @@
             <span class="sous">rupture à ${argent(e.plancher, d)}</span></div>` : ""}
           ${c.perteJour > 0 ? `<div><span class="lib">Perte max du jour restante</span><span class="val">${argent(e.resteJour, d)}</span>
             <span class="sous">sur ${argent(c.perteJour, d)}</span></div>` : ""}
-          ${c.objectifPct > 0 ? `<div><span class="lib">Objectif ${U.nombre(c.objectifPct, 0)} %</span><span class="val">${e.resteObjectif > 0 ? `reste ${argent(e.resteObjectif, d)}` : "atteint ✅"}</span>
+          ${c.objectifPct > 0 ? `<div><span class="lib">Objectif ${U.nombre(c.objectifPct, 0)} %</span><span class="val">${e.resteObjectif > 0 ? `reste ${argent(e.resteObjectif, d)}` : "atteint ✓"}</span>
             <span class="sous">cible ${argent(e.cible, d)}</span></div>` : ""}
         </div>
         ${e.progression !== null ? `<div class="barre-mt5"><span style="width:${e.progression.toFixed(1)}%"></span></div>` : ""}
-        <p class="texte-attenue petit">${esc(c.serveur || "")} · lecture seule 🔒 · lu à ${esc(U.heure(ligne.maj_le))}${vieux ? " ⚠️ PC éteint ?" : ""}</p>`;
+        <p class="texte-attenue petit">${esc(c.serveur || "")} · lecture seule · lu à ${esc(U.heure(ligne.maj_le))}${vieux ? " PC éteint ?" : ""}</p>`;
     return window.GoldAI.comptesTradelocker.carteCompte({
       cle: ligne.cle, nom: c.nom || ligne.cle, devise: d,
       badges: `<span class="badge-statut-compte challenge">MT5</span>`,
