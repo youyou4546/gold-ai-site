@@ -29,7 +29,7 @@
     const cases = sessions.map((s) => `
       <div class="case-session${s.active ? " active" : ""}${s.active && chevauchement ? " chevauchement" : ""}">
         <span class="nom-session">${esc(s.nom)}</span>
-        <span class="heures-session">${heureQc(s.debutMs)} – ${heureQc(s.finMs)}</span>
+        <span class="heures-session"><span>${heureQc(s.debutMs)} –</span> <span>${heureQc(s.finMs)}</span></span>
       </div>`).join("");
     return `
       <h3 class="titre-bloc-annonces">Session de marché</h3>

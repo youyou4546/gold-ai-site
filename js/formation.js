@@ -11,6 +11,7 @@
 //    (+50 du premier coup), expert +150 × difficulté, examen final +1 000,
 //    défi du jour +30 (ou +10), série de jours : +5 par jour (max +50).
 //  - Affichage volontairement minimal : des titres et « Go », pas de descriptions.
+//  - Deux sessions (champ « session » des domaines), chacune avec son examen final.
 //  - Niveaux 1 à 50, avec un titre de métier (Apprenti → Maître trader).
 //  - Domaine : Bronze (tous les quiz ≥ 60 %), Argent (certification ≥ 80 %),
 //    Or = niveau max (examen expert chronométré ≥ 90 %).
@@ -22,7 +23,7 @@
   const $ = (id) => document.getElementById(id);
 
   const NIVEAU_MAX = 50;
-  const XP_NIVEAU_MAX = 12000;
+  const XP_NIVEAU_MAX = 20000;  // sessions 1 et 2 : il faut presque tout réussir pour le niveau 50
   const seuil = (n) => (n <= 1 ? 0 : Math.round(XP_NIVEAU_MAX * Math.pow((n - 1) / (NIVEAU_MAX - 1), 1.4)));
   const niveauDe = (xp) => { let n = 1; while (n < NIVEAU_MAX && xp >= seuil(n + 1)) n++; return n; };
   const TITRES = [[1, "Apprenti"], [3, "Stagiaire"], [6, "Assistant trader"], [10, "Analyste junior"], [15, "Analyste"], [20, "Trader junior"],
@@ -45,7 +46,7 @@
   let minuterieSauvegarde = null;
   let chrono = null;
 
-  const etatVide = () => ({ version: 1, xp: 0, lecons: {}, examens: {}, final: null, serie: { jours: 0, dernier: null },
+  const etatVide = () => ({ version: 1, xp: 0, lecons: {}, examens: {}, final: null, finals: {}, serie: { jours: 0, dernier: null },
     defis: { dernier: null, total: 0 }, erreurs: [] });
 
   // ---------------------------------------------------------------- Données
@@ -82,7 +83,13 @@
   const debloque = (d) => d.prerequis.every(certifie);
   const leconOuverte = (d, i) => debloque(d) && (i === 0 || quizReussi(d.lecons[i - 1]));
   const maitrise = (d) => (expert(d.id) ? 3 : certifie(d.id) ? 2 : d.lecons.every(quizReussi) ? 1 : 0);
-  const toutCertifie = () => cours.domaines.every((d) => certifie(d.id));
+  // Sessions : la 1 (bases et intermédiaire) et la 2 (avancé + l'app). Chacune a son examen final
+  // (celui de la session 1 reste dans etat.final, pour les progressions déjà enregistrées).
+  const sessionDe = (d) => d.session || 1;
+  const domainesSession = (n) => cours.domaines.filter((d) => sessionDe(d) === n);
+  const listeSessions = () => [...new Set(cours.domaines.map(sessionDe))].sort((a, b) => a - b);
+  const finalDe = (n) => (n === 1 ? etat.final : etat.finals?.[n]) || null;
+  const finalOuvert = (n) => cours.sessions?.[n]?.complet !== false && domainesSession(n).every((d) => certifie(d.id));
   const aujourdHui = () => U.cleJour(Date.now());
 
   let gainsSession = [];  // XP gagnés pendant l'écran en cours (affichés au résultat)
@@ -131,7 +138,7 @@
     const zone = $("formation-contenu");
     if (!zone) return;
     clearInterval(chrono);
-    const ecrans = { accueil: ecranAccueil, domaine: ecranDomaine, lecon: ecranLecon, quiz: ecranQuestion, resultat: ecranResultat };
+    const ecrans = { accueil: ecranAccueil, session: ecranSession, domaine: ecranDomaine, lecon: ecranLecon, quiz: ecranQuestion, resultat: ecranResultat };
     zone.innerHTML = (ecrans[vue.nom] || ecranAccueil)();
     if (vue.nom === "quiz") demarrerChrono();
     if (vue.nom === "lecon") brancherVideo();
@@ -147,8 +154,8 @@
   const barre = (x, classe = "") => `<div class="barre-formation ${classe}"><span style="width:${Math.max(0, Math.min(100, x * 100))}%"></span></div>`;
 
   // Une ligne = un titre + « Go » (ou un cadenas). Pas d'autre texte.
-  function ligne({ action, titre, lecon = "", did = "", ouvert = true, fait = false, gauche = "", chip = "" }) {
-    return `<button type="button" class="ligne-formation ${ouvert ? "" : "verrouille"} ${fait ? "fait" : ""}" data-action="${action}" data-lecon="${lecon}" data-domaine="${did}" ${ouvert ? "" : "disabled"}>
+  function ligne({ action, titre, lecon = "", did = "", sess = "", ouvert = true, fait = false, gauche = "", chip = "" }) {
+    return `<button type="button" class="ligne-formation ${ouvert ? "" : "verrouille"} ${fait ? "fait" : ""}" data-action="${action}" data-lecon="${lecon}" data-domaine="${did}" data-session="${sess}" ${ouvert ? "" : "disabled"}>
       ${gauche ? `<span class="numero-lecon">${gauche}</span>` : ""}
       <span class="titre-ligne-formation">${esc(titre)}</span>
       ${chip}
@@ -172,23 +179,33 @@
   function ecranAccueil() {
     const defiDispo = Object.keys(cours.lecons).some(quizReussi);
     const defiFait = etat.defis.dernier === aujourdHui();
-    const niveaux = [...new Set(cours.domaines.map((d) => d.niveau))];
     return `
       <button type="button" class="bouton-retour" data-action="profil"><span aria-hidden="true">←</span> Profil</button>
       ${carteCarriere()}
       ${defiDispo ? ligne({ action: "defi", titre: "Défi du jour", ouvert: !defiFait, fait: defiFait, gauche: ICONES.eclair }) : ""}
+      <h3 class="sous-titre-formation">Sessions</h3>
+      ${listeSessions().map((n) => ligne({ action: "session", sess: n, titre: `Session ${n}`, gauche: String(n), fait: !!finalDe(n) })).join("")}`;
+  }
+
+  function ecranSession() {
+    const n = vue.sess;
+    const doms = domainesSession(n);
+    const niveaux = [...new Set(doms.map((d) => d.niveau))];
+    return `
+      <button type="button" class="bouton-retour" data-action="accueil"><span aria-hidden="true">←</span> Formation</button>
+      <h3 class="titre-lecon">Session ${n}</h3>
       ${niveaux.map((niv) => `<h3 class="sous-titre-formation">${esc(niv)}</h3>
-        ${cours.domaines.filter((d) => d.niveau === niv).map((d) =>
+        ${doms.filter((d) => d.niveau === niv).map((d) =>
           ligne({ action: "domaine", did: d.id, titre: d.nom, ouvert: debloque(d), chip: chipMaitrise(maitrise(d)) })).join("")}`).join("")}
-      <h3 class="sous-titre-formation">Final</h3>
-      ${ligne({ action: "final", titre: "Examen final", ouvert: toutCertifie(), gauche: ICONES.trophee, chip: etat.final ? `<span class="maitrise m3">${pct(etat.final)}</span>` : "" })}`;
+      ${cours.sessions?.[n]?.complet === false ? "" : `<h3 class="sous-titre-formation">Final</h3>
+      ${ligne({ action: "final", sess: n, titre: "Examen final", ouvert: finalOuvert(n), gauche: ICONES.trophee, chip: finalDe(n) ? `<span class="maitrise m3">${pct(finalDe(n))}</span>` : "" })}`}`;
   }
 
   function ecranDomaine() {
     const d = domaine(vue.did);
     const ouvert = debloque(d);
     return `
-      <button type="button" class="bouton-retour" data-action="accueil"><span aria-hidden="true">←</span> Formation</button>
+      <button type="button" class="bouton-retour" data-action="session" data-session="${sessionDe(d)}"><span aria-hidden="true">←</span> Session ${sessionDe(d)}</button>
       <h3 class="titre-lecon">${esc(d.nom)} ${chipMaitrise(maitrise(d))}</h3>
       ${d.lecons.map((lid, i) => ligne({ action: "lecon", lecon: lid, titre: cours.lecons[lid].titre, ouvert: leconOuverte(d, i),
         fait: quizReussi(lid), gauche: String(i + 1) })).join("")}
@@ -230,14 +247,15 @@
     if (type === "quiz") questions = questionsLecon(cle);
     else if (type === "certif") questions = melanger([...questionsDomaine(cle), ...questionsExamen(cle)]).slice(0, 10);
     else if (type === "expert") questions = melanger([...questionsExamen(cle), ...melanger(questionsDomaine(cle)).slice(0, 4)]);
-    else if (type === "final") questions = melanger(cours.domaines.flatMap((d) => melanger([...questionsExamen(d.id), ...questionsDomaine(d.id)]).slice(0, 3)));
+    else if (type === "final") questions = melanger(domainesSession(cle).flatMap((d) => melanger([...questionsExamen(d.id), ...questionsDomaine(d.id)]).slice(0, 3)));
     else {  // défi du jour : d'abord les questions ratées, puis au hasard dans les leçons réussies
       const dispo = Object.keys(cours.lecons).filter(quizReussi).flatMap(questionsLecon);
       const ratees = dispo.filter((q) => etat.erreurs.includes(q.id));
       questions = [...melanger(ratees), ...melanger(dispo.filter((q) => !etat.erreurs.includes(q.id)))].slice(0, 5);
     }
     questions = questions.map((q) => ({ ...q, ordre: melanger(q.choix.map((_, i) => i)) }));
-    const retour = type === "quiz" ? { nom: "lecon", lid: cle } : type === "certif" || type === "expert" ? { nom: "domaine", did: cle } : { nom: "accueil" };
+    const retour = type === "quiz" ? { nom: "lecon", lid: cle } : type === "certif" || type === "expert" ? { nom: "domaine", did: cle }
+      : type === "final" ? { nom: "session", sess: cle } : { nom: "accueil" };
     session = { type, cle, questions, i: 0, bonnes: 0, repondu: null, chrono: CHRONO[type] || 0, retour };
     gainsSession = [];
     niveauAvant = null;
@@ -324,8 +342,9 @@
       if (reussi) ex[s.type] = Math.max(ex[s.type] || 0, score);
       ex[cleEssais] = (ex[cleEssais] || 0) + 1;
     } else if (s.type === "final") {
-      if (reussi && !etat.final) gagner(1000, "Examen final réussi");
-      if (reussi) etat.final = Math.max(etat.final || 0, score);
+      if (reussi && !finalDe(s.cle)) gagner(1000, `Session ${s.cle} terminée`);
+      if (reussi && s.cle === 1) etat.final = Math.max(etat.final || 0, score);
+      else if (reussi) etat.finals = { ...(etat.finals || {}), [s.cle]: Math.max(etat.finals?.[s.cle] || 0, score) };
     } else if (s.type === "defi" && etat.defis.dernier !== aujourdHui()) {
       etat.defis.dernier = aujourdHui();
       etat.defis.total++;
@@ -350,7 +369,7 @@
       else if (r.reussi && d.lecons.every(quizReussi)) suite = `<button type="button" class="bouton" data-action="certif" data-domaine="${d.id}">Certification</button>`;
       else if (!r.reussi) suite = `<button type="button" class="bouton" data-action="quiz" data-lecon="${s.cle}">Réessayer</button>`;
     } else if ((s.type === "certif" || s.type === "expert" || s.type === "final") && !r.reussi) {
-      suite = `<button type="button" class="bouton" data-action="${s.type}" data-domaine="${s.cle || ""}">Réessayer</button>`;
+      suite = `<button type="button" class="bouton" data-action="${s.type}" data-domaine="${s.cle || ""}" data-session="${s.cle || ""}">Réessayer</button>`;
     }
     return `
       <div class="carte-section carte-resultat ${r.reussi ? "reussi" : "rate"}">
@@ -359,7 +378,7 @@
         ${monte ? `<div class="niveau-monte">${ICONES.trophee}<span>Niveau ${r.niveauApres} : <strong>${esc(titreDe(r.niveauApres))}</strong></span></div>` : ""}
       </div>
       ${suite}
-      <button type="button" class="bouton secondaire" data-action="${esc(s.retour.nom)}" data-lecon="${s.retour.lid || ""}" data-domaine="${s.retour.did || ""}">Retour</button>`;
+      <button type="button" class="bouton secondaire" data-action="${esc(s.retour.nom)}" data-lecon="${s.retour.lid || ""}" data-domaine="${s.retour.did || ""}" data-session="${s.retour.sess || ""}">Retour</button>`;
   }
 
   // ---------------------------------------------------------------- Ouverture et clics
@@ -402,7 +421,8 @@
       else if (action === "lecon") aller({ nom: "lecon", lid: lecon });
       else if (action === "quiz") demarrer("quiz", lecon);
       else if (action === "certif" || action === "expert") demarrer(action, did);
-      else if (action === "final") demarrer("final");
+      else if (action === "session") aller({ nom: "session", sess: Number(b.dataset.session) || 1 });
+      else if (action === "final") demarrer("final", Number(b.dataset.session) || 1);
       else if (action === "defi") demarrer("defi");
       else if (action === "repondre") repondre(Number(b.dataset.choix));
       else if (action === "suivante") suivante();
