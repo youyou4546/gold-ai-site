@@ -147,23 +147,7 @@
     return null;
   }
 
-  // Petite courbe du compte (comme sur TopOne) : valeurs successives du solde.
-  let numeroCourbe = 0;
-  function courbe(valeurs) {
-    const v = (valeurs || []).filter(Number.isFinite);
-    if (v.length < 2) v.unshift(v[0] ?? 0);
-    const min = Math.min(...v), max = Math.max(...v), h = max - min || 1;
-    const L = 300, H = 64;
-    const pts = v.map((y, i) => [(i / (v.length - 1)) * L, 4 + (1 - (y - min) / h) * (H - 8)]);
-    const ligne = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
-    const hausse = v[v.length - 1] >= v[0];
-    const id = `degrade-compte-${++numeroCourbe}`;
-    return `<svg class="courbe-compte ${hausse ? "hausse" : "baisse"}" viewBox="0 0 ${L} ${H}" preserveAspectRatio="none" aria-hidden="true">
-      <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity="0.28"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
-      <polygon points="0,${H} ${ligne} ${L},${H}" fill="url(#${id})"/>
-      <polyline points="${ligne}" fill="none" stroke="currentColor" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
-    </svg>`;
-  }
+  const courbe = U.courbe; // petite courbe du compte (comme sur TopOne)
 
   // Carte d'un compte : nom + badges, courbe, solde, profit, numéro, plateforme, état.
   // Toucher la tête de la carte ouvre / ferme son contenu (géré en JS : fiable sur iPhone).

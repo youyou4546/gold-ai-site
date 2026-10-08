@@ -16,7 +16,18 @@ document.addEventListener("DOMContentLoaded", () => {
     onglets.forEach((o) => o.classList.toggle("actif", o.dataset.section === cible));
     // Rectangle du haut (objectif / garde-fou) : caché dans Profil et Journal.
     document.getElementById("barre-haut")?.classList.toggle("cachee-onglet", cible === "profil" || cible === "journal");
-    sections.forEach((s) => s.classList.toggle("actif", s.id === `section-${cible}`));
+    // Sens de l'animation : vers la droite si l'onglet choisi est après l'actuel, sinon vers la gauche.
+    const ordre = [...onglets].map((o) => o.dataset.section);
+    const avant = ordre.indexOf(document.querySelector("main .section.actif")?.id.replace("section-", ""));
+    const apres = ordre.indexOf(cible);
+    const sens = avant < 0 || apres < 0 || avant === apres ? "" : apres > avant ? "vers-droite" : "vers-gauche";
+    sections.forEach((s) => {
+      const visee = s.id === `section-${cible}`;
+      if (visee && s.classList.contains("actif")) return; // déjà affichée : pas d'animation
+      s.classList.remove("vers-gauche", "vers-droite");
+      if (visee && sens) s.classList.add(sens);
+      s.classList.toggle("actif", visee);
+    });
 
     // Charge les données à la demande, seulement au premier affichage de l'onglet.
     // Journal n'a pas besoin d'être ici : sa vue calendrier se charge elle-même

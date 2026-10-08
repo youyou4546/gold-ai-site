@@ -16,6 +16,8 @@
   const COULEURS = { gain: "#2fe0a3", perte: "#ff4d6d", equilibre: "#8a9bb0", ligne: "#22d3ee", grille: "rgba(120,137,158,0.18)", texte: "#aab7c8" };
   const filtre = { periode: "30j", regroupement: "jour" };
   let graphiques = [];
+  const ouvertes = new Set(["barres"]); // cartes ouvertes (gardées quand la page est redessinée)
+  const NOMS_PERIODE = { "7j": "7 jours", "30j": "30 jours", "90j": "90 jours", annee: "Cette année", tout: "Depuis le début" };
 
   const U = () => window.GoldAI.utils;
   const m = (v, opts) => U().montant(v, DEVISE, opts);
@@ -85,9 +87,11 @@
     return filtre.regroupement === "semaine" ? `sem. ${txt}` : txt;
   }
 
-  function carte(label, valeur, sous, classe = "") {
-    return `<div class="carte-stat ${classe}"><div class="label-stat">${label}</div><div class="valeur-stat">${valeur}</div>${sous ? `<div class="sous-valeur-stat">${sous}</div>` : ""}</div>`;
+  // Ligne « libellé … valeur » de la carte Détail des chiffres.
+  function ligne(label, valeur, sous = "") {
+    return `<li><span>${label}${sous ? `<small>${sous}</small>` : ""}</span><strong>${valeur}</strong></li>`;
   }
+  const classe = (x) => (x > 0 ? "positif" : x < 0 ? "negatif" : "");
 
   function detruireGraphiques() {
     graphiques.forEach((g) => g.destroy());
@@ -129,40 +133,47 @@
     tries.forEach((t) => { const k = cleGroupe(t.date); groupes.set(k, (groupes.get(k) || 0) + net(t)); });
 
 
+    const carteS = (o) => U().carteSection({ ...o, ouvertes });
     conteneur.innerHTML = `
-      <div class="grille-stats-perf perf-v2">
-        ${carte("Résultat net réalisé", `<span class="${classeNet}">${signeNet}${m(s.resultatNet, { signe: true })}</span>`, s.avecFrais ? `frais déduits : ${m(s.fraisTotaux)}` : "aucun frais renseigné", "carte-mise-en-avant carte-stat-large")}
-        ${carte("Taux de réussite", s.tauxReussite === null ? "—" : `${U().nombre(s.tauxReussite, 1)} %`, s.tauxReussite === null ? "aucun trade gagnant ou perdant" : `${s.gagnants} gagnant${s.gagnants > 1 ? "s" : ""} ÷ ${s.gagnants + s.perdants} (équilibre exclu)`)}
-        ${carte("Trades clôturés", String(s.nombre), `${s.equilibre} à l'équilibre`)}
-        ${carte("Gain moyen / perte moyenne", s.ratio === null ? "—" : s.ratio.toFixed(2), s.ratio === null ? (s.perdants === 0 ? "aucune perte sur la période" : "aucun gain sur la période") : `${m(s.gainMoyen)} / ${m(s.perteMoyenne)}`)}
-        ${carte("Meilleur / pire trade", `<span class="${s.meilleur > 0 ? "positif" : s.meilleur < 0 ? "negatif" : ""}">${m(s.meilleur, { signe: true })}</span>`, `pire : ${m(s.pire, { signe: true })}`)}
+      <div class="carte-section carte-resume">
+        <div class="titre-carte-compte"><strong>Résultat net</strong><span class="badge-periode">${NOMS_PERIODE[filtre.periode] || ""}</span></div>
+        ${U().courbe([0, ...pointsCumul.map((p) => p.cumul)])}
+        <div class="chiffres-carte-compte">
+          <div><span class="lib">Réalisé</span><span class="val ${classeNet}">${signeNet}${m(s.resultatNet, { signe: true })}</span></div>
+          <div class="droite"><span class="lib">Réussite</span><span class="val">${s.tauxReussite === null ? "—" : `${U().nombre(s.tauxReussite, 1)} %`}</span></div>
+        </div>
+        <div class="pied-carte-compte">
+          <span class="texte-attenue">${s.nombre} trade${s.nombre > 1 ? "s" : ""} clôturé${s.nombre > 1 ? "s" : ""}</span>
+          <span class="texte-attenue">${s.gagnants} ▲ · ${s.perdants} ▼${s.equilibre ? ` · ${s.equilibre} =` : ""}</span>
+        </div>
+        <p class="aide">Somme des résultats nets des trades clôturés — ce n'est pas le solde du compte.</p>
       </div>
 
-      <div class="grille-graphiques">
-        <div class="carte carte-graphique">
-          <h3 class="titre-bloc">Répartition des trades</h3>
-          <div class="zone-anneau"><canvas id="graph-anneau" aria-label="Gagnants ${s.gagnants}, perdants ${s.perdants}, à l'équilibre ${s.equilibre}" role="img"></canvas></div>
+      ${carteS({ cle: "barres", titre: `Gains et pertes par ${filtre.regroupement}`, resume: "",
+        contenu: `<div class="segmente petit" role="group" aria-label="Regroupement">
+            ${["jour", "semaine", "mois"].map((r) => `<button type="button" data-regroupement="${r}" aria-pressed="${filtre.regroupement === r}">${r}</button>`).join("")}
+          </div>
+          <div class="zone-graphique"><canvas id="graph-barres" role="img" aria-label="Barres des gains et pertes par ${filtre.regroupement}"></canvas></div>` })}
+
+      ${carteS({ cle: "repartition", titre: "Répartition des trades",
+        resume: `<span class="positif">${s.gagnants}</span>&nbsp;/&nbsp;<span class="negatif">${s.perdants}</span>`,
+        contenu: `<div class="zone-anneau"><canvas id="graph-anneau" aria-label="Gagnants ${s.gagnants}, perdants ${s.perdants}, à l'équilibre ${s.equilibre}" role="img"></canvas></div>
           <ul class="legende-texte">
             <li><span class="pastille" style="background:${COULEURS.gain}"></span>▲ Gagnants : <strong>${s.gagnants}</strong></li>
             <li><span class="pastille" style="background:${COULEURS.perte}"></span>▼ Perdants : <strong>${s.perdants}</strong></li>
             <li><span class="pastille" style="background:${COULEURS.equilibre}"></span>= À l'équilibre : <strong>${s.equilibre}</strong></li>
-          </ul>
-        </div>
-        <div class="carte carte-graphique large">
-          <h3 class="titre-bloc">Résultat net cumulé</h3>
-          <p class="aide">Somme des résultats nets des trades clôturés — ce n'est pas le solde du compte.</p>
-          <div class="zone-graphique"><canvas id="graph-cumul" role="img" aria-label="Courbe du résultat net cumulé"></canvas></div>
-        </div>
-        <div class="carte carte-graphique large">
-          <div class="entete-graphique">
-            <h3 class="titre-bloc">Gains et pertes par ${filtre.regroupement}</h3>
-            <div class="segmente petit" role="group" aria-label="Regroupement">
-              ${["jour", "semaine", "mois"].map((r) => `<button type="button" data-regroupement="${r}" aria-pressed="${filtre.regroupement === r}">${r}</button>`).join("")}
-            </div>
-          </div>
-          <div class="zone-graphique"><canvas id="graph-barres" role="img" aria-label="Barres des gains et pertes par ${filtre.regroupement}"></canvas></div>
-        </div>
-      </div>`;
+          </ul>` })}
+
+      ${carteS({ cle: "chiffres", titre: "Détail des chiffres", resume: s.ratio === null ? "" : `<span>ratio ${s.ratio.toFixed(2)}</span>`,
+        contenu: `<ul class="liste-chiffres">
+            ${ligne("Gain moyen", `<span class="positif">${m(s.gainMoyen)}</span>`)}
+            ${ligne("Perte moyenne", `<span class="negatif">${s.perteMoyenne === null ? "—" : m(-s.perteMoyenne)}</span>`)}
+            ${ligne("Gain moyen / perte moyenne", s.ratio === null ? "—" : s.ratio.toFixed(2), s.ratio === null ? (s.perdants === 0 ? "aucune perte sur la période" : "aucun gain sur la période") : "")}
+            ${ligne("Meilleur trade", `<span class="${classe(s.meilleur)}">${m(s.meilleur, { signe: true })}</span>`)}
+            ${ligne("Pire trade", `<span class="${classe(s.pire)}">${m(s.pire, { signe: true })}</span>`)}
+            ${ligne("Taux de réussite", s.tauxReussite === null ? "—" : `${U().nombre(s.tauxReussite, 1)} %`, "équilibre exclu")}
+            ${ligne("Frais", s.avecFrais ? m(s.fraisTotaux) : "—", s.avecFrais ? "déduits du résultat" : "aucun frais renseigné")}
+          </ul>` })}`;
 
     if (typeof Chart === "undefined") {
       conteneur.insertAdjacentHTML("beforeend", `<p class="alerte-donnees">Graphiques indisponibles (bibliothèque non chargée — connexion ?). Les chiffres ci-dessus restent exacts.</p>`);
@@ -177,13 +188,6 @@
     }));
 
     const oc = optionsCommunes();
-    graphiques.push(new Chart(document.getElementById("graph-cumul"), {
-      type: "line",
-      data: { labels: pointsCumul.map((p) => libelleGroupeJour(p.date)), datasets: [{ label: "Résultat net cumulé", data: pointsCumul.map((p) => p.cumul), borderColor: COULEURS.ligne, backgroundColor: "rgba(34,211,238,0.10)", fill: true, borderWidth: 2, pointRadius: pointsCumul.length > 40 ? 0 : 3, pointHoverRadius: 5, tension: 0.2 }] },
-      options: { ...oc, interaction: { mode: "index", intersect: false }, plugins: { ...oc.plugins, legend: { display: false },
-        tooltip: { ...oc.plugins.tooltip, callbacks: { label: (c) => ` Cumul : ${m(c.parsed.y, { signe: true })}` } } } },
-    }));
-
     const cles = [...groupes.keys()];
     graphiques.push(new Chart(document.getElementById("graph-barres"), {
       type: "bar",
@@ -192,11 +196,6 @@
       options: { ...oc, plugins: { ...oc.plugins, legend: { display: false },
         tooltip: { ...oc.plugins.tooltip, callbacks: { label: (c) => ` ${c.parsed.y >= 0 ? "▲ Gain" : "▼ Perte"} : ${m(c.parsed.y, { signe: true })}` } } } },
     }));
-  }
-
-  function libelleGroupeJour(dateIso) {
-    const [a, mo, j] = dateIso.split("-").map(Number);
-    return new Date(a, mo - 1, j).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
   }
 
   async function rafraichir({ recharger = true } = {}) {
@@ -235,6 +234,7 @@
       document.querySelectorAll("#filtres-periode-perf [data-periode]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
       rafraichir({ recharger: false });
     });
+    U().basculerSections(document.getElementById("contenu-performance"), ouvertes);
     document.getElementById("contenu-performance")?.addEventListener("click", (e) => {
       const b = e.target.closest("[data-regroupement]");
       if (!b) return;

@@ -79,6 +79,60 @@
     return { data, error, absente };
   }
 
+  // Petite courbe façon TopOne (cartes « Mes comptes », Analyse, Performance) :
+  // valeurs successives, verte si on finit plus haut qu'au départ, rouge sinon.
+  let numeroCourbe = 0;
+  function courbe(valeurs) {
+    const v = (valeurs || []).filter(Number.isFinite);
+    if (v.length < 2) v.unshift(v[0] ?? 0);
+    const min = Math.min(...v), max = Math.max(...v), h = max - min || 1;
+    const L = 300, H = 64;
+    const pts = v.map((y, i) => [(i / (v.length - 1)) * L, 4 + (1 - (y - min) / h) * (H - 8)]);
+    const ligne = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+    const hausse = v[v.length - 1] >= v[0];
+    const id = `degrade-courbe-${++numeroCourbe}`;
+    return `<svg class="courbe-compte ${hausse ? "hausse" : "baisse"}" viewBox="0 0 ${L} ${H}" preserveAspectRatio="none" aria-hidden="true">
+      <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity="0.28"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+      <polygon points="0,${H} ${ligne} ${L},${H}" fill="url(#${id})"/>
+      <polyline points="${ligne}" fill="none" stroke="currentColor" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+    </svg>`;
+  }
+
+  // Carte repliable façon « Mes comptes » : tête (titre, résumé, flèche) à
+  // toucher pour ouvrir / fermer le contenu. `ouvertes` (Set de clés) garde
+  // l'état quand la page est redessinée ; voir basculerSections().
+  function carteSection({ cle, titre, resume = "", contenu, ouvertes }) {
+    const ouvert = ouvertes.has(cle);
+    return `<section class="carte-section${ouvert ? " ouverte" : ""}" data-section="${esc(cle)}">
+      <div class="tete-carte-section" role="button" tabindex="0" aria-expanded="${ouvert}">
+        <strong>${esc(titre)}</strong>
+        <span class="resume-section">${resume}<span class="fleche-compte" aria-hidden="true">›</span></span>
+      </div>
+      <div class="contenu-section">${contenu}</div>
+    </section>`;
+  }
+
+  // À appeler une fois par zone : ouvre / ferme les cartes de carteSection().
+  function basculerSections(zone, ouvertes) {
+    if (!zone) return;
+    const basculer = (tete) => {
+      const carte = tete.closest(".carte-section");
+      const ouvert = carte.classList.toggle("ouverte");
+      tete.setAttribute("aria-expanded", String(ouvert));
+      if (ouvert) ouvertes.add(carte.dataset.section); else ouvertes.delete(carte.dataset.section);
+    };
+    zone.addEventListener("click", (e) => {
+      const tete = e.target.closest(".tete-carte-section");
+      if (tete) basculer(tete);
+    });
+    zone.addEventListener("keydown", (e) => {
+      const tete = e.target.closest(".tete-carte-section");
+      if (!tete || (e.key !== "Enter" && e.key !== " ")) return;
+      e.preventDefault();
+      basculer(tete);
+    });
+  }
+
   window.GoldAI = window.GoldAI || {};
-  window.GoldAI.utils = { esc, fuseau, definirFuseau, formaterDate, heure, jourHeure, jourLong, cleJour, depuis, compteARebours, montant, nombre, rpc, FUSEAU_DEFAUT };
+  window.GoldAI.utils = { esc, fuseau, definirFuseau, formaterDate, heure, jourHeure, jourLong, cleJour, depuis, compteARebours, montant, nombre, rpc, courbe, carteSection, basculerSections, FUSEAU_DEFAUT };
 })();

@@ -20,6 +20,8 @@
   const J = () => window.GoldAI.journal;
 
   let positions = null; // { idTrade: [résultats par position] }, chargé une fois par session
+  let periode = "tout"; // puces 30 jours / 90 jours / Tout
+  const ouvertes = new Set(["conseils"]); // cartes ouvertes (gardées quand la page est redessinée)
 
   const ouverte = () => $("section-journal")?.classList.contains("actif") && !$("journal-analyse")?.classList.contains("hidden");
   const argent = (v, signe = false) => U.montant(v, "USD", { signe });
@@ -44,7 +46,6 @@
   }
 
   function tradesRetenus() {
-    const periode = $("periode-analyse")?.value || "tout";
     let trades = J().filtrerParCompte(J().obtenirTradesBruts());
     if (periode !== "tout") {
       const debut = U.cleJour(Date.now() - Number(periode) * 86400000);
@@ -71,17 +72,36 @@
   // Grille de cases (jours ou heures) : libellé, résultat, % gagnants.
   function grille(groupes, libelle, uneLigne = false) {
     const maxAbs = Math.max(0, ...groupes.map((g) => Math.abs(g.net)));
-    const style = uneLigne ? ` style="grid-template-columns:repeat(${groupes.length}, 1fr)"` : "";
+    const style = uneLigne ? ` style="grid-template-columns:repeat(${groupes.length}, minmax(0, 1fr))"` : "";
     return `<div class="grille-cases-analyse"${style}>${groupes.map((g) => `
       <div class="case-analyse ${g.nb ? "" : "vide"}" ${teinte(g.net, g.nb, maxAbs)}
         title="${esc(libelle(g))} : ${g.nb} trade${g.nb > 1 ? "s" : ""}, ${pct(g.taux)} gagnants, ${esc(argent(g.net, true))}">
         <span class="lib-case">${esc(libelle(g))}</span>
         <strong class="val-case">${g.nb ? compact(g.net) : "—"}</strong>
-        <span class="sous-case">${g.nb ? `${pct(g.taux)} gagn.` : "aucun"}</span>
+        <span class="sous-case">${g.nb ? `${pct(g.taux)}${uneLigne ? "" : " gagn."}` : "aucun"}</span>
       </div>`).join("")}</div>`;
   }
 
-  function dessiner(r) {
+  // Libellé de la période choisie (badge de la carte Résumé).
+  const nomPeriode = () => ({ 30: "30 jours", 90: "90 jours" })[periode] || "Depuis le début";
+
+  // Courbe du résumé : résultat cumulé jour après jour.
+  function valeursCumul(trades) {
+    const parJour = {};
+    trades.forEach((t) => { parJour[t.date] = (parJour[t.date] || 0) + Number(t.resultat) - (Number(t.frais) || 0); });
+    let cumul = 0;
+    return [0, ...Object.keys(parJour).sort().map((j) => (cumul += parJour[j]))];
+  }
+
+  // Meilleur groupe (jour, heure…) pour le résumé d'une carte : « Mar +320 $ ».
+  function meilleur(groupes, libelle) {
+    const avec = groupes.filter((g) => g.nb);
+    if (!avec.length) return "";
+    const g = avec.reduce((x, y) => (y.net > x.net ? y : x));
+    return `<span class="${g.net >= 0 ? "positif" : "negatif"}">${esc(libelle(g))} ${court(g.net)}</span>`;
+  }
+
+  function dessiner(r, trades) {
     const zone = $("contenu-analyse-trades");
     if (!r.nb) {
       zone.innerHTML = `<p class="etat-vide">Aucun trade dans le journal pour ce compte et cette période.</p>`;
@@ -90,57 +110,60 @@
     const icone = { attention: "!", ok: "✓", info: "i" };
     const ordre = { attention: 0, ok: 1, info: 2 }; // les alertes d'abord
     const conseils = [...r.conseils].sort((a, b) => (ordre[a.niveau] ?? 3) - (ordre[b.niveau] ?? 3));
+    const alertes = conseils.filter((c) => c.niveau === "attention").length;
     const gm = r.gainMoyen, pm = r.perteMoyenne, somme = gm + pm;
     const sens = [["Achats", r.parSens.buy], ["Ventes", r.parSens.sell]];
     const jours = r.parJour.map((g) => ({ ...g, court: g.nom.slice(0, 3) }));
+    const nomJour = (g) => g.court.charAt(0).toUpperCase() + g.court.slice(1);
+    const carte = (o) => U.carteSection({ ...o, ouvertes });
 
     zone.innerHTML = `
-      <div class="kpi-analyse">
-        <div class="kpi">
-          <span class="lib-kpi">Réussite</span>
-          <span class="anneau-kpi" style="--p:${Math.round(r.taux)}"><strong>${pct(r.taux)}</strong></span>
-          <span class="sous-kpi">${r.gagnants} gagnant${r.gagnants > 1 ? "s" : ""} sur ${r.nb}</span>
+      <div class="carte-section carte-resume">
+        <div class="titre-carte-compte"><strong>Résumé</strong><span class="badge-periode">${esc(nomPeriode())}</span></div>
+        ${U.courbe(valeursCumul(trades))}
+        <div class="chiffres-carte-compte">
+          <div><span class="lib">Résultat</span><span class="val ${r.total >= 0 ? "positif" : "negatif"}">${court(r.total)}</span></div>
+          <div class="droite"><span class="lib">Réussite</span><span class="val">${pct(r.taux)}</span></div>
         </div>
-        <div class="kpi">
-          <span class="lib-kpi">Résultat</span>
-          <strong class="grand-kpi ${r.total >= 0 ? "positif" : "negatif"}">${court(r.total)}</strong>
-          <span class="sous-kpi">${r.nb} trade${r.nb > 1 ? "s" : ""}</span>
+        ${gm || pm ? `<div class="moyennes-analyse">
+          <div class="entete-moyennes"><span>Gain moyen <strong class="positif">${court(gm)}</strong></span><span>Perte moyenne <strong class="negatif">${court(-pm)}</strong></span></div>
+          <div class="barre-moyennes" role="img" aria-label="Gain moyen ${court(gm)}, perte moyenne ${court(-pm)}">
+            <span class="gain" style="flex:${somme ? gm / somme : 0.5}"></span><span class="perte" style="flex:${somme ? pm / somme : 0.5}"></span>
+          </div>
+        </div>` : ""}
+        <div class="pied-carte-compte">
+          <span class="texte-attenue">${r.nb} trade${r.nb > 1 ? "s" : ""}</span>
+          <span class="texte-attenue">${r.gagnants} gagnant${r.gagnants > 1 ? "s" : ""}</span>
         </div>
       </div>
 
-      ${gm || pm ? `<div class="moyennes-analyse">
-        <div class="entete-moyennes"><span>Gain moyen <strong class="positif">${court(gm)}</strong></span><span>Perte moyenne <strong class="negatif">${court(-pm)}</strong></span></div>
-        <div class="barre-moyennes" role="img" aria-label="Gain moyen ${court(gm)}, perte moyenne ${court(-pm)}">
-          <span class="gain" style="flex:${somme ? gm / somme : 0.5}"></span><span class="perte" style="flex:${somme ? pm / somme : 0.5}"></span>
-        </div>
-      </div>` : ""}
+      ${carte({ cle: "conseils", titre: "À retenir",
+        resume: alertes ? `<span class="pastille-alerte">${alertes} alerte${alertes > 1 ? "s" : ""}</span>` : "",
+        contenu: conseils.length ? `<ul class="conseils-analyse">${conseils.map((c) => `<li class="${c.niveau}"><span class="icone-conseil" aria-hidden="true">${icone[c.niveau] || "•"}</span><span>${esc(c.texte)}</span></li>`).join("")}</ul>`
+          : `<p class="texte-attenue petit">Rien de marquant pour l'instant.</p>` })}
 
-      <h4 class="sous-titre-analyse">À retenir</h4>
-      ${conseils.length ? `<ul class="conseils-analyse">${conseils.map((c) => `<li class="${c.niveau}"><span class="icone-conseil" aria-hidden="true">${icone[c.niveau] || "•"}</span><span>${esc(c.texte)}</span></li>`).join("")}</ul>`
-        : `<p class="texte-attenue petit">Rien de marquant pour l'instant.</p>`}
+      ${carte({ cle: "jours", titre: "Jours de la semaine", resume: meilleur(jours, nomJour),
+        contenu: grille(jours, nomJour, true) })}
 
-      <h4 class="sous-titre-analyse">Jours de la semaine</h4>
-      ${grille(jours, (g) => g.court.charAt(0).toUpperCase() + g.court.slice(1), true)}
+      ${carte({ cle: "heures", titre: "Heures d'ouverture", resume: meilleur(r.parHeure, (g) => `${g.heure}h`),
+        contenu: r.parHeure.length ? grille(r.parHeure, (g) => `${g.heure}h`) : `<p class="texte-attenue petit">Seuls les trades importés de TradeLocker ont une heure.</p>` })}
 
-      <h4 class="sous-titre-analyse">Heures d'ouverture</h4>
-      ${r.parHeure.length ? grille(r.parHeure, (g) => `${g.heure}h`) : `<p class="texte-attenue petit">Seuls les trades importés de TradeLocker ont une heure.</p>`}
+      ${carte({ cle: "sens", titre: "Achats / ventes", resume: meilleur(sens.map(([nom, g]) => ({ ...g, nom })), (g) => g.nom),
+        contenu: `<div class="sens-analyse">${sens.map(([nom, g]) => `
+          <div class="bloc-sens ${g.nb ? "" : "vide"}">
+            <span class="lib-kpi">${nom}</span>
+            <strong class="${g.net >= 0 ? "positif" : "negatif"}">${g.nb ? court(g.net) : "—"}</strong>
+            <div class="barre-sens" role="img" aria-label="${pct(g.taux)} gagnants"><span style="width:${g.taux}%"></span></div>
+            <span class="sous-kpi">${g.nb ? `${pct(g.taux)} gagnants · ${g.nb} trade${g.nb > 1 ? "s" : ""}` : "aucun trade"}</span>
+          </div>`).join("")}</div>` })}
 
-      <h4 class="sous-titre-analyse">Achats / ventes</h4>
-      <div class="sens-analyse">${sens.map(([nom, g]) => `
-        <div class="bloc-sens ${g.nb ? "" : "vide"}">
-          <span class="lib-kpi">${nom}</span>
-          <strong class="${g.net >= 0 ? "positif" : "negatif"}">${g.nb ? court(g.net) : "—"}</strong>
-          <div class="barre-sens" role="img" aria-label="${pct(g.taux)} gagnants"><span style="width:${g.taux}%"></span></div>
-          <span class="sous-kpi">${g.nb ? `${pct(g.taux)} gagnants · ${g.nb} trade${g.nb > 1 ? "s" : ""}` : "aucun trade"}</span>
-        </div>`).join("")}</div>
-
-      ${r.tps.length ? `<h4 class="sous-titre-analyse">TP atteints</h4>
-      <div class="tps-analyse">${r.tps.map((tp) => `
-        <div class="tp-analyse">
-          <span class="anneau-kpi petit-anneau" style="--p:${Math.round(tp.pct)}"><strong>${pct(tp.pct)}</strong></span>
-          <span class="lib-kpi">TP${tp.numero}</span>
-          <span class="sous-kpi">${tp.atteints} / ${tp.total}</span>
-        </div>`).join("")}</div>` : ""}`;
+      ${r.tps.length ? carte({ cle: "tps", titre: "TP atteints", resume: `<span>TP1 ${pct(r.tps[0].pct)}</span>`,
+        contenu: `<div class="tps-analyse">${r.tps.map((tp) => `
+          <div class="tp-analyse">
+            <span class="anneau-kpi petit-anneau" style="--p:${Math.round(tp.pct)}"><strong>${pct(tp.pct)}</strong></span>
+            <span class="lib-kpi">TP${tp.numero}</span>
+            <span class="sous-kpi">${tp.atteints} / ${tp.total}</span>
+          </div>`).join("")}</div>` }) : ""}`;
   }
 
   let enCours = null;
@@ -151,7 +174,8 @@
       if (!filtreLu) { filtreLu = true; J().lireFiltreMemorise(); } // une seule fois : l'événement du filtre relance afficher()
       J().afficherSelecteurCompte("choix-compte-analyse");
       await Promise.all([J().chargerTousLesTrades(), chargerPositions()]);
-      dessiner(N.analyserTrades(tradesRetenus(), { positions, moment }));
+      const trades = tradesRetenus();
+      dessiner(N.analyserTrades(trades, { positions, moment }), trades);
     })();
     enCours = tache;
     try { await tache; } finally { if (enCours === tache) enCours = null; }
@@ -159,7 +183,14 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     $("choix-compte-analyse")?.addEventListener("change", (e) => J().changerFiltreCompte(e.target.value));
-    $("periode-analyse")?.addEventListener("change", afficher);
+    $("filtres-periode-analyse")?.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-periode]");
+      if (!b) return;
+      periode = b.dataset.periode;
+      document.querySelectorAll("#filtres-periode-analyse [data-periode]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      afficher();
+    });
+    U.basculerSections($("contenu-analyse-trades"), ouvertes);
     $("bouton-ouvrir-analyse-trades")?.addEventListener("click", () => {
       $("journal-accueil").classList.add("hidden");
       $("journal-analyse").classList.remove("hidden");

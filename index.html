@@ -284,23 +284,15 @@
       <!-- Vue Analyse de mes trades (js/analyse-trades.js), ouverte par sa tuile -->
       <div id="journal-analyse" class="hidden">
         <button type="button" class="bouton-retour" id="bouton-retour-analyse-trades"><span aria-hidden="true">←</span> Retour</button>
-      <div class="carte" id="carte-analyse-trades">
-        <h3 class="titre-bloc"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg> Analyse de mes trades</h3>
-        <div class="ligne-champs">
-          <div class="champ">
-            <label for="periode-analyse">Période</label>
-            <select id="periode-analyse">
-              <option value="30">30 derniers jours</option>
-              <option value="90">90 derniers jours</option>
-              <option value="tout" selected>Depuis le début</option>
-            </select>
-          </div>
+        <div class="barre-filtres" id="filtres-periode-analyse" role="group" aria-label="Période">
+          <button type="button" class="puce-filtre" data-periode="30" aria-pressed="false">30 jours</button>
+          <button type="button" class="puce-filtre" data-periode="90" aria-pressed="false">90 jours</button>
+          <button type="button" class="puce-filtre" data-periode="tout" aria-pressed="true">Tout</button>
         </div>
-        <div id="contenu-analyse-trades"><p class="etat-vide">Chargement…</p></div>
+        <!-- Cartes façon « Mes comptes » : résumé (courbe, résultat, réussite) puis sections à toucher pour ouvrir -->
+        <div id="contenu-analyse-trades" class="pile-cartes"><p class="etat-vide">Chargement…</p></div>
         <!-- Choix du compte, tout en bas -->
         <div class="champ choix-compte-journal choix-compte-bas hidden" id="choix-compte-analyse"></div>
-      </div>
-
       </div>
 
 
@@ -340,7 +332,7 @@
           <button type="button" class="puce-filtre" data-periode="tout" aria-pressed="false">Tout</button>
         </div>
 
-        <div id="contenu-performance"></div>
+        <div id="contenu-performance" class="pile-cartes"></div>
 
         <!-- Comptes TopOne tout en bas : choix du compte + suivi du challenge (js/challenge-comptes.js) -->
         <div class="champ choix-compte-journal choix-compte-bas hidden" id="choix-compte-performance"></div>
